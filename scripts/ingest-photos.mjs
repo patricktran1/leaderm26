@@ -65,15 +65,23 @@ const warn = (...args) => console.warn('[photos]', ...args);
  * are all the same frame, so they all reduce to `DSC01757`.
  */
 export function photoId(filename) {
-  return path
-    .basename(filename, path.extname(filename))
-    .replace(/[ _-]*\(?\d+\)?$/i, (match) => (/^[ _-]*\(\d+\)$/.test(match) ? '' : match))
-    .replace(/[ _-]*(copy|edited|edit|original|large|small|full|hi ?res|export(ed)?)$/i, '')
-    .replace(/[ _-]*copy[ _-]*\d*$/i, '')
-    .replace(/\s+/g, '-')
-    .replace(/[^A-Za-z0-9._-]/g, '')
-    .replace(/^[-.]+|[-.]+$/g, '')
-    .slice(0, 60) || 'photo';
+  return (
+    path
+      .basename(filename, path.extname(filename))
+      // "(2)" is a copy; "IMG_7885" is a photograph. Only the bracketed form goes.
+      .replace(/[ _-]*\(\d+\)$/, '')
+      .replace(/[ _-]*(copy|edited|edit|original|large|small|full|hi ?res|export(ed)?)$/i, '')
+      .replace(/[ _-]*copy[ _-]*\d*$/i, '')
+      // "café" should stay legible as "cafe" rather than losing the letter.
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^A-Za-z0-9._-]/g, '-')
+      .replace(/-{2,}/g, '-')
+      .replace(/^[-._]+|[-._]+$/g, '')
+      .slice(0, 60)
+      .replace(/[-._]+$/, '') || 'photo'
+  );
 }
 
 /**

@@ -42,7 +42,18 @@ describe('photoId', () => {
 
   it('never returns an empty or unsafe id', () => {
     expect(photoId('....jpg')).toBe('photo');
-    expect(photoId('a photo/with spaces & symbols!.jpg')).toBe('with-spaces--symbols');
+    expect(photoId('a photo/with spaces & symbols!.jpg')).toBe('with-spaces-symbols');
+    expect(photoId('x'.repeat(200) + '.jpg')).toHaveLength(60);
+  });
+
+  it('keeps an accented name legible instead of dropping the letter', () => {
+    expect(photoId('café & friends #1.jpg')).toBe('cafe-friends-1');
+    expect(photoId('Ünïcodé Ñame.JPG')).toBe('Unicode-Name');
+  });
+
+  it('does not confuse two photographs with a number in the name', () => {
+    expect(photoId('beach 1.jpg')).toBe('beach-1');
+    expect(photoId('beach 2.jpg')).toBe('beach-2');
   });
 });
 
