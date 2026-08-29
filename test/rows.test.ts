@@ -26,9 +26,9 @@ describe('buildRows', () => {
       make('lead', 0.75, 'lead'),
       make('b', 0.75, 'minor'),
     ]);
-    const lead = rows.find((r) => r.kind === 'lead');
+    const lead = rows.find((r) => r.items.some((p) => p.id === 'lead'));
+    expect(lead?.kind).toBe('lead');
     expect(lead?.items).toHaveLength(1);
-    expect(lead?.items[0]?.id).toBe('lead');
   });
 
   it('never drops or duplicates a photograph', () => {
@@ -71,5 +71,29 @@ describe('buildRows', () => {
       expect(row.fill).toBeGreaterThan(0);
       expect(row.fill).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe('buildRows — stranded frames', () => {
+  const make = (id: string, ratio: number, weight: Weight): ResolvedPhoto =>
+    ({
+      id,
+      caption: id,
+      alt: `${id} alt text long enough to pass.`,
+      category: 'room',
+      weight,
+      ratio,
+      orientation: ratio > 1 ? 'landscape' : 'portrait',
+      image: { src: '', width: Math.round(600 * ratio), height: 600, format: 'webp' },
+    }) as unknown as ResolvedPhoto;
+
+  it('promotes a frame with nowhere to fold into a plate', () => {
+    const rows = buildRows([
+      make('lead-a', 0.75, 'lead'),
+      make('stranded', 0.75, 'minor'),
+      make('lead-b', 0.75, 'lead'),
+    ]);
+    expect(rows.map((r) => r.kind)).toEqual(['lead', 'lead', 'lead']);
+    expect(rows.every((r) => r.fill === 1)).toBe(true);
   });
 });

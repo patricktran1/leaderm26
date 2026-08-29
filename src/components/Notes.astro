@@ -1,95 +1,98 @@
 ---
-import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
-import { byPhotoId } from '../data/gallery';
-
-const card = byPhotoId('DSC01783');
 
 const notes = [
   {
-    n: '01',
     title: 'The room is the argument',
     body: `Twenty round tables and a low stage. No auditorium rake, no back row to hide in,
     no seat far from a faculty member. You can read a conference's real thesis off its floor
     plan, and this one says the learning happens sideways.`,
   },
   {
-    n: '02',
     title: 'Values before tactics',
-    body: `The 2026 meeting is titled Strong Ground, and the programming keeps returning to
-    the same order of operations: work out what you actually value, then choose the practice,
-    the partners and the technology. Most of medicine's business advice runs that backwards.`,
+    body: `The programming keeps returning to the same order of operations: work out what
+    you actually value, then choose the practice, the partners and the technology. Most of
+    medicine's business advice runs that backwards.`,
   },
   {
-    n: '03',
-    title: 'Technology arrives as a leadership question',
+    title: 'Technology as a management question',
     body: `Artificial intelligence turns up on the agenda not as a product demo but as a
-    management problem — what it does to training, to how a team is built, to the shape of a
-    patient's visit. That is a more useful frame than another tool comparison.`,
+    question about training, about how a team is built, about the shape of a patient's visit.
+    That is a more useful frame than another tool comparison.`,
   },
 ];
 ---
 
-<section class="section on-night" id="notes">
+<section class="section on-night" id="notes" aria-labelledby="notes-title">
   <div class="shell">
-    <SectionHead num="04" label="Field notes" title="Three things worth writing down.">
+    <SectionHead section="notes" title="Three things worth writing down.">
       <p class="prose">
-        Observations, not reporting. What follows is one attendee's reading of the room.
+        What follows is opinion — one attendee's reading of the room, not reporting.
       </p>
     </SectionHead>
 
-    <div class="notes__grid">
-      <ol class="notes__list">
-        {notes.map((note, i) => (
-          <li class="note reveal" style={`--reveal-delay:${i * 80}ms`}>
-            <span class="label note__n">{note.n}</span>
-            <h3 class="h3 note__t">{note.title}</h3>
-            <p class="note__b">{note.body}</p>
-          </li>
-        ))}
-      </ol>
+    <figure class="pull reveal">
+      <blockquote>
+        <p class="pull__line">
+          Leadership isn’t always quiet. Sometimes the best ideas make a little noise.
+        </p>
+      </blockquote>
+      <figcaption class="pull__source">
+        Printed on the entrepreneurship table, beside a bowl of Pop Rocks
+      </figcaption>
+    </figure>
 
-      <div class="notes__media">
-        <figure class="reveal">
-          <div class="frame notes__frame">
-            <Image
-              src={card.image}
-              alt={card.alt}
-              widths={[400, 600, 720]}
-              sizes="(min-width: 62rem) 26rem, min(28rem, calc(100vw - 2.5rem))"
-              quality={84}
-              loading="lazy"
-            />
-          </div>
-          <figcaption class="notes__cap">
-            Left on the entrepreneurship table, beside a bowl of Pop Rocks.
-          </figcaption>
-        </figure>
-
-        <blockquote class="pull reveal">
-          <p class="serif-note">
-            “Leadership isn’t always quiet. Sometimes the best ideas make a little noise.”
-          </p>
-          <cite class="notes__cap">Printed table card, LEADderm 2026</cite>
-        </blockquote>
-      </div>
-    </div>
+    <ol class="notes__row">
+      {notes.map((note, i) => (
+        <li class="note reveal" style={`--reveal-delay:${i * 80}ms`}>
+          <span class="label note__n">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="h3 note__t balance">{note.title}</h3>
+          <p class="note__b">{note.body}</p>
+        </li>
+      ))}
+    </ol>
   </div>
 </section>
 
 <style>
-  .notes__grid {
-    margin-top: clamp(2.5rem, 6vw, 4.5rem);
-    display: grid;
-    gap: clamp(2.5rem, 6vw, 5rem);
+  .pull {
+    margin: clamp(3rem, 8vw, 6rem) 0 clamp(3rem, 7vw, 5rem);
+    max-width: 46rem;
   }
-  @media (min-width: 62rem) {
-    .notes__grid { grid-template-columns: minmax(0, 1fr) 26rem; align-items: start; }
+  .pull blockquote { margin: 0; }
+  .pull__line {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(1.75rem, 4.6vw, 3.25rem);
+    line-height: 1.12;
+    letter-spacing: -0.022em;
+    color: var(--ink-on-night);
+    text-wrap: balance;
+  }
+  .pull__source {
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+    padding-left: 1rem;
+    border-left: 1px solid var(--pine-bright);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: #9a9da2;
+    max-width: 30rem;
   }
 
-  .notes__list { display: grid; border-top: 1px solid var(--rule-on-night); }
+  .notes__row {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--rule-on-night);
+  }
+  @media (min-width: 54rem) {
+    .notes__row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: clamp(1.75rem, 4vw, 3.5rem);
+    }
+  }
   .note {
     display: grid;
+    align-content: start;
     gap: 0.55rem;
     padding-block: clamp(1.5rem, 3vw, 2.25rem);
     border-bottom: 1px solid var(--rule-on-night);
@@ -100,23 +103,5 @@ const notes = [
     font-size: 0.9375rem;
     line-height: 1.68;
     color: var(--ink-2-on-night);
-    max-width: 36rem;
-  }
-
-  .notes__media { display: grid; gap: clamp(1.75rem, 4vw, 2.5rem); max-width: 28rem; }
-  @media (min-width: 62rem) { .notes__media { max-width: none; } }
-  .notes__frame { background: var(--night-soft); }
-  .notes__cap {
-    display: block;
-    margin-top: 0.7rem;
-    font-size: 0.75rem;
-    font-style: normal;
-    color: #83868c;
-    line-height: 1.5;
-  }
-  .pull {
-    margin: 0;
-    padding-left: clamp(1rem, 2vw, 1.5rem);
-    border-left: 1px solid var(--pine-bright);
   }
 </style>

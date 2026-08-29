@@ -1,15 +1,15 @@
 ---
 import { Image } from 'astro:assets';
-import { conference } from '../data/site';
+import { conference, author } from '../data/site';
 import { byPhotoId } from '../data/gallery';
 
 const cover = byPhotoId('IMG_7885');
 
-const meta = [
-  { k: 'Dates', v: conference.dates },
-  { k: 'Venue', v: conference.venue },
-  { k: 'Edition', v: `${conference.edition} meeting` },
-  { k: 'Theme', v: conference.theme },
+const dateline = [
+  conference.dates,
+  conference.venue,
+  `${conference.edition} meeting`,
+  `Theme: ${conference.theme}`,
 ];
 ---
 
@@ -23,8 +23,10 @@ const meta = [
       <p class="lede reveal" style="--reveal-delay:160ms">
         LEADderm gathers dermatologists, physician associates, nurse practitioners and
         industry partners around the part of the job medicine rarely teaches — leadership,
-        community, and the ground you stand on. These are notes and photographs from the
-        third annual meeting.
+        community, and the ground you stand on.
+      </p>
+      <p class="byline reveal" style="--reveal-delay:200ms">
+        Photographs and notes by {author.name}
       </p>
     </div>
 
@@ -40,32 +42,36 @@ const meta = [
           fetchpriority="high"
         />
       </div>
-      <figcaption class="hero__cap">
-        <span>{cover.caption}</span>
-        <span class="hero__cap-place">{conference.venue}</span>
-      </figcaption>
+      <figcaption class="hero__cap">{cover.caption} · {conference.venue}</figcaption>
     </figure>
   </div>
 
   <div class="shell">
-    <dl class="dateline">
-      {meta.map((m, i) => (
-        <div class="dateline__item reveal" style={`--reveal-delay:${i * 60}ms`}>
-          <dt class="label">{m.k}</dt>
-          <dd class="dateline__v">{m.v}</dd>
-        </div>
+    <p class="dateline reveal">
+      {dateline.map((item, i) => (
+        <>
+          {i > 0 && <span class="dateline__sep" aria-hidden="true">·</span>}
+          <span>{item}</span>
+        </>
       ))}
-    </dl>
+    </p>
   </div>
 </section>
 
 <style>
-  .hero { padding-block: clamp(2.5rem, 7vw, 6rem) 0; }
+  .hero { padding-block: clamp(2.25rem, 6vw, 5rem) 0; }
+
+  .byline {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink-3);
+    max-width: 30rem;
+  }
 
   .hero__grid {
     display: grid;
     gap: clamp(2.25rem, 5vw, 4rem);
-    align-items: end;
+    align-items: start;
   }
   @media (min-width: 62rem) {
     .hero__grid {
@@ -86,49 +92,36 @@ const meta = [
      column layouts cap the frame rather than stretching it across a tablet. */
   .hero__figure { margin: 0; max-width: 26rem; }
   @media (min-width: 62rem) { .hero__figure { max-width: none; } }
-  .hero__frame { aspect-ratio: 3 / 4; }
+  /* Cropped past the ceiling: the frame is 4:5 and biased down the picture so
+     the screen and the speaker carry it, not the light fittings. */
+  .hero__frame { aspect-ratio: 4 / 5; }
+  .hero__frame :global(img) { object-position: 50% 64%; }
   .hero__frame :global(img) {
     transform: scale(1.001);
   }
 
   .hero__cap {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
     margin-top: 0.85rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.02em;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    letter-spacing: 0.01em;
     color: var(--ink-3);
+    text-wrap: balance;
   }
-  .hero__cap-place { color: var(--ink-3); }
 
   .dateline {
-    margin-top: clamp(3rem, 7vw, 5.5rem);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-block: clamp(0.9rem, 1.8vw, 1.25rem);
     border-top: 1px solid var(--ink);
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  @media (min-width: 48rem) {
-    .dateline { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  }
-  .dateline__item {
-    padding: clamp(1rem, 2.2vw, 1.5rem) 0;
-    padding-right: 1rem;
     border-bottom: 1px solid var(--rule);
-  }
-  @media (min-width: 48rem) {
-    .dateline__item { border-bottom: 0; }
-    .dateline__item + .dateline__item {
-      border-left: 1px solid var(--rule);
-      padding-left: clamp(1rem, 2.4vw, 2rem);
-    }
-  }
-  .dateline__v {
-    margin-top: 0.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.85rem;
     font-family: var(--serif);
-    font-size: clamp(1rem, 1.5vw, 1.25rem);
-    font-weight: 400;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    font-size: clamp(0.9375rem, 1.2vw, 1.125rem);
+    line-height: 1.35;
+    letter-spacing: -0.005em;
   }
+  .dateline__sep { color: var(--ink-3); }
 </style>

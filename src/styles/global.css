@@ -34,7 +34,7 @@
   /* Ink */
   --ink: #14161a;
   --ink-2: #43474d;
-  --ink-3: #74777d;
+  --ink-3: #686b71; /* 4.78:1 on --paper */
   --ink-on-night: #f0ede7;
   --ink-2-on-night: #a2a5a9;
 
@@ -103,7 +103,13 @@ button { font: inherit; color: inherit; }
 .section { padding-block: var(--section-y); }
 .section--tight { padding-block: clamp(3rem, 6vw, 6rem); }
 
-.rule-top { border-top: 1px solid var(--rule); }
+/* One rule system: every hairline on the page starts and ends at the text
+   column, never at the viewport edge. */
+.rule-top { padding-block-start: 0; }
+.rule-top > .shell:first-child {
+  border-top: 1px solid var(--rule);
+  padding-block-start: var(--section-y);
+}
 
 /* ---------------------------------------------------------- typography -- */
 .display {
@@ -142,7 +148,7 @@ button { font: inherit; color: inherit; }
   text-wrap: pretty;
 }
 
-.prose { max-width: var(--measure); }
+.prose,
 .prose p {
   font-size: 1.0625rem;
   line-height: 1.68;
@@ -160,6 +166,8 @@ button { font: inherit; color: inherit; }
   color: var(--ink-3);
   line-height: 1.4;
 }
+
+.balance { text-wrap: balance; }
 
 .serif-note {
   font-family: var(--serif);
@@ -180,7 +188,7 @@ button { font: inherit; color: inherit; }
 }
 @media (min-width: 56rem) {
   .sec-head {
-    grid-template-columns: 10rem minmax(0, 1fr);
+    grid-template-columns: 11rem minmax(0, 1fr);
     gap: clamp(2rem, 5vw, 5rem);
   }
 }
@@ -189,6 +197,7 @@ button { font: inherit; color: inherit; }
   align-items: baseline;
   gap: 0.75rem;
 }
+.sec-head__index .label { white-space: nowrap; }
 .sec-head__num {
   font-family: var(--serif);
   font-size: 0.9375rem;
@@ -213,7 +222,8 @@ a { color: inherit; }
 
 .arrow-link {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
+  min-height: 2.75rem;
   gap: 0.55em;
   font-size: 0.875rem;
   font-weight: 500;
@@ -233,7 +243,8 @@ a { color: inherit; }
   outline-offset: 3px;
   border-radius: 1px;
 }
-.on-night :where(a, button):focus-visible { outline-color: var(--pine-bright); }
+.on-night :where(a, button):focus-visible,
+.lb :where(a, button, [tabindex]):focus-visible { outline-color: var(--pine-bright); }
 
 /* --------------------------------------------------------------- night -- */
 .on-night {
@@ -241,11 +252,12 @@ a { color: inherit; }
   color: var(--ink-on-night);
 }
 .on-night .label { color: var(--ink-2-on-night); }
+.on-night .prose,
 .on-night .prose p,
 .on-night .lede { color: var(--ink-2-on-night); }
 .on-night .serif-note { color: var(--ink-on-night); }
 .on-night .sec-head__num { color: var(--ink-2-on-night); }
-.on-night .rule-top,
+.on-night .rule-top > .shell:first-child,
 .on-night .rule { border-color: var(--rule-on-night); }
 .on-night .arrow-link { color: var(--ink-on-night); border-color: #3b3f45; }
 .on-night .arrow-link:hover { color: var(--pine-bright); border-color: var(--pine-bright); }

@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
 import { gallery, buildRows } from '../data/gallery';
-import { CATEGORY_LABEL } from '../data/photos';
 
 const rows = buildRows(gallery);
 
@@ -14,9 +13,9 @@ const indexed = rows.map((row) => ({
 }));
 ---
 
-<section class="section rule-top" id="journal">
+<section class="section rule-top" id="journal" aria-labelledby="journal-title">
   <div class="shell">
-    <SectionHead num="02" label="Photographic journal" title="A day, in the order it happened.">
+    <SectionHead section="journal" title="A day, in the order it happened.">
       <p class="prose">
         Photographed on a small camera between sessions. No staging, no press pass — the
         arrival, the empty room, the boards people leave behind, and the twenty minutes
@@ -34,7 +33,7 @@ const indexed = rows.map((row) => ({
               class="shot__btn"
               type="button"
               data-lightbox={index}
-              aria-label={`Open larger: ${photo.caption}`}
+              aria-label={`Open larger — ${photo.caption}. ${photo.alt}`}
             >
               <span class="frame shot__frame" style={`aspect-ratio:${photo.image.width} / ${photo.image.height}`}>
                 <Image
@@ -49,9 +48,9 @@ const indexed = rows.map((row) => ({
                 />
               </span>
             </button>
-            <figcaption class="shot__cap">
-              <span class="shot__caption-text" set:html={photo.caption} />
-              <span class="shot__cat">{CATEGORY_LABEL[photo.category]}</span>
+            <figcaption class="shot__cap balance">
+              {photo.caption}
+              {row.kind === 'lead' && photo.note && <span class="shot__note">{photo.note}</span>}
             </figcaption>
           </figure>
         ))}
@@ -71,7 +70,8 @@ const indexed = rows.map((row) => ({
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: clamp(0.75rem, 2vw, 1.5rem);
+    column-gap: clamp(0.75rem, 2vw, 1.5rem);
+    row-gap: clamp(2rem, 4vw, 3.25rem);
   }
   /* flex-basis 0 + grow proportional to aspect ratio makes every frame in a
      line share one height. Ratios are scaled x4 so a lone item on a wrapped
@@ -82,8 +82,19 @@ const indexed = rows.map((row) => ({
     .jrow--run { max-width: calc(100% * var(--fill)); }
   }
 
-  .jrow--lead { justify-content: center; }
   .jrow--lead .shot { flex: 0 1 100%; }
+  /* A plate carries its caption in the column beside it, so the air to its
+     right is composition rather than leftover. */
+  @media (min-width: 62rem) {
+    .jrow--lead .shot { display: grid; grid-template-columns: 30rem 16rem; column-gap: clamp(2rem, 4vw, 3.5rem); align-items: end; }
+    .jrow--lead .shot__btn { grid-column: 1; }
+    .jrow--lead .shot__cap { grid-column: 2; margin-top: 0; padding-bottom: 0.35rem; }
+  }
+  .shot__note {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--ink-3);
+  }
   @media (min-width: 40rem) {
     .jrow--lead .shot { flex: 0 1 min(100%, 26rem); }
   }
@@ -108,23 +119,9 @@ const indexed = rows.map((row) => ({
   }
 
   .shot__cap {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.75rem;
     margin-top: 0.65rem;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     line-height: 1.45;
     color: var(--ink-2);
-  }
-  .shot__cat {
-    color: var(--ink-3);
-    font-size: 0.5625rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  @media (max-width: 30rem) {
-    .shot__cat { display: none; }
   }
 </style>

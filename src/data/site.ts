@@ -31,10 +31,24 @@ export const author = {
   instagramUrl: 'https://instagram.com/drpatricktran',
 } as const;
 
-export const nav = [
-  { href: '#gathering', label: 'The gathering' },
-  { href: '#journal', label: 'Journal' },
-  { href: '#tables', label: 'Twenty tables' },
-  { href: '#notes', label: 'Field notes' },
-  { href: '#colophon', label: 'Colophon' },
+/**
+ * One source for the section sequence: the numerals printed beside each
+ * heading, the masthead links and the mobile index all read from here, so they
+ * can never disagree.
+ */
+export const sections = [
+  { id: 'gathering', label: 'The gathering' },
+  { id: 'journal', label: 'Journal' },
+  { id: 'tables', label: 'Twenty tables' },
+  { id: 'notes', label: 'Field notes' },
+  { id: 'practice', label: 'Practice' },
+  { id: 'colophon', label: 'Colophon' },
 ] as const;
+
+export type SectionId = (typeof sections)[number]['id'];
+
+export const sectionNumber = (id: SectionId): string =>
+  String(sections.findIndex((s) => s.id === id) + 1).padStart(2, '0');
+
+export const sectionLabel = (id: SectionId): string =>
+  sections.find((s) => s.id === id)!.label;

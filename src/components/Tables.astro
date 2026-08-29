@@ -3,9 +3,9 @@ import SectionHead from './SectionHead.astro';
 import { tables } from '../data/tables';
 ---
 
-<section class="section rule-top" id="tables">
+<section class="section rule-top" id="tables" aria-labelledby="tables-title">
   <div class="shell">
-    <SectionHead num="03" label="Twenty tables" title="Twenty tables. Twenty questions worth sitting down for.">
+    <SectionHead section="tables" title="Twenty tables. Twenty questions worth sitting down for.">
       <p class="prose">
         Lunch is not lunch. Each table carries a host and a single question, printed on a board
         by the door, and you pick the conversation you want to be in. It is the quietly radical
@@ -30,18 +30,13 @@ import { tables } from '../data/tables';
   .tables__source { font-size: 0.75rem !important; color: var(--ink-3); margin-top: 0.9rem; }
   .tables__source :global(p) { font-size: 0.75rem; }
 
+  /* One column. Twenty rows is a list, not a table to be squeezed into two
+     ragged halves. */
   .tables {
     margin-top: clamp(2.5rem, 5vw, 4rem);
     border-top: 1px solid var(--ink);
     display: grid;
-  }
-  @media (min-width: 62rem) {
-    .tables {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: clamp(2.5rem, 5vw, 5rem);
-    }
-    /* Keep the rule continuous across both columns. */
-    .tables__row:nth-child(10) { border-bottom: 1px solid var(--rule); }
+    max-width: 52rem;
   }
 
   .tables__row {
@@ -54,15 +49,12 @@ import { tables } from '../data/tables';
     border-bottom: 1px solid var(--rule);
     align-items: baseline;
   }
-  @media (min-width: 48rem) {
+  @media (min-width: 44rem) {
     .tables__row {
-      grid-template-columns: 2.5rem minmax(0, 1fr) 11rem;
+      grid-template-columns: 2.5rem minmax(0, 1fr) 13rem;
       grid-template-areas: 'num theme host';
-      column-gap: 1.25rem;
+      column-gap: clamp(1.25rem, 3vw, 2.5rem);
     }
-  }
-  @media (min-width: 62rem) {
-    .tables__row { grid-template-columns: 2.5rem minmax(0, 1fr) 9.5rem; }
   }
 
   .tables__num {
@@ -79,7 +71,7 @@ import { tables } from '../data/tables';
     font-weight: 400;
     line-height: 1.3;
     letter-spacing: -0.012em;
-    text-wrap: pretty;
+    text-wrap: balance;
   }
   .tables__host {
     grid-area: host;
@@ -87,7 +79,7 @@ import { tables } from '../data/tables';
     color: var(--ink-3);
     line-height: 1.4;
   }
-  @media (min-width: 48rem) {
+  @media (min-width: 44rem) {
     .tables__host { text-align: right; }
   }
 </style>

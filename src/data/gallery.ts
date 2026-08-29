@@ -106,18 +106,19 @@ function settle(rows: GalleryRow[]): GalleryRow[] {
   for (const row of rows) {
     const previous = settled[settled.length - 1];
     const isOrphan = row.kind === 'run' && row.items.length === 1 && row.fill < 0.6;
-    if (
-      isOrphan &&
-      previous?.kind === 'run' &&
-      previous.items.length < MAX_PER_ROW &&
-      row.items[0]
-    ) {
+    if (!isOrphan) {
+      settled.push(row);
+      continue;
+    }
+    if (previous?.kind === 'run' && previous.items.length < MAX_PER_ROW && row.items[0]) {
       previous.items.push(row.items[0]);
       previous.span += row.span;
       previous.fill = 1;
       continue;
     }
-    settled.push(row);
+    // Nowhere to fold it: give it the full plate treatment so it reads as a
+    // decision rather than a leftover.
+    settled.push({ ...row, kind: 'lead', fill: 1 });
   }
 
   return settled;

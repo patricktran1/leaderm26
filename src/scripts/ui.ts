@@ -14,6 +14,46 @@ interface Slide {
 const prefersReducedMotion = (): boolean =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/** Focusable controls that are actually rendered — media queries hide some. */
+const visibleControls = (root: HTMLElement): HTMLElement[] =>
+  Array.from(root.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')).filter(
+    (el) => el.getClientRects().length > 0,
+  );
+
+/** Take the rest of the page out of the tab order and the accessibility tree. */
+const setPageInert = (inert: boolean): void => {
+  for (const selector of ['header', 'main', 'footer']) {
+    const el = document.querySelector(selector);
+    if (el) el.toggleAttribute('inert', inert);
+  }
+};
+
+/** Cycle Tab inside a dialog. Returns true when the event was handled. */
+function trapTab(event: KeyboardEvent, panel: HTMLElement): void {
+  if (event.key !== 'Tab') return;
+  const controls = visibleControls(panel);
+  if (controls.length === 0) {
+    event.preventDefault();
+    panel.focus();
+    return;
+  }
+  const first = controls[0]!;
+  const last = controls[controls.length - 1]!;
+  const active = document.activeElement;
+  if (controls.length === 1) {
+    event.preventDefault();
+    first.focus();
+    return;
+  }
+  if (event.shiftKey && (active === first || active === panel)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && active === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 /* ----------------------------------------------------------- reveal ---- */
 function initReveal(): void {
   const targets = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
@@ -60,6 +100,7 @@ function initIndexPanel(): void {
     window.setTimeout(() => panel.setAttribute('hidden', ''), prefersReducedMotion() ? 0 : 260);
     openBtn.setAttribute('aria-expanded', 'false');
     document.documentElement.style.removeProperty('overflow');
+    setPageInert(false);
     openBtn.focus();
   };
 
@@ -68,6 +109,7 @@ function initIndexPanel(): void {
     requestAnimationFrame(() => panel.setAttribute('data-open', ''));
     openBtn.setAttribute('aria-expanded', 'true');
     document.documentElement.style.overflow = 'hidden';
+    setPageInert(true);
     panel.querySelector<HTMLAnchorElement>('a')?.focus();
   };
 
@@ -75,7 +117,9 @@ function initIndexPanel(): void {
   panel.querySelector('[data-menu-close]')?.addEventListener('click', close);
   panel.querySelectorAll('[data-menu-link]').forEach((link) => link.addEventListener('click', close));
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && panel.hasAttribute('data-open')) close();
+    if (!panel.hasAttribute('data-open')) return;
+    if (event.key === 'Escape') close();
+    else trapTab(event, panel);
   });
 }
 
@@ -126,6 +170,7 @@ function initLightbox(): void {
     root.removeAttribute('data-open');
     window.setTimeout(() => root.setAttribute('hidden', ''), prefersReducedMotion() ? 0 : 260);
     document.documentElement.style.removeProperty('overflow');
+    setPageInert(false);
     opener?.focus();
     opener = null;
   };
@@ -136,6 +181,7 @@ function initLightbox(): void {
     root.removeAttribute('hidden');
     requestAnimationFrame(() => root.setAttribute('data-open', ''));
     document.documentElement.style.overflow = 'hidden';
+    setPageInert(true);
     panel.focus();
   };
 
@@ -155,25 +201,11 @@ function initLightbox(): void {
   root.querySelector('[data-lb-next]')?.addEventListener('click', () => show(current + 1));
 
   document.addEventListener('keydown', (event) => {
-    if (root.hasAttribute('hidden')) return;
+    if (!root.hasAttribute('data-open')) return;
     if (event.key === 'Escape') close();
     else if (event.key === 'ArrowLeft') show(current - 1);
     else if (event.key === 'ArrowRight') show(current + 1);
-    else if (event.key === 'Tab') {
-      // Keep focus inside the dialog.
-      const focusables = panel.querySelectorAll<HTMLElement>('button:not([disabled])');
-      if (focusables.length === 0) return;
-      const first = focusables[0]!;
-      const last = focusables[focusables.length - 1]!;
-      const active = document.activeElement;
-      if (event.shiftKey && (active === first || active === panel)) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
+    else trapTab(event, panel);
   });
 
   // Horizontal swipe on touch devices.
@@ -203,7 +235,35 @@ function initLightbox(): void {
   );
 }
 
+/* -------------------------------------------------------- scroll spy ---- */
+function initScrollSpy(): void {
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-spy]'));
+  if (links.length === 0 || !('IntersectionObserver' in window)) return;
+
+  const sections = links
+    .map((link) => document.getElementById(link.dataset.spy ?? ''))
+    .filter((el): el is HTMLElement => el !== null);
+
+  const visible = new Set<string>();
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target.id);
+        else visible.delete(entry.target.id);
+      }
+      const current = sections.find((section) => visible.has(section.id))?.id;
+      for (const link of links) {
+        link.toggleAttribute('data-current', link.dataset.spy === current);
+      }
+    },
+    { rootMargin: '-20% 0px -60% 0px' },
+  );
+
+  sections.forEach((section) => observer.observe(section));
+}
+
 initReveal();
+initScrollSpy();
 initMasthead();
 initIndexPanel();
 initLightbox();

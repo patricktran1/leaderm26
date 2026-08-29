@@ -10,15 +10,16 @@ const build = [
 ];
 ---
 
-<section class="section rule-top" id="colophon">
+<section class="section rule-top" id="colophon" aria-labelledby="colophon-title">
   <div class="shell">
-    <SectionHead num="06" label="Colophon" title="About this project." scale="quiet">
+    <SectionHead section="colophon" title="About this project." scale="quiet">
       <p class="prose">
         Field Notes is an independent visual journal, written and photographed by an attendee.
         It is not affiliated with, endorsed by, or produced for {conference.name} or the {conference.organizer};
         the official meeting lives at <a class="link" href={conference.official} target="_blank" rel="noopener noreferrer">leadderm.org</a>.
         Everything factual here about the conference comes either from the organizers' own public
-        material or from something photographed in the room. Everything else is marked as opinion.
+        material or from something photographed in the room. My own reading of it is kept to
+        Field notes, where it says so.
       </p>
     </SectionHead>
 
@@ -59,7 +60,7 @@ const build = [
     gap: clamp(2.5rem, 6vw, 5rem);
   }
   @media (min-width: 62rem) {
-    .colophon__grid { grid-template-columns: minmax(0, 1fr) 24rem; align-items: start; }
+    .colophon__grid { grid-template-columns: minmax(0, 1fr) 26rem; align-items: start; }
   }
 
   .bio { display: grid; gap: 1rem; max-width: 34rem; }
@@ -69,11 +70,16 @@ const build = [
   .build { border-top: 1px solid var(--rule); }
   .build__row {
     display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr);
+    grid-template-columns: 8.5rem minmax(0, 1fr);
     gap: 1rem;
     padding-block: 0.9rem;
     border-bottom: 1px solid var(--rule);
     align-items: baseline;
   }
-  .build__v { font-size: 0.875rem; color: var(--ink-2); line-height: 1.5; }
+  .build__v {
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    line-height: 1.5;
+    text-wrap: balance;
+  }
 </style>

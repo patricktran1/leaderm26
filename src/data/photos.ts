@@ -63,14 +63,6 @@ export const photos: Photo[] = [
     weight: 'minor',
   },
   {
-    id: 'DSC01762',
-    caption: 'Geometry overhead',
-    alt: 'A hexagonal light sculpture of nested illuminated tubes suspended in a dark stairwell.',
-    category: 'venue',
-    weight: 'minor',
-    feature: true,
-  },
-  {
     id: 'DSC01775',
     caption: 'Breakfast, first',
     alt: 'Attendees serving themselves from a breakfast buffet laid out on a long wooden counter.',
@@ -83,7 +75,15 @@ export const photos: Photo[] = [
     alt: 'An empty ballroom set with round banquet tables, projection screens lit and waiting.',
     note: 'Twenty tables, set for twenty conversations.',
     category: 'room',
-    weight: 'major',
+    weight: 'minor',
+  },
+  {
+    id: 'DSC01762',
+    caption: 'Geometry overhead',
+    alt: 'A hexagonal light sculpture of nested illuminated tubes suspended in a dark stairwell.',
+    category: 'venue',
+    weight: 'lead',
+    feature: true,
   },
   {
     id: 'IMG_7878',
@@ -106,7 +106,7 @@ export const photos: Photo[] = [
     alt: 'A speaker stands beside a projection screen reading "Welcome to LEADderm" in a hotel ballroom.',
     note: 'The first slide of the third annual meeting.',
     category: 'room',
-    weight: 'major',
+    weight: 'minor',
     feature: true,
   },
   {
@@ -137,7 +137,7 @@ export const photos: Photo[] = [
     alt: 'An easel holding a poster with a hand-drawn thought bubble reading "One thing that keeps me grounded is...", surrounded by sticky notes left by attendees.',
     note: 'The 2026 meeting is themed Strong Ground.',
     category: 'artifact',
-    weight: 'lead',
+    weight: 'minor',
     feature: true,
   },
   {
@@ -146,6 +146,6 @@ export const photos: Photo[] = [
     alt: 'A printed table card reading "Leadership isn\'t always quiet. Sometimes the best ideas make a little noise."',
     note: 'Left on the entrepreneurship table, beside a bowl of Pop Rocks.',
     category: 'artifact',
-    weight: 'major',
+    weight: 'minor',
   },
 ];

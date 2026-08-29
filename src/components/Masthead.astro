@@ -1,5 +1,5 @@
 ---
-import { nav, conference } from '../data/site';
+import { sections, sectionNumber, conference } from '../data/site';
 ---
 
 <header class="masthead" id="masthead">
@@ -10,7 +10,9 @@ import { nav, conference } from '../data/site';
     </a>
 
     <nav class="masthead__nav" aria-label="Sections">
-      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      {sections.map((item) => (
+        <a href={`#${item.id}`} data-spy={item.id}>{item.label}</a>
+      ))}
     </nav>
 
     <a class="masthead__official" href={conference.official} target="_blank" rel="noopener noreferrer">
@@ -23,18 +25,18 @@ import { nav, conference } from '../data/site';
   </div>
 </header>
 
-<div class="index-panel" id="index-panel" hidden>
+<div class="index-panel" id="index-panel" role="dialog" aria-modal="true" aria-label="Index" hidden>
   <div class="shell index-panel__inner">
     <div class="index-panel__top">
       <span class="label">Index</span>
       <button class="index-panel__close" type="button" data-menu-close>Close</button>
     </div>
-    <nav aria-label="Sections">
+    <nav class="index-panel__nav" aria-label="Index">
       <ol class="index-panel__list">
-        {nav.map((item, i) => (
+        {sections.map((item) => (
           <li>
-            <a href={item.href} data-menu-link>
-              <span class="index-panel__num">{String(i + 1).padStart(2, '0')}</span>
+            <a href={`#${item.id}`} data-menu-link>
+              <span class="index-panel__num">{sectionNumber(item.id)}</span>
               <span>{item.label}</span>
             </a>
           </li>
@@ -74,6 +76,7 @@ import { nav, conference } from '../data/site';
     gap: 0.6rem;
     text-decoration: none;
     white-space: nowrap;
+    padding-block: 0.75rem;
   }
   .wordmark__mark {
     font-size: 0.9375rem;
@@ -99,6 +102,10 @@ import { nav, conference } from '../data/site';
     transition: color 0.25s var(--ease);
   }
   .masthead__nav a:hover { color: var(--ink); }
+  .masthead__nav a[data-current] {
+    color: var(--ink);
+    box-shadow: inset 0 -1px 0 var(--ink);
+  }
 
   .masthead__official {
     display: none;
@@ -112,14 +119,16 @@ import { nav, conference } from '../data/site';
 
   .masthead__toggle {
     background: none;
-    border: 1px solid var(--rule-strong);
-    padding: 0.42rem 0.85rem;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    padding: 0 0 0.2rem;
+    min-height: 2.75rem;
     font-size: 0.75rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
-    border-radius: 999px;
-    color: var(--ink-2);
+    color: var(--ink);
   }
 
   @media (min-width: 62rem) {
@@ -135,8 +144,7 @@ import { nav, conference } from '../data/site';
     inset: 0;
     z-index: 80;
     background: var(--paper);
-    display: grid;
-    align-content: space-between;
+    overflow-y: auto;
     opacity: 0;
     transition: opacity 0.3s var(--ease);
   }
@@ -159,16 +167,19 @@ import { nav, conference } from '../data/site';
   }
   .index-panel__close {
     background: none;
-    border: 1px solid var(--rule-strong);
-    border-radius: 999px;
-    padding: 0.42rem 0.85rem;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    padding: 0 0 0.2rem;
+    min-height: 2.75rem;
     font-size: 0.75rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
-    color: var(--ink-2);
+    color: var(--ink);
   }
-  .index-panel__list { margin: auto 0; display: grid; }
+  .index-panel__nav { flex: 1; display: flex; align-items: center; }
+  .index-panel__list { width: 100%; display: grid; }
   .index-panel__list a {
     display: flex;
     align-items: baseline;
@@ -189,7 +200,12 @@ import { nav, conference } from '../data/site';
     color: var(--ink-3);
   }
   .index-panel__official {
-    margin-top: 2rem;
+    margin-top: auto;
+    padding-top: 2rem;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: flex-end;
+    align-self: flex-start;
     font-size: 0.8125rem;
     color: var(--ink-2);
     text-decoration: none;
