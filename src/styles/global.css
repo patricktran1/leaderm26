@@ -166,7 +166,8 @@ button { font: inherit; color: inherit; }
   max-width: var(--measure);
   text-wrap: pretty;
 }
-.prose p + p { margin-top: 1.1em; }
+.prose p + p,
+.prose + .prose { margin-top: 1.1em; }
 
 .label {
   font-size: 0.6875rem;
@@ -341,6 +342,7 @@ a { color: inherit; }
   .index-panel,
   .lb,
   .skip-link,
+  .contents,
   .foot__top { display: none !important; }
 
   body { background: #fff; color: #000; font-size: 10.5pt; }
@@ -358,5 +360,6 @@ a { color: inherit; }
   .display { font-size: 34pt; }
   .h2 { font-size: 20pt; }
   figure, .tables__row, .objective, .note { break-inside: avoid; }
+  .jrow__bucket { break-after: avoid; }
   a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 8pt; color: #555; }
 }
