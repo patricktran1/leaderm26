@@ -87,7 +87,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'IMG_7878',
-    caption: 'Twenty tables, to scale',
+    caption: 'The floor plan',
     alt: 'A printed floor plan of the ballroom showing twenty round tables arranged in front of a stage.',
     category: 'artifact',
     weight: 'minor',
@@ -127,7 +127,6 @@ export const photos: Photo[] = [
     id: 'DSC01774',
     caption: 'Between sessions',
     alt: 'A small group of attendees talking around a cocktail table beneath a chandelier in a hotel foyer.',
-    note: 'Where the conference actually happens.',
     category: 'people',
     weight: 'minor',
   },
