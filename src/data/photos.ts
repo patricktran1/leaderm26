@@ -311,6 +311,26 @@ export const journalSpan = (() => {
     : `${count}, ${first.day} ${first.time} to ${last.day} ${last.time}`;
 })();
 
+/**
+ * When the site was last rebuilt, in the time zone of the room it was
+ * photographed in — which is to say when a photograph was last added. It is
+ * the only honest signal that this is a journal still being published rather
+ * than an archive, and it needs nobody to maintain it.
+ */
+export const publishedAt: string | null = (() => {
+  const at = new Date(index.generatedAt);
+  if (Number.isNaN(at.valueOf())) return null;
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
+    weekday: 'long',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+    .format(at)
+    .replace(/\bAM\b/, 'a.m.')
+    .replace(/\bPM\b/, 'p.m.');
+})();
+
 export const photoIndexMeta = {
   generatedAt: index.generatedAt,
   maxEdge: index.maxEdge,

@@ -172,6 +172,37 @@ const slides = await Promise.all(
     gap: 0.75rem;
     margin-left: auto;
   }
+
+  /* A phone turned sideways is the shape a photograph is usually taken in, and
+     it is how anyone looks at a landscape frame properly. Stacking the caption
+     under the picture there spends a third of the screen on two lines of text,
+     so it moves into a column beside it and the photograph gets the height. */
+  @media (max-height: 30rem) and (min-aspect-ratio: 1 / 1) {
+    .lb__panel {
+      grid-template-rows: minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 14rem);
+      column-gap: clamp(1rem, 3vw, 2rem);
+      padding-block: 0.5rem;
+    }
+    .lb__bar {
+      position: absolute;
+      top: 0.25rem;
+      right: clamp(0.75rem, 3vw, 2rem);
+      z-index: 1;
+    }
+    .lb__stage { grid-column: 1; padding-block: 0; }
+    .lb__foot {
+      grid-column: 2;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      border-top: 0;
+      padding-top: 2.75rem;
+      padding-bottom: 0.5rem;
+    }
+    .lb__controls { margin-left: 0; }
+  }
   .lb__nav { font-size: 1rem; color: #a9acb1; min-width: 2.75rem; justify-content: center; }
   .lb__nav:hover { color: #fff; }
   .lb__count {

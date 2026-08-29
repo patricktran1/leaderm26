@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
 import { journalRows, journalContents, contentsDepth } from '../data/gallery';
-import { journalDays, journalSpan } from '../data/photos';
+import { journalDays, journalSpan, publishedAt } from '../data/photos';
 
 const rows = journalRows;
 /** A contents line, once the journal covers enough of the meeting to need one. */
@@ -56,7 +56,12 @@ const indexed = rows.map((row) => ({
         arrival, the empty room, the boards people leave behind, and the twenty minutes
         where the actual conference happens, which is to say the coffee.
       </p>
-      {journalSpan && <p class="journal__span">{journalSpan}</p>}
+      {journalSpan && (
+        <p class="journal__span">
+          {journalSpan}
+          {publishedAt && <> · Last added {publishedAt}</>}
+        </p>
+      )}
       {contentsDepth > 2 && (
         <nav class="contents" aria-label="Jump to a part of the meeting">
           <ol>
