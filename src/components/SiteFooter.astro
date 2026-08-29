@@ -1,0 +1,55 @@
+---
+import { conference, author, site } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="shell foot__inner">
+    <div class="foot__brand">
+      <span class="foot__mark">LEAD<span>derm</span> 2026 · Field Notes</span>
+      <span class="foot__sub">{site.tagline}. Photographs © {year} {author.short}.</span>
+    </div>
+    <div class="foot__links">
+      <a class="link" href={conference.official} target="_blank" rel="noopener noreferrer">leadderm.org</a>
+      <a class="link" href={`mailto:${author.email}`}>{author.email}</a>
+      <a class="link" href={author.instagramUrl} target="_blank" rel="noopener noreferrer">@{author.instagram}</a>
+    </div>
+  </div>
+  <div class="shell">
+    <div class="foot__fine">
+      <span>{conference.venue} · {conference.dates}</span>
+      <a class="foot__top" href="#top">Back to top <span aria-hidden="true">↑</span></a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot { border-top: 1px solid var(--ink); padding-block: clamp(2.5rem, 5vw, 4rem) 2rem; }
+  .foot__inner {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  @media (min-width: 48rem) {
+    .foot__inner { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  }
+  .foot__brand { display: grid; gap: 0.5rem; }
+  .foot__mark { font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.02em; }
+  .foot__mark span { font-weight: 400; color: var(--ink-2); }
+  .foot__sub { font-size: 0.8125rem; color: var(--ink-3); max-width: 34rem; line-height: 1.6; }
+  .foot__links { display: grid; gap: 0.6rem; font-size: 0.8125rem; justify-items: start; }
+  @media (min-width: 48rem) { .foot__links { justify-items: end; } }
+
+  .foot__fine {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+  .foot__top { text-decoration: none; color: var(--ink-3); }
+  .foot__top:hover { color: var(--ink); }
+</style>

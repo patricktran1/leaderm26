@@ -1,0 +1,13 @@
+{
+  "name": "LEADderm 2026 — Field Notes",
+  "short_name": "Field Notes",
+  "description": "An independent visual journal from LEADderm 2026.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f2ed",
+  "theme_color": "#f4f2ed",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

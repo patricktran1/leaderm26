@@ -1,0 +1,121 @@
+---
+import { Image } from 'astro:assets';
+import SectionHead from './SectionHead.astro';
+import { byPhotoId } from '../data/gallery';
+
+const card = byPhotoId('DSC01783');
+
+const notes = [
+  {
+    n: '01',
+    title: 'The room is the argument',
+    body: `Twenty round tables and a low stage. No auditorium rake, no back row to hide in,
+    no seat far from a faculty member. You can read a conference's real thesis off its floor
+    plan, and this one says the learning happens sideways.`,
+  },
+  {
+    n: '02',
+    title: 'Values before tactics',
+    body: `The 2026 meeting is titled Strong Ground, and the programming keeps returning to
+    the same order of operations: work out what you actually value, then choose the practice,
+    the partners and the technology. Most of medicine's business advice runs that backwards.`,
+  },
+  {
+    n: '03',
+    title: 'Technology arrives as a leadership question',
+    body: `Artificial intelligence turns up on the agenda not as a product demo but as a
+    management problem — what it does to training, to how a team is built, to the shape of a
+    patient's visit. That is a more useful frame than another tool comparison.`,
+  },
+];
+---
+
+<section class="section on-night" id="notes">
+  <div class="shell">
+    <SectionHead num="04" label="Field notes" title="Three things worth writing down.">
+      <p class="prose">
+        Observations, not reporting. What follows is one attendee's reading of the room.
+      </p>
+    </SectionHead>
+
+    <div class="notes__grid">
+      <ol class="notes__list">
+        {notes.map((note, i) => (
+          <li class="note reveal" style={`--reveal-delay:${i * 80}ms`}>
+            <span class="label note__n">{note.n}</span>
+            <h3 class="h3 note__t">{note.title}</h3>
+            <p class="note__b">{note.body}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="notes__media">
+        <figure class="reveal">
+          <div class="frame notes__frame">
+            <Image
+              src={card.image}
+              alt={card.alt}
+              widths={[400, 600, 720]}
+              sizes="(min-width: 62rem) 26rem, calc(100vw - 2.5rem)"
+              quality={84}
+              loading="lazy"
+            />
+          </div>
+          <figcaption class="notes__cap">
+            Left on the entrepreneurship table, beside a bowl of Pop Rocks.
+          </figcaption>
+        </figure>
+
+        <blockquote class="pull reveal">
+          <p class="serif-note">
+            “Leadership isn’t always quiet. Sometimes the best ideas make a little noise.”
+          </p>
+          <cite class="notes__cap">Printed table card, LEADderm 2026</cite>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .notes__grid {
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+  }
+  @media (min-width: 62rem) {
+    .notes__grid { grid-template-columns: minmax(0, 1fr) 26rem; align-items: start; }
+  }
+
+  .notes__list { display: grid; border-top: 1px solid var(--rule-on-night); }
+  .note {
+    display: grid;
+    gap: 0.55rem;
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-bottom: 1px solid var(--rule-on-night);
+  }
+  .note__n { color: var(--ink-2-on-night); }
+  .note__t { color: var(--ink-on-night); }
+  .note__b {
+    font-size: 0.9375rem;
+    line-height: 1.68;
+    color: var(--ink-2-on-night);
+    max-width: 36rem;
+  }
+
+  .notes__media { display: grid; gap: clamp(1.75rem, 4vw, 2.5rem); }
+  .notes__frame { background: var(--night-soft); }
+  .notes__cap {
+    display: block;
+    margin-top: 0.7rem;
+    font-size: 0.75rem;
+    font-style: normal;
+    color: #83868c;
+    line-height: 1.5;
+  }
+  .pull {
+    margin: 0;
+    padding-left: clamp(1rem, 2vw, 1.5rem);
+    border-left: 1px solid var(--pine-bright);
+  }
+</style>

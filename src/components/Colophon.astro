@@ -1,0 +1,79 @@
+---
+import SectionHead from './SectionHead.astro';
+import { author, conference } from '../data/site';
+
+const build = [
+  ['Made', 'On site at the Pendry Newport Beach, August 2026'],
+  ['Type', 'Newsreader and Libre Franklin, self-hosted'],
+  ['Photographs', 'Sony and iPhone, available light only'],
+  ['Stack', 'Astro, statically generated, deployed on Vercel'],
+];
+---
+
+<section class="section rule-top" id="colophon">
+  <div class="shell">
+    <SectionHead num="06" label="Colophon" title="About this project.">
+      <p class="prose">
+        Field Notes is an independent visual journal, written and photographed by an attendee.
+        It is not affiliated with, endorsed by, or produced for {conference.name} or the {conference.organizer};
+        the official meeting lives at <a class="link" href={conference.official} target="_blank" rel="noopener noreferrer">leadderm.org</a>.
+        Everything factual here about the conference comes either from the organizers' own public
+        material or from something photographed in the room. Everything else is marked as opinion.
+      </p>
+    </SectionHead>
+
+    <div class="colophon__grid">
+      <div class="bio reveal">
+        <h3 class="h3">{author.name}</h3>
+        <p class="bio__body">
+          Dermatologist. I build things at the seam between medicine and software —
+          practice technology, AI workflows, design and photography — and I made this page
+          between sessions to see how far that could be taken in two days.
+        </p>
+        <div class="bio__links">
+          <a class="arrow-link" href={`mailto:${author.email}?subject=From%20LEADderm%202026`}>
+            {author.email} <span class="chev" aria-hidden="true">→</span>
+          </a>
+          <a class="arrow-link" href={author.instagramUrl} target="_blank" rel="noopener noreferrer">
+            Instagram · @{author.instagram} <span class="chev" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <dl class="build reveal">
+        {build.map(([k, v]) => (
+          <div class="build__row">
+            <dt class="label">{k}</dt>
+            <dd class="build__v">{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .colophon__grid {
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+  }
+  @media (min-width: 62rem) {
+    .colophon__grid { grid-template-columns: minmax(0, 1fr) 24rem; align-items: start; }
+  }
+
+  .bio { display: grid; gap: 1rem; max-width: 34rem; }
+  .bio__body { font-size: 1rem; line-height: 1.7; color: var(--ink-2); }
+  .bio__links { display: grid; gap: 0.9rem; justify-items: start; margin-top: 0.5rem; }
+
+  .build { border-top: 1px solid var(--rule); }
+  .build__row {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 1rem;
+    padding-block: 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .build__v { font-size: 0.875rem; color: var(--ink-2); line-height: 1.5; }
+</style>

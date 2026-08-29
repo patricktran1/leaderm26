@@ -1,0 +1,25 @@
+---
+interface Props {
+  num: string;
+  label: string;
+  title: string;
+  id?: string;
+}
+const { num, label, title, id } = Astro.props;
+---
+
+<div class="sec-head">
+  <div class="sec-head__index reveal">
+    <span class="sec-head__num">{num}</span>
+    <span class="label">{label}</span>
+  </div>
+  <div class="sec-head__body">
+    <h2 class="h2 reveal" id={id} style="--reveal-delay:60ms">{title}</h2>
+    <div class="sec-head__aside reveal" style="--reveal-delay:120ms"><slot /></div>
+  </div>
+</div>
+
+<style>
+  .sec-head__aside:empty { display: none; }
+  .sec-head__aside { margin-top: clamp(1.25rem, 2.5vw, 2rem); }
+</style>

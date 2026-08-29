@@ -1,0 +1,106 @@
+---
+import '../styles/global.css';
+import { site, conference, author } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = site.name, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).toString();
+const ogImage = new URL('/og.jpg', Astro.site ?? site.url).toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}/#website`,
+      url: site.url,
+      name: site.name,
+      description: site.description,
+      inLanguage: 'en-US',
+      publisher: { '@id': `${site.url}/#person` },
+    },
+    {
+      '@type': 'Person',
+      '@id': `${site.url}/#person`,
+      name: author.name,
+      jobTitle: 'Dermatologist',
+      email: `mailto:${author.email}`,
+      sameAs: [author.instagramUrl],
+    },
+    {
+      '@type': 'Article',
+      '@id': `${site.url}/#article`,
+      headline: site.name,
+      description: site.description,
+      isPartOf: { '@id': `${site.url}/#website` },
+      author: { '@id': `${site.url}/#person` },
+      image: ogImage,
+      datePublished: conference.startDate,
+      about: {
+        '@type': 'Event',
+        name: conference.name,
+        startDate: conference.startDate,
+        endDate: conference.endDate,
+        url: conference.official,
+        location: {
+          '@type': 'Place',
+          name: conference.venue,
+          address: { '@type': 'PostalAddress', addressLocality: 'Newport Beach', addressRegion: 'CA', addressCountry: 'US' },
+        },
+      },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#f4f2ed" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101215" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light" />
+    <meta name="author" content={author.name} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <link rel="preload" href="/fonts/newsreader-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/libre-franklin-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="LEADderm 2026 — Field Notes, an independent visual journal." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

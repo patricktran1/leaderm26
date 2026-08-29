@@ -1,0 +1,197 @@
+---
+import { nav, conference } from '../data/site';
+---
+
+<header class="masthead" id="masthead">
+  <div class="shell masthead__inner">
+    <a class="wordmark" href="#top">
+      <span class="wordmark__mark">LEAD<span class="wordmark__soft">derm</span> 2026</span>
+      <span class="wordmark__sub">Field Notes</span>
+    </a>
+
+    <nav class="masthead__nav" aria-label="Sections">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+
+    <a class="masthead__official" href={conference.official} target="_blank" rel="noopener noreferrer">
+      Official site <span aria-hidden="true">↗</span>
+    </a>
+
+    <button class="masthead__toggle" type="button" aria-expanded="false" aria-controls="index-panel" data-menu-open>
+      Index
+    </button>
+  </div>
+</header>
+
+<div class="index-panel" id="index-panel" hidden>
+  <div class="shell index-panel__inner">
+    <div class="index-panel__top">
+      <span class="label">Index</span>
+      <button class="index-panel__close" type="button" data-menu-close>Close</button>
+    </div>
+    <nav aria-label="Sections">
+      <ol class="index-panel__list">
+        {nav.map((item, i) => (
+          <li>
+            <a href={item.href} data-menu-link>
+              <span class="index-panel__num">{String(i + 1).padStart(2, '0')}</span>
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+    <a class="index-panel__official" href={conference.official} target="_blank" rel="noopener noreferrer">
+      leadderm.org <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</div>
+
+<style>
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.35s var(--ease), background 0.35s var(--ease);
+  }
+  .masthead[data-scrolled] { border-bottom-color: var(--rule); }
+
+  .masthead__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 3.75rem;
+  }
+
+  .wordmark {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .wordmark__mark {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .wordmark__soft { font-weight: 400; color: var(--ink-2); }
+  .wordmark__sub {
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-left: 0.6rem;
+    border-left: 1px solid var(--rule);
+  }
+
+  .masthead__nav { display: none; gap: clamp(1.1rem, 2.2vw, 2rem); }
+  .masthead__nav a {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    padding-block: 0.4rem;
+    transition: color 0.25s var(--ease);
+  }
+  .masthead__nav a:hover { color: var(--ink); }
+
+  .masthead__official {
+    display: none;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.25s var(--ease);
+  }
+  .masthead__official:hover { color: var(--pine); }
+
+  .masthead__toggle {
+    background: none;
+    border: 1px solid var(--rule-strong);
+    padding: 0.42rem 0.85rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 999px;
+    color: var(--ink-2);
+  }
+
+  @media (min-width: 62rem) {
+    .masthead__nav { display: flex; }
+    .masthead__official { display: block; }
+    .masthead__toggle { display: none; }
+    .masthead__inner { min-height: 4.25rem; }
+  }
+
+  /* --- full screen index --- */
+  .index-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: var(--paper);
+    display: grid;
+    align-content: space-between;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+  }
+  .index-panel[data-open] { opacity: 1; }
+  .index-panel[hidden] { display: none; }
+
+  .index-panel__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    padding-block: 1rem 3rem;
+  }
+  .index-panel__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .index-panel__close {
+    background: none;
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    padding: 0.42rem 0.85rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--ink-2);
+  }
+  .index-panel__list { margin: auto 0; display: grid; }
+  .index-panel__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: clamp(0.7rem, 2.4vw, 1.1rem);
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .index-panel__num {
+    font-family: var(--sans);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+  }
+  .index-panel__official {
+    margin-top: 2rem;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+</style>

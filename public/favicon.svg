@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#14161a"/>
+  <g fill="none" stroke="#f4f2ed" stroke-linejoin="round">
+    <path d="M 51.05 43.00 L 32.00 54.00 L 12.95 43.00 L 12.95 21.00 L 32.00 10.00 L 51.05 21.00 Z" stroke-width="3"/>
+    <path d="M 43.26 38.50 L 32.00 45.00 L 20.74 38.50 L 20.74 25.50 L 32.00 19.00 L 43.26 25.50 Z" stroke-width="2.4"/>
+    <path d="M 36.33 34.50 L 32.00 37.00 L 27.67 34.50 L 27.67 29.50 L 32.00 27.00 L 36.33 29.50 Z" stroke-width="1.8"/>
+  </g>
+</svg>

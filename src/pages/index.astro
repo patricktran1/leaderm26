@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import Hero from '../components/Hero.astro';
+import Gathering from '../components/Gathering.astro';
+import Journal from '../components/Journal.astro';
+import Tables from '../components/Tables.astro';
+import Notes from '../components/Notes.astro';
+import Practice from '../components/Practice.astro';
+import Colophon from '../components/Colophon.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { unlistedFiles } from '../data/gallery';
+
+if (unlistedFiles.length > 0) {
+  console.warn(
+    `[photos] Not in the manifest and therefore not published: ${unlistedFiles.join(', ')}`,
+  );
+}
+---
+
+<Base>
+  <Masthead />
+  <main id="main">
+    <Hero />
+    <Gathering />
+    <Journal />
+    <Tables />
+    <Notes />
+    <Practice />
+    <Colophon />
+  </main>
+  <SiteFooter />
+  <Lightbox />
+</Base>
+
+<script>
+  import '../scripts/ui';
+</script>

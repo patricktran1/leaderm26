@@ -1,0 +1,99 @@
+---
+import SectionHead from './SectionHead.astro';
+import { author } from '../data/site';
+
+const lines = [
+  {
+    k: 'Presence',
+    v: 'A site that reads like your practice at its best — photography, typography and restraint instead of stock smiles and a carousel.',
+  },
+  {
+    k: 'Operations',
+    v: 'Intake, triage, recall and follow-up wired so the front desk stops re-typing what a form already knows.',
+  },
+  {
+    k: 'Intelligence',
+    v: 'Language models used where they are genuinely good — drafting, summarizing, routing — and kept away from where they are not.',
+  },
+];
+---
+
+<section class="section rule-top" id="practice">
+  <div class="shell">
+    <SectionHead num="05" label="A demonstration" title="Imagine your practice like this.">
+      <p class="prose">
+        This page is the argument. It was designed and built during the conference it
+        documents — a working demonstration that a medical brand can look considered without
+        looking corporate, and load fast enough to open on hotel Wi-Fi.
+      </p>
+    </SectionHead>
+
+    <dl class="capability">
+      {lines.map((l, i) => (
+        <div class="capability__row reveal" style={`--reveal-delay:${i * 70}ms`}>
+          <dt class="capability__k">{l.k}</dt>
+          <dd class="capability__v">{l.v}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <div class="invite reveal">
+      <p class="serif-note invite__line">
+        If your practice, department or meeting deserves a digital presence this considered,
+        I would like to see it.
+      </p>
+      <div class="invite__links">
+        <a class="arrow-link" href={`mailto:${author.email}?subject=From%20LEADderm%202026`}>
+          {author.email} <span class="chev" aria-hidden="true">→</span>
+        </a>
+        <a class="arrow-link" href={author.instagramUrl} target="_blank" rel="noopener noreferrer">
+          @{author.instagram} <span class="chev" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .capability {
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+    border-top: 1px solid var(--ink);
+  }
+  .capability__row {
+    display: grid;
+    gap: 0.4rem;
+    padding-block: clamp(1.25rem, 2.6vw, 1.75rem);
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (min-width: 48rem) {
+    .capability__row {
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: clamp(1.5rem, 4vw, 3.5rem);
+      align-items: baseline;
+    }
+  }
+  .capability__k {
+    font-family: var(--serif);
+    font-size: clamp(1.125rem, 1.7vw, 1.375rem);
+    font-weight: 400;
+    letter-spacing: -0.012em;
+  }
+  .capability__v {
+    font-size: 0.9375rem;
+    line-height: 1.68;
+    color: var(--ink-2);
+    max-width: 38rem;
+  }
+
+  .invite {
+    margin-top: clamp(3rem, 7vw, 5rem);
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2rem);
+  }
+  @media (min-width: 62rem) {
+    .invite { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 4rem; }
+  }
+  .invite__line { max-width: 30rem; }
+  .invite__links { display: grid; gap: 0.9rem; justify-items: start; }
+  @media (min-width: 62rem) { .invite__links { justify-items: end; } }
+</style>

@@ -1,0 +1,130 @@
+---
+import { Image } from 'astro:assets';
+import SectionHead from './SectionHead.astro';
+import { gallery, buildRows } from '../data/gallery';
+import { CATEGORY_LABEL } from '../data/photos';
+
+const rows = buildRows(gallery);
+
+// Stable index across the whole gallery so the lightbox can step through it.
+let cursor = 0;
+const indexed = rows.map((row) => ({
+  ...row,
+  items: row.items.map((photo) => ({ photo, index: cursor++ })),
+}));
+---
+
+<section class="section rule-top" id="journal">
+  <div class="shell">
+    <SectionHead num="02" label="Photographic journal" title="A day, in the order it happened.">
+      <p class="prose">
+        Photographed on a small camera between sessions. No staging, no press pass — the
+        arrival, the empty room, the boards people leave behind, and the twenty minutes
+        where the actual conference happens, which is to say the coffee.
+      </p>
+    </SectionHead>
+  </div>
+
+  <div class="shell journal__body">
+    {indexed.map((row) => (
+      <div class={`jrow jrow--${row.kind}`} style={`--fill:${row.fill}`}>
+        {row.items.map(({ photo, index }) => (
+          <figure class="shot reveal" style={`--grow:${(photo.ratio * 4).toFixed(3)}`}>
+            <button
+              class="shot__btn"
+              type="button"
+              data-lightbox={index}
+              aria-label={`Open larger: ${photo.caption}`}
+            >
+              <span class="frame shot__frame" style={`aspect-ratio:${photo.image.width} / ${photo.image.height}`}>
+                <Image
+                  src={photo.image}
+                  alt={photo.alt}
+                  widths={[320, 480, photo.image.width]}
+                  sizes={row.kind === 'lead'
+                    ? '(min-width: 40rem) 30rem, calc(100vw - 2.5rem)'
+                    : '(min-width: 62rem) 30vw, (min-width: 40rem) 42vw, 46vw'}
+                  quality={82}
+                  loading="lazy"
+                />
+              </span>
+            </button>
+            <figcaption class="shot__cap">
+              <span class="shot__caption-text" set:html={photo.caption} />
+              <span class="shot__cat">{CATEGORY_LABEL[photo.category]}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .journal__body {
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.25rem);
+  }
+
+  .jrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+  /* flex-basis 0 + grow proportional to aspect ratio makes every frame in a
+     line share one height. Ratios are scaled x4 so a lone item on a wrapped
+     line still has grow >= 1 and fills the row. */
+  .shot { flex: var(--grow) 1 0; min-width: 42%; margin: 0; }
+  @media (min-width: 40rem) {
+    .shot { min-width: 0; }
+    .jrow--run { max-width: calc(100% * var(--fill)); }
+  }
+
+  .jrow--lead { justify-content: center; }
+  .jrow--lead .shot { flex: 0 1 100%; }
+  @media (min-width: 40rem) {
+    .jrow--lead .shot { flex: 0 1 min(100%, 26rem); }
+  }
+  @media (min-width: 62rem) {
+    .jrow--lead .shot { flex: 0 1 min(100%, 30rem); }
+  }
+
+  .shot__btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+  .shot__frame { display: block; width: 100%; }
+  .shot__frame :global(img) {
+    transition: opacity 0.6s var(--ease), transform 0.9s var(--ease);
+  }
+  @media (hover: hover) {
+    .shot__btn:hover .shot__frame :global(img) { transform: scale(1.018); opacity: 0.94; }
+  }
+
+  .shot__cap {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: 0.65rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .shot__cat {
+    color: var(--ink-3);
+    font-size: 0.5625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  @media (max-width: 30rem) {
+    .shot__cat { display: none; }
+  }
+</style>

@@ -1,0 +1,131 @@
+---
+import { Image } from 'astro:assets';
+import { conference } from '../data/site';
+import { byPhotoId } from '../data/gallery';
+
+const cover = byPhotoId('IMG_7885');
+
+const meta = [
+  { k: 'Dates', v: conference.dates },
+  { k: 'Venue', v: conference.venue },
+  { k: 'Edition', v: `${conference.edition} meeting` },
+  { k: 'Theme', v: conference.theme },
+];
+---
+
+<section class="hero" id="top">
+  <div class="shell hero__grid">
+    <div class="hero__type">
+      <p class="label reveal">An independent visual journal</p>
+      <h1 class="display reveal" style="--reveal-delay:80ms">
+        The other half<br />of the training.
+      </h1>
+      <p class="lede reveal" style="--reveal-delay:160ms">
+        LEADderm gathers dermatologists, physician associates, nurse practitioners and
+        industry partners around the part of the job medicine rarely teaches — leadership,
+        community, and the ground you stand on. These are notes and photographs from the
+        third annual meeting.
+      </p>
+    </div>
+
+    <figure class="hero__figure reveal" style="--reveal-delay:200ms">
+      <div class="frame hero__frame">
+        <Image
+          src={cover.image}
+          alt={cover.alt}
+          widths={[400, 600]}
+          sizes="(min-width: 62rem) 27rem, calc(100vw - 2.5rem)"
+          quality={82}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <figcaption class="hero__cap">
+        <span>{cover.caption}</span>
+        <span class="hero__cap-place">{conference.venue}</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="shell">
+    <dl class="dateline">
+      {meta.map((m, i) => (
+        <div class="dateline__item reveal" style={`--reveal-delay:${i * 60}ms`}>
+          <dt class="label">{m.k}</dt>
+          <dd class="dateline__v">{m.v}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .hero { padding-block: clamp(2.5rem, 7vw, 6rem) 0; }
+
+  .hero__grid {
+    display: grid;
+    gap: clamp(2.25rem, 5vw, 4rem);
+    align-items: end;
+  }
+  @media (min-width: 62rem) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr) clamp(19rem, 27vw, 27rem);
+      gap: clamp(2.5rem, 5vw, 5rem);
+    }
+  }
+
+  .hero__type { display: grid; gap: clamp(1.25rem, 2.6vw, 2rem); }
+  .hero .display { margin-block: 0.1em -0.06em; }
+  @media (min-width: 62rem) {
+    /* The headline shares the row with the photograph, so it scales off the
+       column rather than the viewport. */
+    .hero .display { font-size: clamp(3rem, 5.8vw, 6.5rem); }
+  }
+
+  .hero__figure { margin: 0; }
+  .hero__frame { aspect-ratio: 3 / 4; }
+  .hero__frame :global(img) {
+    transform: scale(1.001);
+  }
+
+  .hero__cap {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.85rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+  }
+  .hero__cap-place { color: var(--ink-3); }
+
+  .dateline {
+    margin-top: clamp(3rem, 7vw, 5.5rem);
+    border-top: 1px solid var(--ink);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 48rem) {
+    .dateline { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .dateline__item {
+    padding: clamp(1rem, 2.2vw, 1.5rem) 0;
+    padding-right: 1rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (min-width: 48rem) {
+    .dateline__item { border-bottom: 0; }
+    .dateline__item + .dateline__item {
+      border-left: 1px solid var(--rule);
+      padding-left: clamp(1rem, 2.4vw, 2rem);
+    }
+  }
+  .dateline__v {
+    margin-top: 0.4rem;
+    font-family: var(--serif);
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+</style>
