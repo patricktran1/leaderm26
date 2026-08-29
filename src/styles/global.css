@@ -6,7 +6,7 @@
 
 @font-face {
   font-family: 'Newsreader';
-  src: url('/fonts/newsreader-normal-latin.woff2') format('woff2-variations');
+  src: url('/fonts/newsreader-normal-latin.woff2') format('woff2');
   font-weight: 200 600;
   font-style: normal;
   font-display: swap;
@@ -15,7 +15,7 @@
 }
 @font-face {
   font-family: 'Libre Franklin';
-  src: url('/fonts/libre-franklin-normal-latin.woff2') format('woff2-variations');
+  src: url('/fonts/libre-franklin-normal-latin.woff2') format('woff2');
   font-weight: 300 700;
   font-style: normal;
   font-display: swap;
@@ -112,7 +112,6 @@ button { font: inherit; color: inherit; }
   font-size: clamp(2.9rem, 8.2vw, 6.75rem);
   line-height: 0.94;
   letter-spacing: -0.025em;
-  font-variation-settings: 'opsz' 60;
   text-wrap: balance;
 }
 
@@ -122,7 +121,6 @@ button { font: inherit; color: inherit; }
   font-size: clamp(2rem, 4.4vw, 3.5rem);
   line-height: 1.02;
   letter-spacing: -0.02em;
-  font-variation-settings: 'opsz' 40;
   text-wrap: balance;
 }
 
