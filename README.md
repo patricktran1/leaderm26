@@ -25,16 +25,18 @@ npm run lint       # eslint
 npm test           # vitest — photo manifest + gallery layout
 ```
 
-Browser harnesses (need the preview server running on :4321):
+Browser harnesses (start `npm run preview` first — they drive :4321):
 
 ```bash
 node tools/shot.mjs        # screenshots at 4 viewports into /tmp/shots
-node tools/interact.mjs    # lightbox, mobile nav, no-JS and keyboard checks
+node tools/interact.mjs    # viewer, mobile index, no-JS and keyboard behaviour
+node tools/a11y.mjs        # axe-core, focus traps, inert, tap targets
 node tools/perf.mjs        # page weight, LCP, CLS
 ```
 
-Set `FORCE_VISIBLE=1` for `shot.mjs` to disable reveal animations so full-page
-screenshots are deterministic.
+`FORCE_VISIBLE=1 node tools/shot.mjs` disables the reveal animations so
+full-page screenshots are deterministic. `tools/interact.mjs` and
+`tools/a11y.mjs` exit non-zero on failure, so they work in CI.
 
 ---
 
@@ -114,6 +116,18 @@ and **every frame in a row ends up the same height** — a justified gallery wit
 no cropping and no JavaScript. On phones a `min-width: 42%` forces the same rows
 to wrap two-up; a wrapped single frame runs full width.
 
+### Photograph resolution
+
+The frames in this repository came from a source that had already compressed
+them to 300–400px on the long edge; they were upscaled once, with a sharpening
+pass, to the masters now in `src/assets/photos/`. That ceiling is why the
+layout leans on scale contrast and whitespace rather than full-bleed hero
+imagery, why display widths are capped in `Hero`, `Gathering` and `Journal`,
+and why the viewer enlarges only to 1.35x. `tools/shot.mjs` plus a quick DOM
+measurement will tell you if a change starts stretching a frame past its
+master. None of this constrains future photographs — drop in full-resolution
+files and the same components will serve larger derivatives with no edits.
+
 ### Design decisions
 
 - **Photography is the only decoration.** No gradients, shadows, glass or
@@ -128,8 +142,13 @@ to wrap two-up; a wrapped single frame runs full width.
   scale contrast and whitespace rather than full-bleed hero imagery, which these
   files cannot support. Future full-resolution photographs need no change —
   Astro will simply generate larger derivatives.
+- **Each frame declares its own `sizes`.** In a justified row a landscape frame
+  takes twice the measure a portrait one does, so `Journal.astro` derives
+  `sizes` from `ratio / row.span`. A flat value under-served the widest frames
+  by up to 1.96x.
 - **CSS is inlined** (`build.inlineStylesheets: 'always'`) so the first paint
-  needs one request. Fonts are preloaded. Measured: ~177kB first load, CLS 0.
+  needs one request. Fonts are preloaded. Measured: ~180kB first load, CLS 0,
+  and zero axe-core violations at 1440 and 390 with the viewer open and closed.
 - **Animation degrades to nothing.** Reveal transitions are scoped to `.js`,
   added by an inline script, so the page is fully visible without JavaScript,
   and `prefers-reduced-motion` disables them outright.
@@ -146,13 +165,17 @@ number cannot be sourced, it is not on the page.
 
 ## Deployment
 
-Vercel, zero configuration: it detects Astro, runs `npm run build`, serves
-`dist/`. `vercel.json` adds immutable caching for `/_astro/*` and `/fonts/*`
-plus baseline security headers.
+The `leaderm26` Vercel project is linked to this repository, so every push
+builds: `main` goes to production at `leaderm26.vercel.app`, and any other
+branch gets its own preview URL. Vercel detects Astro on its own; `vercel.json`
+only adds immutable caching for `/_astro/*` and `/fonts/*` plus baseline
+security headers.
 
-To deploy: import the repository at [vercel.com/new](https://vercel.com/new), or
-from a checkout run `npx vercel --prod`.
+Vercel Authentication is switched off for this project, so the deployment URLs
+open for anyone — which is the point, since the site exists to be handed to
+someone at a conference. Turn it back on under Project → Settings →
+Deployment Protection if that ever stops being true.
 
-After the first deploy, set the real domain in `src/data/site.ts` (`site.url`)
-and `astro.config.mjs` (`site`) so canonical URLs, the sitemap and Open Graph
-tags point at it.
+If you move to a custom domain, set it in `src/data/site.ts` (`site.url`) and
+`astro.config.mjs` (`site`) so canonical URLs, the sitemap and the Open Graph
+tags follow.
