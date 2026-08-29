@@ -10,9 +10,13 @@ const year = new Date().getFullYear();
       <span class="foot__sub">{site.tagline}. Photographs © {year} {author.short}.</span>
     </div>
     <div class="foot__links">
-      <a class="link" href={conference.official} target="_blank" rel="noopener noreferrer">leadderm.org</a>
-      <a class="link" href={`mailto:${author.email}`}>{author.email}</a>
-      <a class="link" href={author.instagramUrl} target="_blank" rel="noopener noreferrer">@{author.instagram}</a>
+      <a class="foot__link" href={conference.official} target="_blank" rel="noopener noreferrer"
+        ><span class="link">leadderm.org</span></a
+      >
+      <a class="foot__link" href={`mailto:${author.email}`}><span class="link">{author.email}</span></a>
+      <a class="foot__link" href={author.instagramUrl} target="_blank" rel="noopener noreferrer"
+        ><span class="link">@{author.instagram}</span></a
+      >
     </div>
   </div>
   <div class="shell">
@@ -43,7 +47,14 @@ const year = new Date().getFullYear();
     text-wrap: pretty;
   }
   .foot__links { display: grid; font-size: 0.8125rem; justify-items: start; }
-  .foot__links a { display: inline-flex; align-items: center; min-height: 2.75rem; }
+  /* The anchor carries the touch target; the span carries the underline, so
+     the rule stays tight to the text. */
+  .foot__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    text-decoration: none;
+  }
   @media (min-width: 48rem) { .foot__links { justify-items: end; } }
 
   .foot__fine {
@@ -57,11 +68,14 @@ const year = new Date().getFullYear();
     font-size: 0.75rem;
     color: var(--ink-3);
   }
+  /* inline-flex drops the whitespace-only run between the label and the
+     glyph, so the gap has to be declared. */
   .foot__top {
     text-decoration: none;
     color: var(--ink-3);
     display: inline-flex;
     align-items: center;
+    gap: 0.4em;
     min-height: 2.75rem;
   }
   .foot__top:hover { color: var(--ink); }

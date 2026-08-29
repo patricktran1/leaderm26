@@ -54,11 +54,9 @@ import { sections, sectionNumber, conference } from '../data/site';
     position: sticky;
     top: 0;
     z-index: 60;
-    background: color-mix(in srgb, var(--paper) 88%, transparent);
-    backdrop-filter: saturate(1.4) blur(14px);
-    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    background: var(--paper);
     border-bottom: 1px solid transparent;
-    transition: border-color 0.35s var(--ease), background 0.35s var(--ease);
+    transition: border-color 0.35s var(--ease);
   }
   .masthead[data-scrolled] { border-bottom-color: var(--rule); }
 
@@ -204,6 +202,7 @@ import { sections, sectionNumber, conference } from '../data/site';
     padding-top: 2rem;
     min-height: 2.75rem;
     display: inline-flex;
+    gap: 0.4em;
     align-items: flex-end;
     align-self: flex-start;
     font-size: 0.8125rem;
