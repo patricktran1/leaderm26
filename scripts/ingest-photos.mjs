@@ -457,6 +457,13 @@ export function resolveDuplicates(entries) {
   );
 }
 
+/**
+ * The file is opened a second time here rather than carried over from
+ * `describe`, because holding a hundred decoded camera originals at once is
+ * more than a build machine should be asked to carry. For HEIC that means
+ * paying the WebAssembly decode twice — measured at a fraction of a second per
+ * photograph, which is the cheaper of the two things to spend.
+ */
 async function writeMaster(entry, dir) {
   const longEdge = Math.max(entry.sourceWidth, entry.sourceHeight);
   const { image } = await openImage(entry.file);

@@ -31,10 +31,21 @@ for (const v of viewports) {
     window.scrollTo(0, 0);
     await new Promise(r => setTimeout(r, 400));
   });
+  // A full-page screenshot renders the whole document at once, so every lazy
+  // image has to be asked for explicitly or the review is of a blank page.
   await page.evaluate(() => {
+    document.querySelectorAll('img[loading="lazy"]').forEach(i => i.setAttribute('loading', 'eager'));
     const waits = Array.from(document.images).filter(i => !i.complete).map(i => new Promise(r => { i.addEventListener('load', r); i.addEventListener('error', r); }));
-    return Promise.race([Promise.all(waits), new Promise(r => setTimeout(r, 4000))]);
+    return Promise.race([Promise.all(waits), new Promise(r => setTimeout(r, 8000))]);
   });
+  // Decode, not merely load: a full-page capture paints in one go and an
+  // undecoded image comes out as an empty frame.
+  await page.evaluate(() =>
+    Promise.race([
+      Promise.all(Array.from(document.images).map(i => i.decode().catch(() => {}))),
+      new Promise(r => setTimeout(r, 15000)),
+    ]),
+  );
   await page.waitForTimeout(700);
   if (process.env.FORCE_VISIBLE) await page.addStyleTag({ content: '.reveal{opacity:1!important;transform:none!important}' });
   await page.waitForTimeout(200);
