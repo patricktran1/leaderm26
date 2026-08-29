@@ -4,8 +4,11 @@ interface Props {
   label: string;
   title: string;
   id?: string;
+  /** `quiet` sets the heading at text scale — for sections that should not
+      compete with the journal, such as the colophon. */
+  scale?: 'display' | 'quiet';
 }
-const { num, label, title, id } = Astro.props;
+const { num, label, title, id, scale = 'display' } = Astro.props;
 ---
 
 <div class="sec-head">
@@ -14,12 +17,21 @@ const { num, label, title, id } = Astro.props;
     <span class="label">{label}</span>
   </div>
   <div class="sec-head__body">
-    <h2 class="h2 reveal" id={id} style="--reveal-delay:60ms">{title}</h2>
+    <h2 class:list={[scale === 'quiet' ? 'h2--quiet' : 'h2', 'reveal']} id={id} style="--reveal-delay:60ms">
+      {title}
+    </h2>
     <div class="sec-head__aside reveal" style="--reveal-delay:120ms"><slot /></div>
   </div>
 </div>
 
 <style>
   .sec-head__aside:empty { display: none; }
+  .h2--quiet {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(1.375rem, 2vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+  }
   .sec-head__aside { margin-top: clamp(1.25rem, 2.5vw, 2rem); }
 </style>

@@ -34,7 +34,7 @@ const meta = [
           src={cover.image}
           alt={cover.alt}
           widths={[400, 600]}
-          sizes="(min-width: 62rem) 27rem, calc(100vw - 2.5rem)"
+          sizes="(min-width: 62rem) 27rem, min(26rem, calc(100vw - 2.5rem))"
           quality={82}
           loading="eager"
           fetchpriority="high"
@@ -82,7 +82,10 @@ const meta = [
     .hero .display { font-size: clamp(3rem, 5.8vw, 6.5rem); }
   }
 
-  .hero__figure { margin: 0; }
+  /* The photographic masters top out at 600px on the long edge, so single
+     column layouts cap the frame rather than stretching it across a tablet. */
+  .hero__figure { margin: 0; max-width: 26rem; }
+  @media (min-width: 62rem) { .hero__figure { max-width: none; } }
   .hero__frame { aspect-ratio: 3 / 4; }
   .hero__frame :global(img) {
     transform: scale(1.001);

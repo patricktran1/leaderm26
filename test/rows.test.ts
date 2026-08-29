@@ -39,6 +39,25 @@ describe('buildRows', () => {
     expect(flat).toEqual(input.map((p) => p.id));
   });
 
+  it('folds an orphaned frame back into the previous row', () => {
+    const rows = buildRows([
+      make('a', 0.75, 'minor'),
+      make('b', 0.75, 'minor'),
+      make('c', 0.75, 'minor'),
+      make('orphan', 0.75, 'minor'),
+      make('lead', 0.75, 'lead'),
+    ]);
+    const runs = rows.filter((r) => r.kind === 'run');
+    expect(runs).toHaveLength(1);
+    expect(runs[0]?.items.map((p) => p.id)).toEqual(['a', 'b', 'c', 'orphan']);
+  });
+
+  it('leaves a genuinely wide final row alone', () => {
+    const rows = buildRows([make('lead', 0.75, 'lead'), make('wide', 1.5, 'major')]);
+    expect(rows).toHaveLength(2);
+    expect(rows[1]?.items).toHaveLength(1);
+  });
+
   it('keeps run rows from growing unusably wide', () => {
     const input = Array.from({ length: 12 }, (_, i) => make(`p${i}`, 0.667, 'minor'));
     for (const row of buildRows(input)) {

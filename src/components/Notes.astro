@@ -56,7 +56,7 @@ const notes = [
               src={card.image}
               alt={card.alt}
               widths={[400, 600, 720]}
-              sizes="(min-width: 62rem) 26rem, calc(100vw - 2.5rem)"
+              sizes="(min-width: 62rem) 26rem, min(28rem, calc(100vw - 2.5rem))"
               quality={84}
               loading="lazy"
             />
@@ -103,7 +103,8 @@ const notes = [
     max-width: 36rem;
   }
 
-  .notes__media { display: grid; gap: clamp(1.75rem, 4vw, 2.5rem); }
+  .notes__media { display: grid; gap: clamp(1.75rem, 4vw, 2.5rem); max-width: 28rem; }
+  @media (min-width: 62rem) { .notes__media { max-width: none; } }
   .notes__frame { background: var(--night-soft); }
   .notes__cap {
     display: block;

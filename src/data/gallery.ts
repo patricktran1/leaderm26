@@ -64,6 +64,7 @@ export interface GalleryRow {
 }
 
 const BUDGET: Record<'major' | 'minor', number> = { major: 2.0, minor: 2.6 };
+const MAX_PER_ROW = 4;
 
 export function buildRows(items: ResolvedPhoto[]): GalleryRow[] {
   const rows: GalleryRow[] = [];
@@ -90,5 +91,34 @@ export function buildRows(items: ResolvedPhoto[]): GalleryRow[] {
   }
   flush();
 
-  return rows;
+  return settle(rows);
+}
+
+/**
+ * A row left holding a single frame — because a lead photograph forced an early
+ * flush, or because the journal ended — renders as a lonely sliver. Fold it back
+ * into the previous run row when there is space; the order is preserved because
+ * the orphan always directly follows that row.
+ */
+function settle(rows: GalleryRow[]): GalleryRow[] {
+  const settled: GalleryRow[] = [];
+
+  for (const row of rows) {
+    const previous = settled[settled.length - 1];
+    const isOrphan = row.kind === 'run' && row.items.length === 1 && row.fill < 0.6;
+    if (
+      isOrphan &&
+      previous?.kind === 'run' &&
+      previous.items.length < MAX_PER_ROW &&
+      row.items[0]
+    ) {
+      previous.items.push(row.items[0]);
+      previous.span += row.span;
+      previous.fill = 1;
+      continue;
+    }
+    settled.push(row);
+  }
+
+  return settled;
 }
