@@ -20,7 +20,7 @@ const slides = await Promise.all(
       h: full.attributes.height ?? photo.image.height,
       alt: photo.alt,
       caption: photo.caption,
-      note: photo.note ?? '',
+      note: photo.note ?? photo.meta,
       category: CATEGORY_LABEL[photo.category],
     };
   }),

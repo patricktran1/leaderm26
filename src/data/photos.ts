@@ -85,6 +85,8 @@ export interface Photo {
   sourceHeight: number;
   supersedes: string[];
   featured: boolean;
+  /** A quiet second line for the viewer: when it was taken, on what. */
+  meta: string;
 }
 
 const index = rawIndex as PhotoIndex;
@@ -166,7 +168,19 @@ function toPhoto(entry: IndexEntry): Photo {
     sourceHeight: entry.sourceHeight,
     supersedes: entry.supersedes,
     featured: override.featured === true,
+    meta: viewerMeta(entry, Boolean(caption)),
   };
+}
+
+/**
+ * The line under the caption in the photograph viewer. When the caption is
+ * already the capture time there is no point repeating it, so only the camera
+ * is left; when someone has written a caption, both belong.
+ */
+function viewerMeta(entry: IndexEntry, hasWrittenCaption: boolean): string {
+  const parts = captureParts(entry.takenAt);
+  const when = parts && hasWrittenCaption ? `${parts.day}, ${parts.time}` : null;
+  return [when, entry.camera].filter(Boolean).join(' · ');
 }
 
 /**

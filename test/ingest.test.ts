@@ -6,6 +6,7 @@ import {
   hammingDistance,
   hashIsDistinctive,
   resolveDuplicates,
+  tidyCamera,
   validateOverrides,
 } from '../scripts/ingest-photos.mjs';
 
@@ -240,5 +241,23 @@ describe('parseCaptions', () => {
 
   it('refuses something that is not a map of photographs', () => {
     expect(parseCaptions('[1,2,3]').error).toMatch(/object of photo ids/);
+  });
+});
+
+describe('tidyCamera', () => {
+  it('stops EXIF shouting the maker twice', () => {
+    expect(tidyCamera('SONY ZV-1M2')).toBe('Sony ZV-1M2');
+    expect(tidyCamera('Canon Canon EOS R6')).toBe('Canon EOS R6');
+    expect(tidyCamera('NIKON CORPORATION NIKON Z 6')).toBe('Nikon Z 6');
+    expect(tidyCamera('Leica Camera AG Leica Q3')).toBe('Leica Q3');
+  });
+
+  it('lets an iPhone be an iPhone', () => {
+    expect(tidyCamera('Apple Apple iPhone 16 Pro')).toBe('iPhone 16 Pro');
+  });
+
+  it('returns nothing rather than an empty string', () => {
+    expect(tidyCamera('')).toBeNull();
+    expect(tidyCamera(null)).toBeNull();
   });
 });

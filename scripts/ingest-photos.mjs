@@ -168,6 +168,30 @@ export function disambiguate(groups) {
   return groups;
 }
 
+/** Camera makers shout their own names in EXIF. */
+const MAKERS = { SONY: 'Sony', NIKON: 'Nikon', CANON: 'Canon', FUJIFILM: 'Fujifilm', OLYMPUS: 'Olympus', PANASONIC: 'Panasonic', LEICA: 'Leica', RICOH: 'Ricoh', APPLE: 'Apple', GOOGLE: 'Google', SAMSUNG: 'Samsung', DJI: 'DJI' };
+
+export function tidyCamera(raw) {
+  // Makers write their name into both Make and Model, sometimes with a legal
+  // suffix: "NIKON CORPORATION NIKON Z 6" is one camera, not three words of one.
+  let words = (raw ?? '')
+    .replace(/\b(corporation|company|imaging|camera|ag|inc\.?|co\.?,? ?ltd\.?)\b/gi, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (words.length === 0) return null;
+
+  const maker = MAKERS[words[0].toUpperCase()];
+  if (maker) {
+    words = [maker, ...words.slice(1).filter((word) => word.toUpperCase() !== maker.toUpperCase())];
+    // "Apple iPhone 16 Pro" reads better as "iPhone 16 Pro".
+    if (maker === 'Apple' && /^iPh|^iPad/i.test(words[1] ?? '')) words.shift();
+  } else if (words.length > 1 && words[0].toUpperCase() === words[1].toUpperCase()) {
+    words.shift();
+  }
+  return words.join(' ') || null;
+}
+
 function readExif(metadata) {
   if (!metadata.exif) return {};
   try {
@@ -176,11 +200,7 @@ function readExif(metadata) {
       exif?.Photo?.DateTimeOriginal ?? exif?.Photo?.DateTimeDigitized ?? exif?.Image?.DateTime;
     const make = exif?.Image?.Make?.trim();
     const model = exif?.Image?.Model?.trim();
-    const camera = [make, model]
-      .filter(Boolean)
-      .join(' ')
-      .replace(/\b(\w+)\s+\1\b/i, '$1') // "Apple Apple iPhone" -> "Apple iPhone"
-      .trim();
+    const camera = tidyCamera([make, model].filter(Boolean).join(' '));
     return {
       takenAt: taken instanceof Date && !Number.isNaN(taken.valueOf()) ? taken.toISOString() : null,
       camera: camera || null,
