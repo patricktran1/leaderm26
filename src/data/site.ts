@@ -4,7 +4,7 @@ export const site = {
   tagline: 'An independent visual journal from LEADderm 2026',
   description:
     'An independent photographic and editorial journal from LEADderm 2026 — the third annual leadership meeting for dermatology, held August 29–30 at the Pendry Newport Beach. Photographed and built on site by Patrick Tran, MD, FAAD.',
-  url: 'https://leadderm26.vercel.app',
+  url: 'https://leaderm26.vercel.app',
   locale: 'en_US',
 } as const;
 

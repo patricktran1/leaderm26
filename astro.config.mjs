@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://leadderm26.vercel.app',
+  site: 'https://leaderm26.vercel.app',
   build: { inlineStylesheets: 'always' },
   image: {
     // Photographs are already delivered as compressed WebP masters; keep the
