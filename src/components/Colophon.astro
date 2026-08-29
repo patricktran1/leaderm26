@@ -29,16 +29,8 @@ const build = [
         <p class="bio__body">
           Dermatologist. I build things at the seam between medicine and software —
           practice technology, AI workflows, design and photography — and I made this page
-          between sessions to see how far that could be taken in two days.
+          between sessions, to see how far two days would go.
         </p>
-        <div class="bio__links">
-          <a class="arrow-link" href={`mailto:${author.email}?subject=From%20LEADderm%202026`}>
-            {author.email} <span class="chev" aria-hidden="true">→</span>
-          </a>
-          <a class="arrow-link" href={author.instagramUrl} target="_blank" rel="noopener noreferrer">
-            Instagram · @{author.instagram} <span class="chev" aria-hidden="true">↗</span>
-          </a>
-        </div>
       </div>
 
       <dl class="build reveal">
@@ -65,7 +57,6 @@ const build = [
 
   .bio { display: grid; gap: 1rem; max-width: 34rem; }
   .bio__body { font-size: 1rem; line-height: 1.7; color: var(--ink-2); }
-  .bio__links { display: grid; gap: 0.9rem; justify-items: start; margin-top: 0.5rem; }
 
   .build { border-top: 1px solid var(--rule); }
   .build__row {

@@ -6,10 +6,29 @@ import { gallery, buildRows } from '../data/gallery';
 const rows = buildRows(gallery);
 
 // Stable index across the whole gallery so the lightbox can step through it.
+// `sizes` is derived from each frame's share of its row, because in a justified
+// row a landscape frame takes far more of the measure than a portrait one — a
+// single flat value under-declares for one and over-declares for the other.
+const MAX_CONTENT = 1320;
+
 let cursor = 0;
 const indexed = rows.map((row) => ({
   ...row,
-  items: row.items.map((photo) => ({ photo, index: cursor++ })),
+  items: row.items.map((photo) => {
+    const share = row.kind === 'lead' ? 1 : photo.ratio / row.span;
+    const sizes =
+      row.kind === 'lead'
+        ? '(min-width: 62rem) 30rem, calc(100vw - 2.5rem)'
+        : [
+            `(min-width: 82.5rem) ${Math.round(share * MAX_CONTENT)}px`,
+            `(min-width: 40rem) ${Math.round(share * 92)}vw`,
+            '100vw',
+          ].join(', ');
+    const ladder = [240, 320, 400, 480, 600, 800, photo.image.width]
+      .filter((w) => w <= photo.image.width)
+      .filter((w, i, all) => all.indexOf(w) === i);
+    return { photo, index: cursor++, sizes, widths: ladder };
+  }),
 }));
 ---
 
@@ -27,7 +46,7 @@ const indexed = rows.map((row) => ({
   <div class="shell journal__body">
     {indexed.map((row) => (
       <div class={`jrow jrow--${row.kind}`} style={`--fill:${row.fill}`}>
-        {row.items.map(({ photo, index }) => (
+        {row.items.map(({ photo, index, sizes, widths }) => (
           <figure class="shot reveal" style={`--grow:${(photo.ratio * 4).toFixed(3)}`}>
             <button
               class="shot__btn"
@@ -39,10 +58,8 @@ const indexed = rows.map((row) => ({
                 <Image
                   src={photo.image}
                   alt={photo.alt}
-                  widths={[320, 480, photo.image.width]}
-                  sizes={row.kind === 'lead'
-                    ? '(min-width: 40rem) 30rem, calc(100vw - 2.5rem)'
-                    : '(min-width: 62rem) 30vw, (min-width: 40rem) 42vw, 46vw'}
+                  widths={widths}
+                  sizes={sizes}
                   quality={82}
                   loading="lazy"
                 />
