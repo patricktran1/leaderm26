@@ -50,8 +50,8 @@ const dateline = [
     <p class="dateline reveal">
       {dateline.map((item, i) => (
         <span class="dateline__item">
-          {i > 0 && <span class="dateline__sep" aria-hidden="true">· </span>}
           {item}
+          {i < dateline.length - 1 && <span class="dateline__sep" aria-hidden="true">·</span>}
         </span>
       ))}
     </p>
@@ -116,12 +116,23 @@ const dateline = [
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.5rem 0.85rem;
+    gap: 0.4rem 0;
     font-family: var(--serif);
     font-size: clamp(0.9375rem, 1.2vw, 1.125rem);
     line-height: 1.35;
     letter-spacing: -0.005em;
   }
   .dateline__item { white-space: nowrap; }
-  .dateline__sep { color: var(--ink-3); }
+  /* On a narrow screen a wrapped item would begin with its separator, so the
+     dateline becomes a stacked list instead. */
+  @media (max-width: 34rem) {
+    .dateline { display: grid; gap: 0.2rem; }
+    .dateline__sep { display: none; }
+  }
+  /* The separator travels inside its item's nowrap span, so it can never be
+     left alone at the start or end of a wrapped line. */
+  .dateline__sep {
+    color: var(--ink-3);
+    margin-inline: 0.65em 0.7em;
+  }
 </style>
