@@ -30,7 +30,7 @@ const slides = await Promise.all(
   <div class="lb__panel" data-lb-dismiss role="dialog" aria-modal="true" aria-label="Photograph viewer" tabindex="-1">
     <div class="lb__bar" data-lb-dismiss>
       <button class="lb__close" type="button" data-lb-close aria-label="Close viewer">
-        Close <span aria-hidden="true">×</span>
+        <span class="lb__close-label">Close</span> <span aria-hidden="true">×</span>
       </button>
     </div>
 
@@ -79,6 +79,8 @@ const slides = await Promise.all(
     height: 100%;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
+    width: min(100%, 62rem);
+    margin-inline: auto;
     padding: 0.5rem clamp(0.75rem, 3vw, 2rem) max(0.75rem, env(safe-area-inset-bottom));
     transform: scale(0.985);
     transition: transform 0.34s var(--ease);
@@ -103,15 +105,20 @@ const slides = await Promise.all(
     text-transform: uppercase;
     padding-inline: 0.25rem;
   }
-  .lb__close { border-bottom: 1px solid #6b6f75; padding-bottom: 0.2rem; }
-  .lb__close:hover { border-color: #e7e5e1; }
+  .lb__close-label {
+    border-bottom: 1px solid #6b6f75;
+    padding-bottom: 0.18em;
+  }
+  .lb__close:hover .lb__close-label { border-color: #e7e5e1; }
 
   .lb__stage {
+    position: relative;
     display: grid;
     place-items: center;
     min-height: 0;
     padding-block: clamp(0.5rem, 2vw, 1.25rem);
   }
+  .lb__figure { width: 100%; }
 
   .lb__figure {
     margin: 0;
@@ -124,9 +131,8 @@ const slides = await Promise.all(
      the page is useless, so allow a modest 1.35x — beyond that these masters
      have nothing left to give. */
   .lb__figure img {
-    max-width: min(100%, calc(var(--natural-w, 100%) * 1.35));
+    width: min(100%, calc(var(--natural-w, 100%) * 1.35));
     max-height: 100%;
-    width: auto;
     height: auto;
     min-width: 0;
     min-height: 0;
@@ -139,7 +145,7 @@ const slides = await Promise.all(
   .lb__foot {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
     padding-top: 0.75rem;

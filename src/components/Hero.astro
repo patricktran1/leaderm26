@@ -21,8 +21,8 @@ const dateline = [
         The other half<br />of the training.
       </h1>
       <p class="lede reveal" style="--reveal-delay:160ms">
-        LEADderm gathers dermatologists, physician associates, nurse practitioners and
-        industry partners around the part of the job medicine rarely teaches — leadership,
+        LEADderm gathers dermatologists, physician associates, nurse&nbsp;practitioners and
+        industry partners around the part of the job medicine rarely teaches: leadership,
         community, and the ground you stand on.
       </p>
       <p class="byline reveal" style="--reveal-delay:200ms">
@@ -49,10 +49,10 @@ const dateline = [
   <div class="shell">
     <p class="dateline reveal">
       {dateline.map((item, i) => (
-        <>
-          {i > 0 && <span class="dateline__sep" aria-hidden="true">·</span>}
-          <span>{item}</span>
-        </>
+        <span class="dateline__item">
+          {i > 0 && <span class="dateline__sep" aria-hidden="true">· </span>}
+          {item}
+        </span>
       ))}
     </p>
   </div>
@@ -113,7 +113,6 @@ const dateline = [
     margin-top: clamp(2.5rem, 5vw, 4rem);
     padding-block: clamp(0.9rem, 1.8vw, 1.25rem);
     border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--rule);
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -123,5 +122,6 @@ const dateline = [
     line-height: 1.35;
     letter-spacing: -0.005em;
   }
+  .dateline__item { white-space: nowrap; }
   .dateline__sep { color: var(--ink-3); }
 </style>

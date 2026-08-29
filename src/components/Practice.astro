@@ -5,7 +5,7 @@ import { author } from '../data/site';
 const lines = [
   {
     k: 'Presence',
-    v: 'A site that reads like your practice at its best — photography, typography and restraint instead of stock smiles and a carousel.',
+    v: 'A site that reads like your practice at its best. Real photography, real typography, and the restraint to leave the rest out.',
   },
   {
     k: 'Operations',
@@ -13,18 +13,18 @@ const lines = [
   },
   {
     k: 'Intelligence',
-    v: 'Language models used where they are genuinely good — drafting, summarizing, routing — and kept away from where they are not.',
+    v: 'Language models put where they are genuinely good: drafting, summarizing, routing. Kept well away from clinical judgement.',
   },
 ];
 ---
 
 <section class="section rule-top" id="practice" aria-labelledby="practice-title">
   <div class="shell">
-    <SectionHead section="practice" title="Imagine your practice like this.">
+    <SectionHead section="practice" title="The same thinking, for a practice.">
       <p class="prose">
         This page is the demonstration. It was designed and built during the conference it
-        documents: a medical brand can look considered without looking corporate, and still
-        open fast on hotel Wi-Fi.
+        documents, on the same principles a practice site would use: photography that is
+        actually yours, type that holds up, and a page that opens fast on hotel Wi-Fi.
       </p>
     </SectionHead>
 
@@ -44,10 +44,10 @@ const lines = [
       </p>
       <div class="invite__links">
         <a class="arrow-link" href={`mailto:${author.email}?subject=From%20LEADderm%202026`}>
-          {author.email} <span class="chev" aria-hidden="true">→</span>
+          <span>{author.email}</span> <span class="chev" aria-hidden="true">→</span>
         </a>
         <a class="arrow-link" href={author.instagramUrl} target="_blank" rel="noopener noreferrer">
-          @{author.instagram} <span class="chev" aria-hidden="true">↗</span>
+          <span>@{author.instagram}</span> <span class="chev" aria-hidden="true">↗</span>
         </a>
       </div>
     </div>
@@ -58,6 +58,7 @@ const lines = [
   .capability {
     margin-top: clamp(2.5rem, 6vw, 4.5rem);
     border-top: 1px solid var(--ink);
+    max-width: 50rem;
   }
   .capability__row {
     display: grid;
@@ -67,8 +68,8 @@ const lines = [
   }
   @media (min-width: 48rem) {
     .capability__row {
-      grid-template-columns: 12rem minmax(0, 1fr);
-      gap: clamp(1.5rem, 4vw, 3.5rem);
+      grid-template-columns: 9rem minmax(0, 1fr);
+      gap: clamp(1.5rem, 3vw, 2.5rem);
       align-items: baseline;
     }
   }
@@ -89,12 +90,9 @@ const lines = [
   .invite {
     margin-top: clamp(3rem, 7vw, 5rem);
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2rem);
+    gap: clamp(1.25rem, 2.5vw, 1.75rem);
+    justify-items: start;
   }
-  @media (min-width: 62rem) {
-    .invite { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 4rem; }
-  }
-  .invite__line { max-width: 30rem; }
-  .invite__links { display: grid; gap: 0.9rem; justify-items: start; }
-  @media (min-width: 62rem) { .invite__links { justify-items: end; } }
+  .invite__line { max-width: 32rem; text-wrap: balance; }
+  .invite__links { display: grid; gap: 0.25rem; justify-items: start; }
 </style>

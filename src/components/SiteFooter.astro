@@ -22,13 +22,22 @@ const year = new Date().getFullYear();
   <div class="shell">
     <div class="foot__fine">
       <span>{conference.venue} · {conference.dates}</span>
-      <a class="foot__top" href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      <a class="foot__top" href="/#top">Back to top <span aria-hidden="true">↑</span></a>
     </div>
   </div>
 </footer>
 
 <style>
-  .foot { border-top: 1px solid var(--ink); padding-block: clamp(2.5rem, 5vw, 4rem) 2rem; }
+  .foot { padding-block: 0 2rem; position: relative; }
+  .foot > .shell:first-child { position: relative; padding-block-start: clamp(2.5rem, 5vw, 4rem); }
+  .foot > .shell:first-child::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: var(--gutter);
+    right: var(--gutter);
+    border-top: 1px solid var(--ink);
+  }
   .foot__inner {
     display: grid;
     gap: clamp(1.5rem, 4vw, 3rem);

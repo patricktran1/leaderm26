@@ -154,7 +154,7 @@ function initLightbox(): void {
     image.style.setProperty('--natural-w', `${slide.w}px`);
     image.alt = slide.alt;
     caption.textContent = slide.caption;
-    note.textContent = [slide.category, slide.note].filter(Boolean).join(' · ');
+    note.textContent = slide.note;
     counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
     if (image.complete) image.setAttribute('data-ready', '');
     // Warm the neighbours so arrowing through feels instant.

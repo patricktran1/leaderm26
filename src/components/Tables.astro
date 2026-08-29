@@ -36,7 +36,7 @@ import { tables } from '../data/tables';
     margin-top: clamp(2.5rem, 5vw, 4rem);
     border-top: 1px solid var(--ink);
     display: grid;
-    max-width: 52rem;
+    max-width: 50rem;
   }
 
   .tables__row {
@@ -51,9 +51,9 @@ import { tables } from '../data/tables';
   }
   @media (min-width: 44rem) {
     .tables__row {
-      grid-template-columns: 2.5rem minmax(0, 1fr) 13rem;
+      grid-template-columns: 2.5rem minmax(0, 1fr) 12rem;
       grid-template-areas: 'num theme host';
-      column-gap: clamp(1.25rem, 3vw, 2.5rem);
+      column-gap: clamp(1.25rem, 3vw, 2rem);
     }
   }
 
@@ -79,7 +79,5 @@ import { tables } from '../data/tables';
     color: var(--ink-3);
     line-height: 1.4;
   }
-  @media (min-width: 44rem) {
-    .tables__host { text-align: right; }
-  }
+
 </style>

@@ -107,8 +107,18 @@ button { font: inherit; color: inherit; }
    column, never at the viewport edge. */
 .rule-top { padding-block-start: 0; }
 .rule-top > .shell:first-child {
-  border-top: 1px solid var(--rule);
+  position: relative;
   padding-block-start: var(--section-y);
+}
+/* Drawn inside the gutter so the hairline starts and ends at the text column,
+   which a border on the padding box does not do. */
+.rule-top > .shell:first-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--gutter);
+  right: var(--gutter);
+  border-top: 1px solid var(--rule);
 }
 
 /* ---------------------------------------------------------- typography -- */
@@ -145,7 +155,7 @@ button { font: inherit; color: inherit; }
   color: var(--ink-2);
   letter-spacing: -0.005em;
   max-width: 36rem;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 .prose,
@@ -230,12 +240,17 @@ a { color: inherit; }
   letter-spacing: 0.01em;
   color: var(--ink);
   text-decoration: none;
+  transition: color 0.3s var(--ease);
+}
+/* The rule hugs the word; the anchor only carries the touch target. */
+.arrow-link > span:first-child {
   border-bottom: 1px solid var(--rule-strong);
-  padding-bottom: 0.35em;
-  transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+  padding-bottom: 0.18em;
+  transition: border-color 0.3s var(--ease);
 }
 .arrow-link .chev { transition: transform 0.35s var(--ease); }
-.arrow-link:hover { color: var(--pine); border-color: var(--pine); }
+.arrow-link:hover { color: var(--pine); }
+.arrow-link:hover > span:first-child { border-color: var(--pine); }
 .arrow-link:hover .chev { transform: translateX(0.25em); }
 
 :where(a, button, [tabindex]):focus-visible {
@@ -257,10 +272,12 @@ a { color: inherit; }
 .on-night .lede { color: var(--ink-2-on-night); }
 .on-night .serif-note { color: var(--ink-on-night); }
 .on-night .sec-head__num { color: var(--ink-2-on-night); }
-.on-night .rule-top > .shell:first-child,
+.on-night .rule-top > .shell:first-child::before,
 .on-night .rule { border-color: var(--rule-on-night); }
-.on-night .arrow-link { color: var(--ink-on-night); border-color: #3b3f45; }
-.on-night .arrow-link:hover { color: var(--pine-bright); border-color: var(--pine-bright); }
+.on-night .arrow-link { color: var(--ink-on-night); }
+.on-night .arrow-link > span:first-child { border-color: #3b3f45; }
+.on-night .arrow-link:hover { color: var(--pine-bright); }
+.on-night .arrow-link:hover > span:first-child { border-color: var(--pine-bright); }
 
 /* --------------------------------------------------------------- media -- */
 .frame {
@@ -317,3 +334,29 @@ a { color: inherit; }
   transition: top 0.2s var(--ease);
 }
 .skip-link:focus { top: 1rem; }
+
+/* ---------------------------------------------------------------- print -- */
+@media print {
+  .masthead,
+  .index-panel,
+  .lb,
+  .skip-link,
+  .foot__top { display: none !important; }
+
+  body { background: #fff; color: #000; font-size: 10.5pt; }
+  .js .reveal { opacity: 1 !important; transform: none !important; }
+  .shell { max-width: none; padding-inline: 0; }
+  .section { padding-block: 1.5rem; break-inside: avoid-page; }
+  .on-night { background: #fff; color: #000; }
+  .on-night .prose,
+  .on-night .note__b,
+  .on-night .notes__cap,
+  .on-night .pull__source { color: #333; }
+  .on-night .note__t,
+  .on-night .pull__line,
+  .on-night .h2 { color: #000; }
+  .display { font-size: 34pt; }
+  .h2 { font-size: 20pt; }
+  figure, .tables__row, .objective, .note { break-inside: avoid; }
+  a[href^='http']::after { content: ' (' attr(href) ')'; font-size: 8pt; color: #555; }
+}

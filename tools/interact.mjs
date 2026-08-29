@@ -42,7 +42,7 @@ const ok = (c, m) => { console.log(c ? 'PASS' : 'FAIL', m); if (!c) fails.push(m
   ok(await page.locator('#lightbox').isHidden(), 'clicking outside the photograph closes the lightbox');
 
   // anchor navigation
-  await page.click('.masthead__nav a[href="#tables"]');
+  await page.click('.masthead__nav a[href="/#tables"]');
   await page.waitForTimeout(900);
   ok(await page.evaluate(() => window.scrollY > 1000), 'nav anchor scrolls');
 

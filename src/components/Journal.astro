@@ -18,11 +18,11 @@ const indexed = rows.map((row) => ({
     const share = row.kind === 'lead' ? 1 : photo.ratio / row.span;
     const sizes =
       row.kind === 'lead'
-        ? '(min-width: 62rem) 30rem, calc(100vw - 2.5rem)'
+        ? '(min-width: 48rem) 30rem, calc(100vw - 2.5rem)'
         : [
             `(min-width: 82.5rem) ${Math.round(share * MAX_CONTENT)}px`,
             `(min-width: 40rem) ${Math.round(share * 92)}vw`,
-            '100vw',
+            'calc(100vw - 2.5rem)',
           ].join(', ');
     const ladder = [240, 320, 400, 480, 600, 800, photo.image.width]
       .filter((w) => w <= photo.image.width)
@@ -47,7 +47,10 @@ const indexed = rows.map((row) => ({
     {indexed.map((row) => (
       <div class={`jrow jrow--${row.kind}`} style={`--fill:${row.fill}`}>
         {row.items.map(({ photo, index, sizes, widths }) => (
-          <figure class="shot reveal" style={`--grow:${(photo.ratio * 4).toFixed(3)}`}>
+          <figure
+            class="shot reveal"
+            style={`--grow:${(photo.ratio * 4).toFixed(3)};--master-w:${photo.image.width}px`}
+          >
             <button
               class="shot__btn"
               type="button"
@@ -83,27 +86,40 @@ const indexed = rows.map((row) => ({
     gap: clamp(2rem, 4vw, 3.25rem);
   }
 
-  .jrow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    column-gap: clamp(0.75rem, 2vw, 1.5rem);
-    row-gap: clamp(2rem, 4vw, 3.25rem);
-  }
-  /* flex-basis 0 + grow proportional to aspect ratio makes every frame in a
-     line share one height. Ratios are scaled x4 so a lone item on a wrapped
-     line still has grow >= 1 and fills the row. */
-  .shot { flex: var(--grow) 1 0; min-width: 42%; margin: 0; }
+  /* Phones get one frame per row. Two-up needs a minimum width to force the
+     wrap, and that minimum overrides the ratio-proportional widths, so the
+     frames in a pair stop sharing a height — the whole premise of the row. */
+  .jrow { display: grid; gap: clamp(2rem, 6vw, 3rem); }
+  .shot { margin: 0; }
+
   @media (min-width: 40rem) {
-    .shot { min-width: 0; }
+    .jrow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      column-gap: clamp(0.75rem, 2vw, 1.5rem);
+      row-gap: clamp(2rem, 4vw, 3.25rem);
+    }
+    /* flex-basis 0 + grow proportional to aspect ratio makes every frame in a
+       line share one height. Ratios are scaled x4 so a lone item on a wrapped
+       line still has grow >= 1 and fills the row. */
+    .shot { flex: var(--grow) 1 0; min-width: 0; }
     .jrow--run { max-width: calc(100% * var(--fill)); }
+    .jrow--lead .shot { flex: 0 1 100%; }
   }
 
-  .jrow--lead .shot { flex: 0 1 100%; }
-  /* A plate carries its caption in the column beside it, so the air to its
-     right is composition rather than leftover. */
-  @media (min-width: 62rem) {
-    .jrow--lead .shot { display: grid; grid-template-columns: 30rem 16rem; column-gap: clamp(2rem, 4vw, 3.5rem); align-items: end; }
+  /* A plate is a photograph at its own resolution with its caption in the
+     column beside it — never a stretched frame in a half-empty row. */
+  @media (min-width: 48rem) {
+    .jrow--lead { max-width: 50rem; }
+    .jrow--lead .shot {
+      flex: 1 1 100%;
+      width: 100%;
+      display: grid;
+      grid-template-columns: min(30rem, var(--master-w)) minmax(0, 1fr);
+      column-gap: clamp(1.75rem, 4vw, 3.5rem);
+      align-items: end;
+    }
     .jrow--lead .shot__btn { grid-column: 1; }
     .jrow--lead .shot__cap { grid-column: 2; margin-top: 0; padding-bottom: 0.35rem; }
   }
@@ -112,13 +128,6 @@ const indexed = rows.map((row) => ({
     margin-top: 0.4rem;
     color: var(--ink-3);
   }
-  @media (min-width: 40rem) {
-    .jrow--lead .shot { flex: 0 1 min(100%, 26rem); }
-  }
-  @media (min-width: 62rem) {
-    .jrow--lead .shot { flex: 0 1 min(100%, 30rem); }
-  }
-
   .shot__btn {
     display: block;
     width: 100%;

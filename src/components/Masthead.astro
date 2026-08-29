@@ -4,14 +4,14 @@ import { sections, sectionNumber, conference } from '../data/site';
 
 <header class="masthead" id="masthead">
   <div class="shell masthead__inner">
-    <a class="wordmark" href="#top">
+    <a class="wordmark" href="/#top">
       <span class="wordmark__mark">LEAD<span class="wordmark__soft">derm</span> 2026</span>
       <span class="wordmark__sub">Field Notes</span>
     </a>
 
     <nav class="masthead__nav" aria-label="Sections">
       {sections.map((item) => (
-        <a href={`#${item.id}`} data-spy={item.id}>{item.label}</a>
+        <a href={`/#${item.id}`} data-spy={item.id}>{item.label}</a>
       ))}
     </nav>
 
@@ -20,7 +20,7 @@ import { sections, sectionNumber, conference } from '../data/site';
     </a>
 
     <button class="masthead__toggle" type="button" aria-expanded="false" aria-controls="index-panel" data-menu-open>
-      Index
+      <span>Index</span>
     </button>
   </div>
 </header>
@@ -29,13 +29,13 @@ import { sections, sectionNumber, conference } from '../data/site';
   <div class="shell index-panel__inner">
     <div class="index-panel__top">
       <span class="label">Index</span>
-      <button class="index-panel__close" type="button" data-menu-close>Close</button>
+      <button class="index-panel__close" type="button" data-menu-close><span>Close</span></button>
     </div>
     <nav class="index-panel__nav" aria-label="Index">
       <ol class="index-panel__list">
         {sections.map((item) => (
           <li>
-            <a href={`#${item.id}`} data-menu-link>
+            <a href={`/#${item.id}`} data-menu-link data-spy={item.id}>
               <span class="index-panel__num">{sectionNumber(item.id)}</span>
               <span>{item.label}</span>
             </a>
@@ -43,9 +43,12 @@ import { sections, sectionNumber, conference } from '../data/site';
         ))}
       </ol>
     </nav>
-    <a class="index-panel__official" href={conference.official} target="_blank" rel="noopener noreferrer">
-      leadderm.org <span aria-hidden="true">↗</span>
-    </a>
+    <div class="index-panel__foot">
+      <p class="index-panel__where">{conference.venue} · {conference.dates}</p>
+      <a class="index-panel__official" href={conference.official} target="_blank" rel="noopener noreferrer">
+        leadderm.org <span aria-hidden="true">↗</span>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -115,13 +118,15 @@ import { sections, sectionNumber, conference } from '../data/site';
   }
   .masthead__official:hover { color: var(--pine); }
 
-  .masthead__toggle {
+  .masthead__toggle,
+  .index-panel__close {
     background: none;
     border: 0;
-    border-bottom: 1px solid var(--ink);
     border-radius: 0;
-    padding: 0 0 0.2rem;
+    padding: 0;
     min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
     font-size: 0.75rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -163,20 +168,12 @@ import { sections, sectionNumber, conference } from '../data/site';
     padding-bottom: 1.25rem;
     border-bottom: 1px solid var(--rule);
   }
-  .index-panel__close {
-    background: none;
-    border: 0;
+  .masthead__toggle > span,
+  .index-panel__close > span {
     border-bottom: 1px solid var(--ink);
-    border-radius: 0;
-    padding: 0 0 0.2rem;
-    min-height: 2.75rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    color: var(--ink);
+    padding-bottom: 0.18em;
   }
-  .index-panel__nav { flex: 1; display: flex; align-items: center; }
+  .index-panel__nav { flex: 1; display: flex; align-items: flex-start; padding-top: clamp(1.5rem, 5vw, 3rem); }
   .index-panel__list { width: 100%; display: grid; }
   .index-panel__list a {
     display: flex;
@@ -197,9 +194,21 @@ import { sections, sectionNumber, conference } from '../data/site';
     letter-spacing: 0.16em;
     color: var(--ink-3);
   }
-  .index-panel__official {
+  .index-panel__list a[data-current] .index-panel__num { color: var(--pine); }
+  .index-panel__foot {
     margin-top: auto;
     padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    gap: 0.25rem;
+  }
+  .index-panel__where {
+    padding-top: 1rem;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+  }
+  .index-panel__official {
+    padding-top: 0;
     min-height: 2.75rem;
     display: inline-flex;
     gap: 0.4em;

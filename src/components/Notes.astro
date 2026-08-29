@@ -15,7 +15,7 @@ const notes = [
     medicine’s business advice runs that backwards.`,
   },
   {
-    title: 'Technology as a management question',
+    title: 'Technology is a management question',
     body: `Artificial intelligence turns up on the agenda not as a product demo but as a
     question about training, about how a team is built, about the shape of a patient’s visit.
     That is a more useful frame than another tool comparison.`,
@@ -26,8 +26,8 @@ const notes = [
 <section class="section on-night" id="notes" aria-labelledby="notes-title">
   <div class="shell">
     <SectionHead section="notes" title="Three things worth writing down.">
-      <p class="prose">
-        What follows is opinion — one attendee’s reading of the room, not reporting.
+      <p class="prose balance">
+        What follows is opinion, not reporting: one attendee’s reading of the room.
       </p>
     </SectionHead>
 
@@ -45,7 +45,6 @@ const notes = [
     <ol class="notes__row">
       {notes.map((note, i) => (
         <li class="note reveal" style={`--reveal-delay:${i * 80}ms`}>
-          <span class="label note__n">{String(i + 1).padStart(2, '0')}</span>
           <h3 class="h3 note__t balance">{note.title}</h3>
           <p class="note__b">{note.body}</p>
         </li>
@@ -71,8 +70,6 @@ const notes = [
   }
   .pull__source {
     margin-top: clamp(1rem, 2vw, 1.5rem);
-    padding-left: 1rem;
-    border-left: 1px solid var(--pine-bright);
     font-size: 0.8125rem;
     line-height: 1.5;
     color: #9a9da2;
@@ -93,11 +90,11 @@ const notes = [
   .note {
     display: grid;
     align-content: start;
+    grid-template-rows: 2lh auto;
     gap: 0.55rem;
     padding-block: clamp(1.5rem, 3vw, 2.25rem);
     border-bottom: 1px solid var(--rule-on-night);
   }
-  .note__n { color: var(--ink-2-on-night); }
   .note__t { color: var(--ink-on-night); }
   .note__b {
     font-size: 0.9375rem;
