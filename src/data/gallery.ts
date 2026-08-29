@@ -59,6 +59,14 @@ export const pick = (...ids: string[]): ResolvedPhoto | undefined => {
   return gallery[0];
 };
 
+/**
+ * The opening photograph. Marking any frame `"featured": true` in
+ * captions.json takes it over; otherwise the named fallbacks apply, and
+ * failing those the journal's first frame. The hero is never a broken slot.
+ */
+export const heroPhoto = (...fallbackIds: string[]): ResolvedPhoto | undefined =>
+  gallery.find((photo) => photo.featured) ?? pick(...fallbackIds);
+
 /* -------------------------------------------------------------------------
  * Justified gallery rows.
  * Photographs keep their true aspect ratio; each row shares a common height,

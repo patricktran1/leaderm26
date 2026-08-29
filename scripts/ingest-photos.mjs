@@ -198,7 +198,7 @@ async function writeMaster(entry) {
   return { width: info.width, height: info.height, bytes: info.size };
 }
 
-const OVERRIDE_KEYS = new Set(['caption', 'alt', 'note', 'category', 'weight', 'order', 'hidden']);
+const OVERRIDE_KEYS = new Set(['caption', 'alt', 'note', 'category', 'weight', 'order', 'hidden', 'featured']);
 const CATEGORY_VALUES = new Set(['venue', 'room', 'people', 'artifact', 'unfiled']);
 const WEIGHT_VALUES = new Set(['lead', 'major', 'minor']);
 
@@ -227,8 +227,10 @@ export function validateOverrides(captions) {
     if (value.order !== undefined && typeof value.order !== 'number') {
       problems.push(`${id}.order must be a number`);
     }
-    if (value.hidden !== undefined && typeof value.hidden !== 'boolean') {
-      problems.push(`${id}.hidden must be true or false`);
+    for (const flag of ['hidden', 'featured']) {
+      if (value[flag] !== undefined && typeof value[flag] !== 'boolean') {
+        problems.push(`${id}.${flag} must be true or false`);
+      }
     }
   }
   return problems;

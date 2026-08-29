@@ -9,6 +9,7 @@
     "  category venue | room | people | artifact",
     "  weight   lead (a full plate) | major (opens a row) | minor (default)",
     "  order    pins the photograph; unpinned frames sort by the time they were taken",
+    "  featured true opens the journal with this photograph (the first one wins)",
     "  hidden   true keeps the file in the repo but off the page",
     "A caption written against an old filename follows the photograph when a",
     "higher-resolution version replaces it. See /admin/photos for what needs work."
@@ -66,7 +67,8 @@
       "alt": "A speaker stands beside a projection screen reading \"Welcome to LEADderm\" in a hotel ballroom.",
       "note": "The first slide of the third annual meeting.",
       "category": "room",
-      "order": 8
+      "order": 8,
+      "featured": true
     },
     "IMG_7886": {
       "caption": "The floor",

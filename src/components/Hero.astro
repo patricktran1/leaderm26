@@ -1,10 +1,11 @@
 ---
 import { Image } from 'astro:assets';
 import { conference, author } from '../data/site';
-import { pick } from '../data/gallery';
+import { heroPhoto } from '../data/gallery';
 
-// Falls back through the journal so the opening never depends on one filename.
-const cover = pick('IMG_7885', 'DSC01757');
+// Any photograph marked `"featured": true` in captions.json opens the journal;
+// these are only the fallbacks, so the slot never depends on one filename.
+const cover = heroPhoto('IMG_7885', 'DSC01757');
 
 const dateline = [
   conference.dates,

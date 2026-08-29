@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
 import { gallery, buildRows } from '../data/gallery';
+import { journalSpan } from '../data/photos';
 
 const rows = buildRows(gallery);
 
@@ -44,6 +45,7 @@ const indexed = rows.map((row) => ({
         arrival, the empty room, the boards people leave behind, and the twenty minutes
         where the actual conference happens, which is to say the coffee.
       </p>
+      {journalSpan && <p class="journal__span">{journalSpan}</p>}
     </SectionHead>
   </div>
 
@@ -108,6 +110,12 @@ const indexed = rows.map((row) => ({
     padding-bottom: 0.35rem;
     border-top: 1px solid var(--rule);
     color: var(--ink-2);
+  }
+
+  .journal__span {
+    margin-top: 0.9rem;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
   }
 
   .journal__empty {

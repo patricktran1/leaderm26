@@ -36,6 +36,8 @@ export interface PhotoOverride {
   order?: number;
   /** Keeps a frame in the repository but off the page. */
   hidden?: boolean;
+  /** Offers the photograph to the opening spread. The first one wins. */
+  featured?: boolean;
 }
 
 interface IndexEntry {
@@ -81,6 +83,7 @@ export interface Photo {
   sourceWidth: number;
   sourceHeight: number;
   supersedes: string[];
+  featured: boolean;
 }
 
 const index = rawIndex as PhotoIndex;
@@ -161,6 +164,7 @@ function toPhoto(entry: IndexEntry): Photo {
     sourceWidth: entry.sourceWidth,
     sourceHeight: entry.sourceHeight,
     supersedes: entry.supersedes,
+    featured: override.featured === true,
   };
 }
 
@@ -186,6 +190,18 @@ export function sortPhotos(entries: IndexEntry[]): IndexEntry[] {
 export const photos: Photo[] = sortPhotos(index.photos.filter((entry) => !entry.override?.hidden)).map(
   toPhoto,
 );
+
+/** The span the journal covers, when capture times are known. */
+export const journalSpan = (() => {
+  const dated = photos.filter((photo) => photo.takenAt).map((photo) => photo.takenAt!);
+  if (dated.length < 2) return null;
+  const first = captureParts(dated.reduce((a, b) => (a < b ? a : b)));
+  const last = captureParts(dated.reduce((a, b) => (a > b ? a : b)));
+  if (!first || !last) return null;
+  return first.day === last.day
+    ? `${photos.length} frames, ${first.day} ${first.time} to ${last.time}.`
+    : `${photos.length} frames, ${first.day} ${first.time} to ${last.day} ${last.time}.`;
+})();
 
 export const photoIndexMeta = {
   generatedAt: index.generatedAt,

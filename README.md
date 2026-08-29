@@ -115,6 +115,7 @@ automatic defaults.
 | `weight` | `lead` gives a full plate with its caption alongside; `major` opens a row; `minor` is the default. |
 | `order` | Pins the photograph. Pinned frames lead, in the order given; everything else follows by capture time. |
 | `hidden` | `true` keeps the file in the repository but off the page. |
+| `featured` | `true` opens the journal with this photograph — the hero, and the share card. The first featured frame wins. |
 
 A caption written against an old filename **follows the photograph** when a
 higher-resolution version replaces it, even if the new file is named
@@ -206,6 +207,11 @@ are; they are generous enough that a 2560px master is never the limit.
   takes twice the measure a portrait one does, so `Journal.astro` derives
   `sizes` from `ratio / row.span`. A flat value under-served the widest frames
   by up to 1.96x.
+- **The share card composes itself.** `src/pages/og.jpg.ts` composites whatever
+  photograph currently opens the journal into `assets/og-plate.png`, which
+  carries the typography with a transparent well. Mark a different frame
+  `featured` and the preview follows. If anything fails, the plate is served
+  alone rather than the build breaking.
 - **CSS is inlined** (`build.inlineStylesheets: 'always'`) so the first paint
   needs one request. Fonts are preloaded. Measured: ~180kB first load, CLS 0,
   and zero axe-core violations at 1440 and 390 with the viewer open and closed.
