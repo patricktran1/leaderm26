@@ -43,12 +43,12 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
         <div><dt>Superseded</dt><dd>{photoIndexMeta.counts.superseded}</dd></div>
         <div>
           <dt>Unreadable</dt>
-          <dd class={photoIndexMeta.counts.unreadable ? 'flag' : ''}>
+          <dd class:list={[{ flag: photoIndexMeta.counts.unreadable > 0 }]}>
             {photoIndexMeta.counts.unreadable}
           </dd>
         </div>
-        <div><dt>Need alt text</dt><dd class={needsAlt.length ? 'flag' : ''}>{needsAlt.length}</dd></div>
-        <div><dt>Need a caption</dt><dd class={needsCaption.length ? 'flag' : ''}>{needsCaption.length}</dd></div>
+        <div><dt>Need alt text</dt><dd class:list={[{ flag: needsAlt.length > 0 }]}>{needsAlt.length}</dd></div>
+        <div><dt>Need a caption</dt><dd class:list={[{ flag: needsCaption.length > 0 }]}>{needsCaption.length}</dd></div>
       </dl>
 
       {(photoIndexMeta.captions.error || photoIndexMeta.captions.problems.length > 0) && (
@@ -122,10 +122,10 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
               </div>
               <div class="sheet__meta">
                 <p class="sheet__id"><strong>{photo.id}</strong> <span>#{i + 1}</span></p>
-                <p class={photo.captionIsGenerated ? 'sheet__gap' : ''}>
+                <p class:list={[{ sheet__gap: photo.captionIsGenerated }]}>
                   {photo.captionIsGenerated ? 'caption: generated' : `caption: ${photo.caption}`}
                 </p>
-                <p class={photo.altIsGenerated ? 'sheet__gap' : ''}>
+                <p class:list={[{ sheet__gap: photo.altIsGenerated }]}>
                   {photo.altIsGenerated ? 'alt: generated — needs writing' : 'alt: written'}
                 </p>
                 <p class="sheet__dim">
