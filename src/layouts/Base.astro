@@ -65,8 +65,9 @@ const jsonLd = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#f4f2ed" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#101215" media="(prefers-color-scheme: dark)" />
+    <!-- The page is a single light design, so the browser chrome matches the
+         paper in both OS themes rather than flipping to a clashing dark bar. -->
+    <meta name="theme-color" content="#f4f2ed" />
     <meta name="color-scheme" content="light" />
     <meta name="author" content={author.name} />
     <meta name="robots" content="index, follow, max-image-preview:large" />
