@@ -24,6 +24,17 @@ const draft = Object.fromEntries(
     ]),
 );
 
+/**
+ * Pins are seat numbers. A block of pinned frames with no capture time holds
+ * the front of the journal, which is right until the day's own photographs
+ * arrive — so the desk says so plainly rather than leaving it to be discovered.
+ */
+const pinned = gallery.filter((photo) => photo.pinnedAt !== null);
+const pinsBlockDated =
+  pinned.length > 0 &&
+  pinned.every((photo) => !photo.takenAt) &&
+  gallery.some((photo) => photo.takenAt);
+
 const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(/\..*$/, '') : '—');
 ---
 
@@ -70,12 +81,40 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
         </section>
       )}
 
+      {photoIndexMeta.captions.strays && photoIndexMeta.captions.strays.length > 0 && (
+        <section class="block">
+          <h2 class="h3">Pasted a level too high</h2>
+          <p class="prose">
+            These were written outside the <code>photos</code> block. They have been used anyway,
+            but move them inside it when you get a moment so the file stays readable.
+          </p>
+          <ul class="plain">
+            {photoIndexMeta.captions.strays.map((key) => (
+              <li><code>{key}</code></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {pinsBlockDated && (
+        <section class="block">
+          <h2 class="h3">The pinned frames are holding the opening</h2>
+          <p class="prose">
+            {pinned.length} photograph{pinned.length === 1 ? '' : 's'} carry an <code>order</code>{' '}
+            and no capture time, so they hold seats {1}–{pinned.length} and everything shot at the
+            conference runs after them. That is the curated opening working as intended. To let the
+            whole journal sort itself by the clock, delete the <code>order</code> lines from{' '}
+            <code>photos/captions.json</code>, or give those frames a{' '}
+            <code>takenAt</code> of <code>2026-08-29T14:20</code>.
+          </p>
+        </section>
+      )}
+
       {photoIndexMeta.unreadable.length > 0 && (
         <section class="block">
           <h2 class="h3">Could not be read</h2>
           <p class="prose">
-            These were skipped and the build carried on. HEIC from an iPhone is the usual cause —
-            re-export as JPEG.
+            These were skipped and the build carried on. Everything else published normally.
           </p>
           <ul class="plain">
             {photoIndexMeta.unreadable.map((item) => (

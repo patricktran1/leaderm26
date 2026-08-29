@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { captureBucket, captureParts, sortPhotos } from '../src/data/photos';
+import { captureBucket, captureParts, sortPhotos, statedTime } from '../src/data/photos';
 
 const entry = (id: string, takenAt: string | null, order?: number) =>
   ({ id, takenAt, override: order === undefined ? {} : { order } }) as never;
@@ -34,13 +34,29 @@ describe('captureBucket', () => {
 });
 
 describe('sortPhotos', () => {
-  it('leads with pinned photographs in the order given', () => {
+  it('reads a pin as a seat number, not as a place at the front of the queue', () => {
+    // The whole promise of the workflow is that a photograph uploaded later
+    // lands where it was taken. A pin holds one seat; it does not push the
+    // day's own sequence to the bottom of the page.
     const sorted = sortPhotos([
-      entry('c', '2026-08-29T09:00:00.000Z'),
-      entry('a', null, 2),
-      entry('b', null, 1),
+      entry('nine', '2026-08-29T09:00:00.000Z'),
+      entry('ten', '2026-08-29T10:00:00.000Z'),
+      entry('pinned-third', null, 3),
+      entry('pinned-first', null, 1),
     ]);
-    expect(sorted.map((p) => p.id)).toEqual(['b', 'a', 'c']);
+    expect(sorted.map((p) => p.id)).toEqual(['pinned-first', 'nine', 'pinned-third', 'ten']);
+  });
+
+  it('pins beyond the end of the run simply finish it', () => {
+    const sorted = sortPhotos([entry('a', null, 40), entry('b', '2026-08-29T09:00:00.000Z')]);
+    expect(sorted.map((p) => p.id)).toEqual(['b', 'a']);
+  });
+
+  it('orders two photographs pinned to one seat by name rather than by luck', () => {
+    const forward = sortPhotos([entry('b', null, 2), entry('a', null, 2)]);
+    const back = sortPhotos([entry('a', null, 2), entry('b', null, 2)]);
+    expect(forward.map((p) => p.id)).toEqual(['a', 'b']);
+    expect(back.map((p) => p.id)).toEqual(['a', 'b']);
   });
 
   it('then runs in the order the photographs were taken', () => {
@@ -59,6 +75,18 @@ describe('sortPhotos', () => {
       entry('aa', null),
     ]);
     expect(sorted.map((p) => p.id)).toEqual(['dated', 'aa', 'zz']);
+  });
+});
+
+describe('statedTime', () => {
+  it('reads a hand-written time as the camera would have stamped it', () => {
+    expect(statedTime('2026-08-29T14:20')).toBe('2026-08-29T14:20:00.000Z');
+    expect(statedTime('2026-08-29 14:20:30')).toBe('2026-08-29T14:20:30.000Z');
+  });
+
+  it('ignores anything it cannot read, rather than inventing a date', () => {
+    expect(statedTime('Saturday afternoon')).toBeNull();
+    expect(statedTime(undefined)).toBeNull();
   });
 });
 

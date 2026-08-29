@@ -1,6 +1,19 @@
 ---
 import { conference, author, site } from '../data/site';
+import { photoIndexMeta } from '../data/photos';
 const year = new Date().getFullYear();
+
+/**
+ * The photo desk is linked from here rather than from the navigation: it is a
+ * working page, not a section of the journal. When a batch has gone in badly —
+ * an unreadable file, a damaged captions.json — the link says so, because a
+ * build log on a phone at a conference is not somewhere anyone looks.
+ */
+const trouble =
+  photoIndexMeta.counts.unreadable + (photoIndexMeta.captions.error ? 1 : 0);
+const deskLabel = trouble
+  ? `Photo desk — ${trouble} thing${trouble === 1 ? '' : 's'} to look at`
+  : 'Photo desk';
 ---
 
 <footer class="foot">
@@ -22,13 +35,30 @@ const year = new Date().getFullYear();
   <div class="shell">
     <div class="foot__fine">
       <span>{conference.venue} · {conference.dates}</span>
-      <a class="foot__top" href="/#top">Back to top <span aria-hidden="true">↑</span></a>
+      <span class="foot__fine-right">
+        <a class="foot__desk" href="/admin/photos" data-attention={trouble ? '' : undefined}>{deskLabel}</a>
+        <a class="foot__top" href="/#top">Back to top <span aria-hidden="true">↑</span></a>
+      </span>
     </div>
   </div>
 </footer>
 
 <style>
   .foot { padding-block: 0 2rem; position: relative; }
+  .foot__fine-right { display: flex; align-items: center; gap: clamp(1rem, 3vw, 2rem); flex-wrap: wrap; }
+  .foot__desk {
+    text-decoration: none;
+    color: var(--ink-3);
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    transition: color 0.25s var(--ease);
+  }
+  .foot__desk:hover { color: var(--ink-2); }
+  .foot__desk[data-attention] {
+    color: var(--pine);
+    box-shadow: inset 0 -1px 0 var(--pine);
+  }
   .foot > .shell:first-child { position: relative; padding-block-start: clamp(2.5rem, 5vw, 4rem); }
   .foot > .shell:first-child::before {
     content: '';

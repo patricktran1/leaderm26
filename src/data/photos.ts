@@ -32,8 +32,17 @@ export interface PhotoOverride {
   note?: string;
   category?: Category;
   weight?: Weight;
-  /** Pins the photograph to a position; unpinned photographs sort by capture time. */
+  /**
+   * Places the photograph at this position in the journal, counting from 1.
+   * Everything unpinned flows around it in the order it was taken.
+   */
   order?: number;
+  /**
+   * The capture time, for a frame whose file has none — an old export, a
+   * screenshot, anything that lost its EXIF. Written as `2026-08-29T14:20`
+   * and read as the camera's own wall clock, never converted.
+   */
+  takenAt?: string;
   /** Keeps a frame in the repository but off the page. */
   hidden?: boolean;
   /** Offers the photograph to the opening spread. The first one wins. */
@@ -62,7 +71,7 @@ interface PhotoIndex {
   maxEdge: number;
   counts: { files: number; photos: number; superseded: number; unreadable: number };
   unreadable: { source: string; reason: string }[];
-  captions?: { error: string | null; repaired: boolean; problems: string[] };
+  captions?: { error: string | null; repaired: boolean; strays?: string[]; problems: string[] };
   photos: IndexEntry[];
 }
 
@@ -85,6 +94,8 @@ export interface Photo {
   sourceHeight: number;
   supersedes: string[];
   featured: boolean;
+  /** The seat this photograph was pinned to in captions.json, if any. */
+  pinnedAt: number | null;
   /** A quiet second line for the viewer: when it was taken, on what. */
   meta: string;
 }
@@ -168,6 +179,7 @@ function toPhoto(entry: IndexEntry): Photo {
     sourceHeight: entry.sourceHeight,
     supersedes: entry.supersedes,
     featured: override.featured === true,
+    pinnedAt: pinnedAt(entry),
     meta: viewerMeta(entry, Boolean(caption)),
   };
 }
@@ -184,25 +196,65 @@ function viewerMeta(entry: IndexEntry, hasWrittenCaption: boolean): string {
 }
 
 /**
- * Reading order: photographs pinned with `order` lead, in that order; the rest
- * follow in the order they were taken; anything with neither falls back to its
- * filename, so the sequence is always deterministic.
+ * A capture time written by hand in captions.json. EXIF times are a camera's
+ * wall clock and are printed as such, so a stated time is read the same way
+ * rather than being shifted into whatever zone the build machine is in.
+ */
+export function statedTime(value: string | undefined): string | null {
+  if (!value) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/.exec(value.trim());
+  if (!match) return null;
+  const [, y, mo, d, h, mi, sec] = match;
+  const at = new Date(Date.UTC(+y!, +mo! - 1, +d!, +h!, +mi!, +(sec ?? 0)));
+  return Number.isNaN(at.valueOf()) ? null : at.toISOString();
+}
+
+/** The pinned position of a photograph, if it has a usable one. */
+function pinnedAt(entry: IndexEntry): number | null {
+  const order = entry.override?.order;
+  return typeof order === 'number' && Number.isFinite(order) ? Math.max(1, Math.round(order)) : null;
+}
+
+/**
+ * Reading order is the order the photographs were taken. `order` in
+ * captions.json is a seat number, not a queue: a frame pinned to 3 sits third
+ * and everything else flows around it, so a photograph uploaded at midnight
+ * still lands where it belongs in the day rather than at the bottom of the
+ * page. Anything with no capture time at all falls back to its filename, so
+ * the sequence is always the same twice running.
  */
 export function sortPhotos(entries: IndexEntry[]): IndexEntry[] {
-  return [...entries].sort((a, b) => {
-    const pinA = a.override?.order;
-    const pinB = b.override?.order;
-    if (pinA !== undefined && pinB !== undefined) return pinA - pinB;
-    if (pinA !== undefined) return -1;
-    if (pinB !== undefined) return 1;
+  const byTime = (a: IndexEntry, b: IndexEntry) => {
     if (a.takenAt && b.takenAt && a.takenAt !== b.takenAt) return a.takenAt < b.takenAt ? -1 : 1;
     if (a.takenAt && !b.takenAt) return -1;
     if (!a.takenAt && b.takenAt) return 1;
     return a.id.localeCompare(b.id, 'en');
-  });
+  };
+
+  const free = entries.filter((entry) => pinnedAt(entry) === null).sort(byTime);
+  const pinned = entries
+    .filter((entry) => pinnedAt(entry) !== null)
+    // Two frames pinned to the same seat would otherwise be ordered by whatever
+    // the folder listing happened to be that morning.
+    .sort((a, b) => pinnedAt(a)! - pinnedAt(b)! || a.id.localeCompare(b.id, 'en'));
+
+  const ordered: IndexEntry[] = [];
+  let next = 0;
+  for (const entry of pinned) {
+    while (ordered.length < pinnedAt(entry)! - 1 && next < free.length) ordered.push(free[next++]!);
+    ordered.push(entry);
+  }
+  while (next < free.length) ordered.push(free[next++]!);
+  return ordered;
 }
 
-export const photos: Photo[] = sortPhotos(index.photos.filter((entry) => !entry.override?.hidden)).map(
+/** A time written into captions.json stands in for a file that lost its EXIF. */
+const entries: IndexEntry[] = index.photos.map((entry) => {
+  const stated = statedTime(entry.override?.takenAt);
+  return stated ? { ...entry, takenAt: stated } : entry;
+});
+
+export const photos: Photo[] = sortPhotos(entries.filter((entry) => !entry.override?.hidden)).map(
   toPhoto,
 );
 
@@ -237,6 +289,6 @@ export const photoIndexMeta = {
   maxEdge: index.maxEdge,
   counts: index.counts,
   unreadable: index.unreadable,
-  captions: index.captions ?? { error: null, repaired: false, problems: [] },
+  captions: index.captions ?? { error: null, repaired: false, strays: [], problems: [] },
   hidden: index.photos.filter((entry) => entry.override?.hidden).map((entry) => entry.id),
 };

@@ -48,25 +48,37 @@ full-page screenshots are deterministic. `tools/interact.mjs` and
    is a drop zone for the `photos` folder. (Or: repo → `photos` → *Add file* →
    *Upload files*.)
 2. Drag the photographs in. Straight from the camera roll or the SD card is
-   fine — JPG, JPEG, PNG, WebP, AVIF, TIFF. Any size, any orientation, any
-   number at once.
+   fine — **HEIC and HEIF included**, along with JPG, JPEG, PNG, WebP, AVIF and
+   TIFF. Any size, any orientation, any number at once.
 3. Leave **"Commit directly to the `main` branch"** selected and click
    **Commit changes**.
-4. Vercel rebuilds on its own. Roughly **one to three minutes** later they are
-   live at **https://leaderm26.vercel.app**.
+4. Vercel rebuilds on its own. A handful of frames is live in about a minute; a
+   hundred takes nearer five. It is **https://leaderm26.vercel.app** either way.
+5. Open **https://leaderm26.vercel.app/admin/photos** and check the count.
+   That page is the only place a problem is visible — a deployment goes green
+   whether ten photographs landed or six, so this is the ten seconds that tells
+   you which.
 
 That is the whole job. Nothing to rename, nothing to edit, no code.
 
-> **iPhone photographs:** shoot or export JPEG. HEIC is read when the build
-> server can decode it and skipped with a note when it cannot — the site still
-> builds either way, the frame just does not appear. To stop thinking about it:
-> **Settings → Camera → Formats → Most Compatible.**
+> **iPhone photographs are fine as they are.** HEIC is decoded during the build,
+> orientation and capture time included. There is nothing to change in Settings
+> and nothing to export.
+
+**Put each batch in its own folder** — `photos/saturday-am/`, `photos/lunch/`.
+GitHub's uploader lets you type a folder name into the path box before
+committing, and dragging a folder in from a Mac keeps its name. This matters for
+one reason: **if you upload a file whose name already exists in the same folder,
+GitHub replaces it**, and the older photograph is gone before this site ever
+sees it. Two cameras both counting from `IMG_0001` is exactly how that happens.
+Different folders can hold the same filename safely — the ingest keeps them
+apart and names the second one after its folder.
 
 **Two limits worth knowing**, both GitHub's rather than this site's: **100 files
 per upload** and **25 MB per file**. A camera JPEG is nowhere near 25 MB, so in
 practice only the file count matters — a hundred at a time, as many times as
-you like. Dragging a whole folder works too; the subfolder is kept and used to
-tell two photographs apart if they end up sharing a filename.
+you like. On a phone, use *Add file → Upload files* and pick from the photo
+library; drag-and-drop is a desktop gesture and iOS Safari has no equivalent.
 
 Originals are committed as they arrive, so the repository grows by roughly what
 the camera writes. That is fine into the hundreds of photographs; past a
@@ -82,11 +94,13 @@ anything larger.
 | **Identity** | Each photograph is keyed by its filename without the extension, so `DSC01757.JPG` is `DSC01757`. |
 | **Orientation** | EXIF rotation is baked in. Nothing arrives sideways. |
 | **Size** | The long edge is capped at 2560px for the build; your original stays untouched in the repo. |
-| **Order** | Photographs sort by the time they were taken, read from EXIF. A batch uploaded at midnight still lands in the order you shot it. |
+| **Order** | Photographs sort by the time they were taken, read from EXIF. A batch uploaded at midnight lands in the order you shot it, wherever in the day that is — `order` in the captions file is a seat number, not a queue, so pinning one frame never pushes the rest down the page. The thirteen frames already here are re-encoded exports carrying no EXIF at all, so they are pinned by hand to hold the opening sequence and new photographs run after them; `/admin/photos` says so, and deleting those `order` lines undoes it. |
 | **Timeline** | Once there are photographs from more than one half-day, the journal breaks itself into *Saturday morning*, *Saturday afternoon*, *Sunday morning* and so on. |
 | **Caption** | Defaults to the capture time — "Saturday, 2:41 p.m." |
 | **Alt text** | Defaults to an honest placeholder that says the frame has not been described yet. It never invents a description. |
-| **Duplicates** | Upload a full-resolution version of something already on the site and it **replaces** it rather than appearing twice — matched first on the filename, then on a perceptual hash of the picture itself, so a rename or re-export is still caught. The better copy wins and inherits the old caption. Two frames the camera timed a minute apart are never merged, however alike they look, and a hash of a nearly featureless frame is not trusted at all — so a burst from one seat stays a burst. |
+| **A wrong clock** | A camera whose date is unset stamps its files 1980, which would rewrite the journal's dates. Anything outside living memory is disbelieved, said out loud in the log, and the frame is placed by filename instead. |
+| **A bad captions file** | A byte-order mark, a stray comma, a `//` comment and the curly quotes a phone substitutes for straight ones are all repaired rather than costing every caption on the site. A block pasted one level too high — the likeliest mistake there is — is adopted where it was meant to go, and the photo desk says so. |
+| **Duplicates** | Upload a full-resolution version of something already on the site and it **replaces** it rather than appearing twice — matched first on the filename, then on a perceptual hash of the picture itself, so a rename or re-export is still caught. The better copy wins and inherits the old caption, *and* the capture time and camera the re-export threw away. Two frames the camera timed a minute apart are never merged, however alike they look; two frames of the same size are never merged at all, since a burst from one seat is a burst; and a hash of a nearly featureless frame is not trusted in the first place. |
 | **Navigation** | Once the journal covers three or more half-days it grows its own contents line, and the headline changes from "A day" to "Two days" on its own. |
 | **Rhythm** | The first photograph of each half-day is given more of the measure, the way a section opener is in print — a claim about sequence, not about importance, so it needs no judgement from anyone. |
 
@@ -128,7 +142,8 @@ automatic defaults.
 | `note` | A second line, shown only in the photograph viewer. |
 | `category` | `venue`, `room`, `people` or `artifact`. |
 | `weight` | `lead` gives a full plate with its caption alongside; `major` opens a row; `minor` is the default. |
-| `order` | Pins the photograph. Pinned frames lead, in the order given; everything else follows by capture time. |
+| `order` | A seat number, counting from 1. The frame sits in that position and everything unpinned flows around it by capture time — so pinning one photograph does not push the rest of the day down the page. |
+| `takenAt` | `2026-08-29T14:20`, for a frame whose file lost its EXIF. Read as the camera's own wall clock, never converted into a time zone. |
 | `hidden` | `true` keeps the file in the repository but off the page. |
 | `featured` | `true` opens the journal with this photograph — the hero, and the share card. The first featured frame wins. |
 

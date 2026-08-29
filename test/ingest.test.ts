@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 import {
   parseCaptions,
   photoId,
+  plausibleCapture,
+  straightenQuotes,
   hammingDistance,
   hashIsDistinctive,
   resolveDuplicates,
@@ -14,9 +16,12 @@ const frame = (id: string, pixels: number, hash = '0'.repeat(64)) => ({
   id: photoId(id),
   source: `photos/${id}`,
   pixels,
+  bytes: pixels,
   hash,
   takenAt: null as string | null,
 });
+
+type Group = { winner: ReturnType<typeof frame>; aliases: string[] };
 
 describe('photoId', () => {
   it('reduces a filename to a stable identity', () => {
@@ -42,9 +47,36 @@ describe('photoId', () => {
   });
 
   it('never returns an empty or unsafe id', () => {
-    expect(photoId('....jpg')).toBe('photo');
     expect(photoId('a photo/with spaces & symbols!.jpg')).toBe('with-spaces-symbols');
-    expect(photoId('x'.repeat(200) + '.jpg')).toHaveLength(60);
+    expect(photoId('x'.repeat(200) + '.jpg').length).toBeLessThanOrEqual(60);
+  });
+
+  it('gives a name it cannot spell a fingerprint rather than a shared fallback', () => {
+    // Two files whose names survive none of the folding still need two ids,
+    // or one photograph overwrites the other on the way to disk.
+    const ids = ['....jpg', '\u65e5\u672c\u8a9e.jpg', '\ud55c\uad6d\uc5b4.jpg'].map(photoId);
+    expect(new Set(ids).size).toBe(3);
+    for (const id of ids) expect(id).toMatch(/^photo-[0-9a-f]{6}$/);
+    // And the same name always folds to the same id.
+    expect(photoId('\u65e5\u672c\u8a9e.jpg')).toBe(photoId('folder/\u65e5\u672c\u8a9e.jpg'));
+  });
+
+  it('two long names that share a prefix do not collide', () => {
+    const a = photoId(`${'x'.repeat(70)}-arrival.jpg`);
+    const b = photoId(`${'x'.repeat(70)}-lunch.jpg`);
+    expect(a).not.toBe(b);
+  });
+
+  it('only strips copy words from files a camera numbered', () => {
+    // "Room full" and "Room small" are two photographs of a room, not one
+    // photograph and its export.
+    expect(photoId('Room full.jpg')).toBe('Room-full');
+    expect(photoId('Room small.jpg')).toBe('Room-small');
+    expect(photoId('my original.jpg')).toBe('my-original');
+    expect(photoId('the edit.jpg')).toBe('the-edit');
+    // The camera-numbered forms still reduce.
+    expect(photoId('IMG_7885 2.jpg')).toBe('IMG_7885');
+    expect(photoId('DSC01757 original.jpg')).toBe('DSC01757');
   });
 
   it('keeps an accented name legible instead of dropping the letter', () => {
@@ -90,7 +122,7 @@ describe('resolveDuplicates', () => {
     ]);
     expect(groups).toHaveLength(1);
     expect(groups[0]!.winner.source).toBe('photos/DSC01757 copy.jpg');
-    expect(groups[0]!.superseded.map((s) => s.source)).toEqual(['photos/DSC01757.webp']);
+    expect(groups[0]!.superseded.map((s: { source: string }) => s.source)).toEqual(['photos/DSC01757.webp']);
   });
 
   it('matches on the picture when the filename changed', () => {
@@ -187,7 +219,7 @@ describe('telling similar photographs apart', () => {
     ]);
     expect(groups).toHaveLength(2);
     // Distinct ids, or one would overwrite the other's master on disk.
-    expect(new Set(groups.map((g) => g.winner.id)).size).toBe(2);
+    expect(new Set(groups.map((g: Group) => g.winner.id)).size).toBe(2);
     expect(groups[1]!.winner.id).toBe('sunday-IMG_001');
   });
 
@@ -199,7 +231,7 @@ describe('telling similar photographs apart', () => {
       { ...frame('b-copy.jpg', 100, busy) },
     ];
     const ids = (list: typeof input) =>
-      resolveDuplicates(list).map((g) => `${g.winner.id}:${g.winner.pixels}`);
+      resolveDuplicates(list).map((g: Group) => `${g.winner.id}:${g.winner.pixels}`);
     expect(ids([...input].reverse()).sort()).toEqual(ids(input).sort());
   });
 });
@@ -259,5 +291,143 @@ describe('tidyCamera', () => {
   it('returns nothing rather than an empty string', () => {
     expect(tidyCamera('')).toBeNull();
     expect(tidyCamera(null)).toBeNull();
+  });
+});
+
+
+describe('supersession', () => {
+  const busy = '1100101001011010010110100101101001011010010110100101101001011010';
+  const near = `${busy.slice(0, 62)}11`;
+
+  it('does not merge two exposures of the same scene at the same size', () => {
+    // A burst from one seat: near-identical frames, no jump in resolution.
+    const groups = resolveDuplicates([
+      { ...frame('DSC01801.JPG', 20_000_000, busy) },
+      { ...frame('DSC01802.JPG', 20_000_000, near) },
+    ]);
+    expect(groups).toHaveLength(2);
+  });
+
+  it('still merges the same frame arriving at a real jump in resolution', () => {
+    const groups = resolveDuplicates([
+      { ...frame('web-export.jpg', 345_600, busy) },
+      { ...frame('DSC01801.JPG', 20_000_000, near) },
+    ]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]!.winner.source).toBe('photos/DSC01801.JPG');
+  });
+
+  it('the high-resolution re-export inherits the capture time it lost', () => {
+    // Exporting, AirDropping or messaging a photograph strips its EXIF. The
+    // copy it replaces still knows when it was taken.
+    const groups = resolveDuplicates([
+      { ...frame('IMG_9100.jpg', 1_080_000, busy), takenAt: '2026-08-29T09:15:00.000Z', camera: 'iPhone 16 Pro' },
+      { ...frame('IMG_9100 hires.jpg', 7_680_000, near), takenAt: null },
+    ]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]!.winner.takenAt).toBe('2026-08-29T09:15:00.000Z');
+    expect(groups[0]!.winner.camera).toBe('iPhone 16 Pro');
+  });
+
+  it('prefers the copy that still carries EXIF when the sizes tie', () => {
+    const groups = resolveDuplicates([
+      { ...frame('EX_stripped.jpg', 345_600, busy), takenAt: null },
+      { ...frame('IMG_7878.jpg', 345_600, near), takenAt: '2026-08-29T13:00:00.000Z' },
+    ]);
+    // Different sizes are required to merge on the picture alone, so these
+    // stay apart — which is the point; neither silently replaces the other.
+    expect(groups).toHaveLength(2);
+  });
+});
+
+describe('disambiguate', () => {
+  const a = '1100101001011010010110100101101001011010010110100101101001011010';
+  const b = '0011010110100101101001011010010110100101101001011010010110100101';
+  const c = '1010101010101010101010101010101010101010101010101010101010101010';
+
+  it('a file added in a folder never renames the one already published', () => {
+    const root = { ...frame('IMG_0001.jpg', 9000, a), source: 'photos/IMG_0001.jpg' };
+    const sat = { ...frame('IMG_0001.jpg', 9000, b), source: 'photos/saturday/IMG_0001.jpg' };
+    const sun = { ...frame('IMG_0001.jpg', 9000, c), source: 'photos/sunday/IMG_0001.jpg' };
+
+    const two = resolveDuplicates([root, sat]).map((g: Group) => g.winner.id);
+    const three = resolveDuplicates([root, sat, sun]).map((g: Group) => g.winner.id);
+    expect(two).toContain('IMG_0001');
+    expect(three).toContain('IMG_0001');
+    expect(new Set(three).size).toBe(3);
+    // The id a published photograph already had is an anchor; it must not move
+    // because somebody uploaded another file with the same camera number.
+    expect(three).toEqual(expect.arrayContaining(two));
+  });
+
+  it('retires a name two photographs answer to, so one caption cannot land on both', () => {
+    const groups: Group[] = resolveDuplicates([
+      { ...frame('IMG_0001.jpg', 9000, a), source: 'photos/IMG_0001.jpg' },
+      { ...frame('IMG_0001.jpg', 9000, b), source: 'photos/sunday/IMG_0001.jpg' },
+    ]);
+    const claiming = groups.filter((group) => group.aliases.includes('IMG_0001'));
+    expect(claiming).toHaveLength(1);
+    expect(claiming[0]!.winner.id).toBe('IMG_0001');
+  });
+});
+
+describe('plausibleCapture', () => {
+  const now = Date.UTC(2026, 7, 29, 12);
+
+  it('believes a conference weekend', () => {
+    expect(plausibleCapture(new Date('2026-08-29T14:20:00Z'), now)).toBe(true);
+  });
+
+  it('rejects a camera whose clock reset and one whose EXIF rolled over', () => {
+    expect(plausibleCapture(new Date('1999-12-31T23:59:59Z'), now)).toBe(false);
+    expect(plausibleCapture(new Date('2027-02-18T04:40:39Z'), now)).toBe(false);
+    expect(plausibleCapture(new Date('nonsense'), now)).toBe(false);
+  });
+});
+
+describe('captions.json read the way a person writes it', () => {
+  it('straightens the curly quotes an iPhone substitutes, and keeps the ones inside a caption', () => {
+    const typed = '{\n  \u201cphotos\u201d: {\n    \u201cIMG_1\u201d: { \u201ccaption\u201d: \u201cThe \u201cgood\u201d room\u201d }\n  }\n}';
+    const result = parseCaptions(typed);
+    expect(result.error).toBeUndefined();
+    expect(result.repaired).toBe(true);
+    expect(Object.keys(result.photos)).toEqual(['IMG_1']);
+  });
+
+  it('leaves a straight-quoted file alone', () => {
+    expect(straightenQuotes('{"a": "b"}')).toBe('{"a": "b"}');
+  });
+
+  it('adopts a caption pasted one level too high instead of discarding it', () => {
+    const result = parseCaptions(
+      '{"photos":{"IMG_1":{"caption":"x"}},"IMG_2":{"caption":"pasted too high"}}',
+    );
+    expect(result.strays).toEqual(['IMG_2']);
+    expect(result.photos.IMG_2.caption).toBe('pasted too high');
+  });
+
+  it('does not mistake the readme block for a caption', () => {
+    const result = parseCaptions('{"_readme":["a note"],"photos":{"IMG_1":{"caption":"x"}}}');
+    expect(result.strays).toEqual([]);
+    expect(Object.keys(result.photos)).toEqual(['IMG_1']);
+  });
+});
+
+describe('validateOverrides', () => {
+  it('names two photographs pinned to the same seat', () => {
+    const problems = validateOverrides({ A: { order: 3 }, B: { order: 3 } });
+    expect(problems.join(' ')).toContain('order 3 is used by A, B');
+  });
+
+  it('rejects an order that is not a real number', () => {
+    // `1e999` is valid JSON, parses to Infinity, and passes `typeof === number`.
+    expect(JSON.parse('{"order":1e999}').order).toBe(Number.POSITIVE_INFINITY);
+    expect(validateOverrides({ A: { order: Number.POSITIVE_INFINITY } }).join(' ')).toContain('order must be a number');
+    expect(validateOverrides({ A: { order: 4 } })).toEqual([]);
+  });
+
+  it('checks a hand-written capture time', () => {
+    expect(validateOverrides({ A: { takenAt: '2026-08-29T14:20' } })).toEqual([]);
+    expect(validateOverrides({ A: { takenAt: 'Saturday afternoon' } }).join(' ')).toContain('takenAt');
   });
 });
