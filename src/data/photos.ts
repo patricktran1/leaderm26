@@ -62,6 +62,7 @@ interface PhotoIndex {
   maxEdge: number;
   counts: { files: number; photos: number; superseded: number; unreadable: number };
   unreadable: { source: string; reason: string }[];
+  captions?: { error: string | null; repaired: boolean; problems: string[] };
   photos: IndexEntry[];
 }
 
@@ -222,5 +223,6 @@ export const photoIndexMeta = {
   maxEdge: index.maxEdge,
   counts: index.counts,
   unreadable: index.unreadable,
+  captions: index.captions ?? { error: null, repaired: false, problems: [] },
   hidden: index.photos.filter((entry) => entry.override?.hidden).map((entry) => entry.id),
 };

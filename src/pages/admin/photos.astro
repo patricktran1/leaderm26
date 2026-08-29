@@ -41,10 +41,34 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
         <div><dt>Files read</dt><dd>{photoIndexMeta.counts.files}</dd></div>
         <div><dt>Published</dt><dd>{gallery.length}</dd></div>
         <div><dt>Superseded</dt><dd>{photoIndexMeta.counts.superseded}</dd></div>
-        <div><dt>Unreadable</dt><dd>{photoIndexMeta.counts.unreadable}</dd></div>
+        <div>
+          <dt>Unreadable</dt>
+          <dd class={photoIndexMeta.counts.unreadable ? 'flag' : ''}>
+            {photoIndexMeta.counts.unreadable}
+          </dd>
+        </div>
         <div><dt>Need alt text</dt><dd class={needsAlt.length ? 'flag' : ''}>{needsAlt.length}</dd></div>
         <div><dt>Need a caption</dt><dd class={needsCaption.length ? 'flag' : ''}>{needsCaption.length}</dd></div>
       </dl>
+
+      {(photoIndexMeta.captions.error || photoIndexMeta.captions.problems.length > 0) && (
+        <section class="block">
+          <h2 class="h3">The captions file needs a look</h2>
+          {photoIndexMeta.captions.error && (
+            <p class="prose">
+              <strong>Ignored:</strong> {photoIndexMeta.captions.error}. Every photograph is
+              keeping its automatic caption until this is fixed — nothing else is affected.
+            </p>
+          )}
+          {photoIndexMeta.captions.problems.length > 0 && (
+            <ul class="plain">
+              {photoIndexMeta.captions.problems.map((problem) => (
+                <li>{problem}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {photoIndexMeta.unreadable.length > 0 && (
         <section class="block">

@@ -312,15 +312,52 @@ export function validateOverrides(captions) {
   return problems;
 }
 
-async function loadCaptions() {
-  if (!existsSync(CAPTIONS_FILE)) return {};
-  try {
-    const parsed = JSON.parse(await readFile(CAPTIONS_FILE, 'utf8'));
-    return parsed && typeof parsed === 'object' ? (parsed.photos ?? parsed) : {};
-  } catch (error) {
-    warn(`captions.json could not be parsed and was ignored — ${error.message}`);
-    return {};
+/**
+ * Reads captions.json the way a person writes it. A byte-order mark, a
+ * comment, or the trailing comma every editor tempts you into are repaired
+ * rather than costing every caption on the site; anything else is reported
+ * with the offending line, because losing all the captions to one typo, in a
+ * hotel lobby, is the worst outcome available.
+ */
+export function parseCaptions(text) {
+  const clean = text.replace(/^\uFEFF/, '');
+  const attempts = [
+    clean,
+    clean
+      .replace(/(^|[^:])\/\/[^\n"]*$/gm, '$1')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/,(\s*[}\]])/g, '$1'),
+  ];
+  let lastError;
+  for (const [index, attempt] of attempts.entries()) {
+    try {
+      const parsed = JSON.parse(attempt);
+      const photos = parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+        ? (parsed.photos ?? parsed)
+        : null;
+      if (!photos || typeof photos !== 'object' || Array.isArray(photos)) {
+        return { photos: {}, error: 'expected an object of photo ids, or a { "photos": { … } } wrapper' };
+      }
+      return { photos, repaired: index > 0 };
+    } catch (error) {
+      lastError = error;
+    }
   }
+
+  // Point at the line, not the byte offset.
+  const at = /position (\d+)/.exec(lastError?.message ?? '');
+  let where = '';
+  if (at) {
+    const upto = clean.slice(0, Number(at[1]));
+    const line = upto.split('\n').length;
+    where = ` (line ${line}: ${(clean.split('\n')[line - 1] ?? '').trim().slice(0, 60)})`;
+  }
+  return { photos: {}, error: `${lastError?.message ?? 'could not be parsed'}${where}` };
+}
+
+async function loadCaptions() {
+  if (!existsSync(CAPTIONS_FILE)) return { photos: {} };
+  return parseCaptions(await readFile(CAPTIONS_FILE, 'utf8'));
 }
 
 async function main() {
@@ -346,8 +383,14 @@ async function main() {
   }
 
   const groups = resolveDuplicates(entries);
-  const captions = await loadCaptions();
-  for (const problem of validateOverrides(captions)) warn(`captions.json — ${problem}`);
+  const { photos: captions, error: captionsError, repaired } = await loadCaptions();
+  if (captionsError) {
+    warn(`captions.json was ignored — ${captionsError}`);
+    warn('  every photograph keeps its automatic caption until this is fixed.');
+  }
+  if (repaired) warn('captions.json had a trailing comma or a comment; it was read anyway.');
+  const captionProblems = validateOverrides(captions);
+  for (const problem of captionProblems) warn(`captions.json — ${problem}`);
 
   const known = new Set(groups.flatMap((group) => group.aliases));
   for (const id of Object.keys(captions)) {
@@ -405,6 +448,7 @@ async function main() {
       unreadable: unreadable.length,
     },
     unreadable,
+    captions: { error: captionsError ?? null, repaired: repaired ?? false, problems: captionProblems },
     photos,
   };
 

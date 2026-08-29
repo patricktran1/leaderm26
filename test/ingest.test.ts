@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import {
+  parseCaptions,
   photoId,
   hammingDistance,
   hashIsDistinctive,
@@ -188,5 +189,45 @@ describe('telling similar photographs apart', () => {
     const ids = (list: typeof input) =>
       resolveDuplicates(list).map((g) => `${g.winner.id}:${g.winner.pixels}`);
     expect(ids([...input].reverse()).sort()).toEqual(ids(input).sort());
+  });
+});
+
+
+describe('parseCaptions', () => {
+  it('reads a clean file', () => {
+    const result = parseCaptions('{"photos":{"A":{"caption":"x"}}}');
+    expect(result.photos).toEqual({ A: { caption: 'x' } });
+    expect(result.error).toBeUndefined();
+  });
+
+  it('accepts a bare map without the photos wrapper', () => {
+    expect(parseCaptions('{"A":{"caption":"x"}}').photos).toEqual({ A: { caption: 'x' } });
+  });
+
+  it('repairs the mistakes a person actually makes', () => {
+    for (const text of [
+      '{"photos":{"A":{"caption":"x"}},}',
+      '\uFEFF{"photos":{"A":{"caption":"x"}}}',
+      '{\n// a note\n"photos":{"A":{"caption":"x"}}}',
+    ]) {
+      const result = parseCaptions(text);
+      expect(Object.keys(result.photos), text).toEqual(['A']);
+      expect(result.error, text).toBeUndefined();
+    }
+  });
+
+  it('keeps a curly quote inside a caption intact', () => {
+    const result = parseCaptions('{"photos":{"A":{"caption":"\u201cquiet\u201d"}}}');
+    expect((result.photos as Record<string, { caption: string }>).A!.caption).toBe('\u201cquiet\u201d');
+  });
+
+  it('names the line when it truly cannot be read', () => {
+    const result = parseCaptions('{\n"photos":{\n"A":{"caption":"x"}\n');
+    expect(result.photos).toEqual({});
+    expect(result.error).toMatch(/line \d/);
+  });
+
+  it('refuses something that is not a map of photographs', () => {
+    expect(parseCaptions('[1,2,3]').error).toMatch(/object of photo ids/);
   });
 });
