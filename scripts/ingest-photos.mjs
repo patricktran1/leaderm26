@@ -459,8 +459,12 @@ async function main() {
     (sum, size) => sum + size,
     0,
   );
-  if (inboxSize > 500 * 1024 * 1024) {
-    warn(`the photos folder is ${(inboxSize / 1024 / 1024).toFixed(0)} MB — large for a git repository.`);
+  const megabytes = inboxSize / 1024 / 1024;
+  if (megabytes > 500) {
+    warn(
+      `the photos folder is ${megabytes.toFixed(0)} MB. Past a gigabyte every push clones a lot ` +
+        'of data; replacing the originals with 3000px exports would fix it without changing the site.',
+    );
   }
 
   log(

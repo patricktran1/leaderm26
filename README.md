@@ -62,6 +62,19 @@ That is the whole job. Nothing to rename, nothing to edit, no code.
 > builds either way, the frame just does not appear. To stop thinking about it:
 > **Settings → Camera → Formats → Most Compatible.**
 
+**Two limits worth knowing**, both GitHub's rather than this site's: **100 files
+per upload** and **25 MB per file**. A camera JPEG is nowhere near 25 MB, so in
+practice only the file count matters — a hundred at a time, as many times as
+you like. Dragging a whole folder works too; the subfolder is kept and used to
+tell two photographs apart if they end up sharing a filename.
+
+Originals are committed as they arrive, so the repository grows by roughly what
+the camera writes. That is fine into the hundreds of photographs; past a
+gigabyte the build starts cloning a lot of data on every push, and the ingest
+step says so in the log. If it ever gets there, the fix is a one-time pass to
+replace the originals with 3000px exports — the site has never displayed
+anything larger.
+
 ### What happens on its own
 
 | | |
@@ -122,8 +135,21 @@ A caption written against an old filename **follows the photograph** when a
 higher-resolution version replaces it, even if the new file is named
 differently. You never have to rewrite one.
 
-The easiest way to fill these in: open the photo desk, hit **Copy**, and hand
-the block to Claude along with the photographs.
+### Getting the captions written without writing them
+
+The photographs are in the repository, so Claude can look at them. Open a
+Claude Code session on this repo and say:
+
+> Look at the photographs in `photos/` that `/admin/photos` lists as needing
+> alt text. Write real alt text and a short editorial caption for each, in the
+> voice already in `photos/captions.json`, and add them to that file. Describe
+> only what is in the frame — never name a person, and never invent a session,
+> a speaker or a fact. Then run the checks.
+
+That is the intended path: upload photographs with no effort at all, and let
+the descriptions catch up afterwards. The site is correct at every point in
+between — a photograph with a generated caption is dated, ordered, and honest
+about not having been described yet.
 
 ## Architecture
 
