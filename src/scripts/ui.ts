@@ -107,6 +107,7 @@ function initLightbox(): void {
     image.src = slide.src;
     image.width = slide.w;
     image.height = slide.h;
+    image.style.setProperty('--natural-w', `${slide.w}px`);
     image.alt = slide.alt;
     caption.textContent = slide.caption;
     note.textContent = [slide.category, slide.note].filter(Boolean).join(' · ');
