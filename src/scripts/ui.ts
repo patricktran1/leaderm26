@@ -2,6 +2,7 @@
    Reveal-on-scroll, the mobile index panel, and the photograph viewer. */
 
 interface Slide {
+  id: string;
   src: string;
   w: number;
   h: number;
@@ -141,8 +142,17 @@ function initLightbox(): void {
 
   let current = 0;
   let opener: HTMLElement | null = null;
+  /** Whether the viewer put an entry on the history stack that it owes back. */
+  let pushed = false;
 
   const pad = (n: number): string => String(n).padStart(2, '0');
+
+  const hashFor = (index: number): string => `#photo-${slides[index]!.id}`;
+  const indexFromHash = (): number =>
+    slides.findIndex((slide) => `#photo-${slide.id}` === decodeURIComponent(location.hash));
+  /** The frame in the grid a photograph came from, so focus has somewhere to return to. */
+  const triggerFor = (index: number): HTMLElement | null =>
+    document.querySelector<HTMLElement>(`[data-lightbox="${index}"]`);
 
   const show = (index: number): void => {
     current = (index + slides.length) % slides.length;
@@ -156,6 +166,9 @@ function initLightbox(): void {
     caption.textContent = slide.caption;
     note.textContent = slide.note;
     counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
+    // Paging rewrites the address rather than stacking history: Back should
+    // leave the viewer, not walk back through every photograph paged past.
+    if (pushed) history.replaceState({ photo: current }, '', hashFor(current));
     if (image.complete) image.setAttribute('data-ready', '');
     // Warm the neighbours so arrowing through feels instant.
     for (const step of [1, -1]) {
@@ -167,6 +180,7 @@ function initLightbox(): void {
   image.addEventListener('load', () => image.setAttribute('data-ready', ''));
 
   const close = (): void => {
+    if (!root.hasAttribute('data-open')) return;
     root.removeAttribute('data-open');
     window.setTimeout(() => root.setAttribute('hidden', ''), prefersReducedMotion() ? 0 : 260);
     document.documentElement.style.removeProperty('overflow');
@@ -175,8 +189,22 @@ function initLightbox(): void {
     opener = null;
   };
 
-  const open = (index: number, trigger: HTMLElement): void => {
+  /**
+   * Closing goes through history, because on a phone a full-screen viewer is a
+   * place and Back is how you leave one. Unwinding the entry fires popstate,
+   * which does the actual closing — one path, whichever way it was asked for.
+   */
+  const dismiss = (): void => {
+    if (pushed) history.back();
+    else close();
+  };
+
+  const open = (index: number, trigger: HTMLElement | null): void => {
     opener = trigger;
+    if (!pushed) {
+      history.pushState({ photo: index }, '', hashFor(index));
+      pushed = true;
+    }
     show(index);
     root.removeAttribute('hidden');
     requestAnimationFrame(() => root.setAttribute('data-open', ''));
@@ -185,28 +213,49 @@ function initLightbox(): void {
     panel.focus();
   };
 
+  window.addEventListener('popstate', () => {
+    pushed = false;
+    const index = indexFromHash();
+    // Forward as well as back: a shared link and the Back button are the same
+    // mechanism, so arriving at a photograph hash opens it either way.
+    if (index >= 0) open(index, triggerFor(index));
+    else close();
+  });
+
   document.querySelectorAll<HTMLElement>('[data-lightbox]').forEach((trigger) => {
     trigger.addEventListener('click', () => {
       open(Number(trigger.dataset.lightbox), trigger);
     });
   });
 
-  root.querySelector('[data-lb-close]')?.addEventListener('click', close);
+  root.querySelector('[data-lb-close]')?.addEventListener('click', dismiss);
   // Clicking anywhere that is not the photograph or a control dismisses.
   root.addEventListener('click', (event) => {
     const target = event.target as HTMLElement | null;
-    if (target?.closest('[data-lb-dismiss]') && !target.closest('button, img')) close();
+    if (target?.closest('[data-lb-dismiss]') && !target.closest('button, img')) dismiss();
   });
   root.querySelector('[data-lb-prev]')?.addEventListener('click', () => show(current - 1));
   root.querySelector('[data-lb-next]')?.addEventListener('click', () => show(current + 1));
 
   document.addEventListener('keydown', (event) => {
     if (!root.hasAttribute('data-open')) return;
-    if (event.key === 'Escape') close();
+    if (event.key === 'Escape') dismiss();
     else if (event.key === 'ArrowLeft') show(current - 1);
     else if (event.key === 'ArrowRight') show(current + 1);
     else trapTab(event, panel);
   });
+
+  // A link to a single photograph opens on that photograph. The grid frame
+  // carries the same id, so the anchor still lands in the right place with no
+  // JavaScript at all.
+  const deepLinked = indexFromHash();
+  if (deepLinked >= 0) {
+    // The entry the link arrived on becomes the journal itself, and the viewer
+    // is pushed on top of it — so Back leaves the photograph rather than
+    // reopening it, and lands on the page rather than off the site.
+    history.replaceState({}, '', location.pathname + location.search);
+    open(deepLinked, triggerFor(deepLinked));
+  }
 
   // Horizontal swipe on touch devices.
   let startX = 0;

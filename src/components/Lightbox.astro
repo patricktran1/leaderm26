@@ -15,6 +15,7 @@ const slides = await Promise.all(
       quality: 86,
     });
     return {
+      id: photo.id,
       src: full.src,
       w: full.attributes.width ?? photo.image.width,
       h: full.attributes.height ?? photo.image.height,

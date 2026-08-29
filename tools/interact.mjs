@@ -52,7 +52,44 @@ const ok = (c, m) => { console.log(c ? 'PASS' : 'FAIL', m); if (!c) fails.push(m
   await page.waitForTimeout(500);
   ok(await page.locator('#lightbox').isHidden(), 'clicking outside the photograph closes the lightbox');
 
+  // ---------- a photograph is a place you can link to and leave ----------
+  await page.locator('[data-lightbox="2"]').scrollIntoViewIfNeeded();
+  await page.locator('[data-lightbox="2"]').click();
+  await page.waitForTimeout(400);
+  const opened = new URL(page.url()).hash;
+  ok(/^#photo-.+/.test(opened), `opening a photograph names it in the address (${opened})`);
+
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(350);
+  const paged = new URL(page.url()).hash;
+  ok(paged !== opened && /^#photo-.+/.test(paged), 'paging rewrites the address');
+
+  await page.goBack();
+  await page.waitForTimeout(500);
+  ok(await page.locator('#lightbox').isHidden(), 'Back closes the viewer instead of leaving the page');
+  ok(new URL(page.url()).hash === '', 'and takes the photograph out of the address');
+  ok(
+    await page.evaluate(() => getComputedStyle(document.documentElement).overflow !== 'hidden'),
+    'Back releases the scroll lock',
+  );
+
+  // The shared link, opened cold the way a recipient would.
+  const fresh = await ctx.newPage();
+  await fresh.goto(base + paged, { waitUntil: 'networkidle' });
+  await fresh.waitForTimeout(600);
+  ok(await fresh.locator('#lightbox').isVisible(), 'a shared link opens on that photograph');
+  ok(
+    (await fresh.locator('[data-lb-count]').textContent()).trim() === `04 / ${pad(total)}`,
+    'and on the right one',
+  );
+  await fresh.keyboard.press('Escape');
+  await fresh.waitForTimeout(600);
+  ok(await fresh.locator('#lightbox').isHidden(), 'and closing leaves you in the journal');
+  ok(new URL(fresh.url()).pathname === '/', 'on the page, not off the site');
+  await fresh.close();
+
   // anchor navigation
+  await page.goto(base, { waitUntil: 'networkidle' });
   await page.click('.masthead__nav a[href="/#tables"]');
   await page.waitForTimeout(900);
   ok(await page.evaluate(() => window.scrollY > 1000), 'nav anchor scrolls');

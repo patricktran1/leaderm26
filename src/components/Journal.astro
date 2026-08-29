@@ -78,6 +78,7 @@ const indexed = rows.map((row) => ({
         {row.items.map(({ photo, index, sizes, widths }) => (
           <figure
             class="shot reveal"
+            id={`photo-${photo.id}`}
             style={`--grow:${(photo.ratio * 4).toFixed(3)};--master-w:${photo.image.width}px`}
           >
             <button
