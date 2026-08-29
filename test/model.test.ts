@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { captureBucket, captureParts, sortPhotos, statedTime } from '../src/data/photos';
+import {
+  captureBucket,
+  captureParts,
+  defaultCaption,
+  sortPhotos,
+  statedTime,
+} from '../src/data/photos';
 
 const entry = (id: string, takenAt: string | null, order?: number) =>
   ({ id, takenAt, override: order === undefined ? {} : { order } }) as never;
@@ -75,6 +81,22 @@ describe('sortPhotos', () => {
       entry('aa', null),
     ]);
     expect(sorted.map((p) => p.id)).toEqual(['dated', 'aa', 'zz']);
+  });
+});
+
+describe('defaultCaption', () => {
+  const frame = { id: 'DSC01900', takenAt: '2026-08-29T08:19:00.000Z' } as never;
+
+  it('drops the day where the page has already said it once', () => {
+    expect(defaultCaption(frame, true)).toBe('8:19 a.m.');
+  });
+
+  it('keeps the day as soon as the journal covers more than one', () => {
+    expect(defaultCaption(frame, false)).toBe('Saturday, 8:19 a.m.');
+  });
+
+  it('falls back to the id rather than inventing a time', () => {
+    expect(defaultCaption({ id: 'DSC01900', takenAt: null } as never, true)).toBe('DSC01900');
   });
 });
 

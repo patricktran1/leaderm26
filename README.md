@@ -52,8 +52,10 @@ full-page screenshots are deterministic. `tools/interact.mjs` and
    TIFF. Any size, any orientation, any number at once.
 3. Leave **"Commit directly to the `main` branch"** selected and click
    **Commit changes**.
-4. Vercel rebuilds on its own. A handful of frames is live in about a minute; a
-   hundred takes nearer five. It is **https://leaderm26.vercel.app** either way.
+4. Vercel rebuilds on its own — **about a minute**, near enough whatever you
+   uploaded. (Measured: fifty 20-megapixel camera originals go from folder to
+   finished site in 21 seconds of build; the rest is Vercel fetching the
+   repository and installing.) It is **https://leaderm26.vercel.app**.
 5. Open **https://leaderm26.vercel.app/admin/photos** and check the count.
    That page is the only place a problem is visible — a deployment goes green
    whether ten photographs landed or six, so this is the ten seconds that tells
@@ -150,6 +152,11 @@ automatic defaults.
 A caption written against an old filename **follows the photograph** when a
 higher-resolution version replaces it, even if the new file is named
 differently. You never have to rewrite one.
+
+**To take a photograph down**, delete the file in `photos/` (GitHub: open it →
+the ⋯ menu → *Delete file*), or add `"hidden": true` to its entry if you would
+rather keep the original in the repository. Either way the journal renumbers,
+re-rows and rewrites its own contents line on the next build.
 
 ### Getting the captions written without writing them
 

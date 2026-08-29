@@ -139,9 +139,17 @@ export function captureBucket(iso: string | null): string | null {
 
 /* --------------------------------------------------------------- assembly */
 
-function defaultCaption(entry: IndexEntry): string {
+/**
+ * Down a page of forty frames the day is said once, by the standfirst and by
+ * the half-day headings; printing "Saturday," above every photograph is
+ * repetition, not information. So a journal that covers a single day captions
+ * its frames with the time alone. As soon as it covers two, the day is
+ * load-bearing on every frame and comes back.
+ */
+export function defaultCaption(entry: IndexEntry, dayIsUnderstood: boolean): string {
   const parts = captureParts(entry.takenAt);
-  return parts ? `${parts.day}, ${parts.time}` : entry.id;
+  if (!parts) return entry.id;
+  return dayIsUnderstood ? parts.time : `${parts.day}, ${parts.time}`;
 }
 
 /**
@@ -156,14 +164,14 @@ function defaultAlt(entry: IndexEntry): string {
     : 'Undescribed photograph from LEADderm 2026.';
 }
 
-function toPhoto(entry: IndexEntry): Photo {
+function toPhoto(entry: IndexEntry, dayIsUnderstood = false): Photo {
   const override = entry.override ?? {};
   const caption = override.caption?.trim();
   const alt = override.alt?.trim();
   return {
     id: entry.id,
     file: entry.file,
-    caption: caption || defaultCaption(entry),
+    caption: caption || defaultCaption(entry, dayIsUnderstood),
     alt: alt || defaultAlt(entry),
     note: override.note?.trim() || undefined,
     category: CATEGORIES.includes(override.category as Category)
@@ -180,7 +188,7 @@ function toPhoto(entry: IndexEntry): Photo {
     supersedes: entry.supersedes,
     featured: override.featured === true,
     pinnedAt: pinnedAt(entry),
-    meta: viewerMeta(entry, Boolean(caption)),
+    meta: viewerMeta(entry, Boolean(caption), dayIsUnderstood),
   };
 }
 
@@ -189,9 +197,16 @@ function toPhoto(entry: IndexEntry): Photo {
  * already the capture time there is no point repeating it, so only the camera
  * is left; when someone has written a caption, both belong.
  */
-function viewerMeta(entry: IndexEntry, hasWrittenCaption: boolean): string {
+function viewerMeta(entry: IndexEntry, hasWrittenCaption: boolean, dayIsUnderstood: boolean): string {
   const parts = captureParts(entry.takenAt);
-  const when = parts && hasWrittenCaption ? `${parts.day}, ${parts.time}` : null;
+  if (!parts) return entry.camera ?? '';
+  // Where the caption is already the time, the viewer adds only what the
+  // caption left out — the day, when the caption dropped it — never the time twice.
+  const when = hasWrittenCaption
+    ? `${parts.day}, ${parts.time}`
+    : dayIsUnderstood
+      ? parts.day
+      : null;
   return [when, entry.camera].filter(Boolean).join(' · ');
 }
 
@@ -254,12 +269,10 @@ const entries: IndexEntry[] = index.photos.map((entry) => {
   return stated ? { ...entry, takenAt: stated } : entry;
 });
 
-export const photos: Photo[] = sortPhotos(entries.filter((entry) => !entry.override?.hidden)).map(
-  toPhoto,
-);
+const visible = sortPhotos(entries.filter((entry) => !entry.override?.hidden));
 
-const dates = photos
-  .map((photo) => photo.takenAt)
+const dates = visible
+  .map((entry) => entry.takenAt)
   .filter((takenAt): takenAt is string => Boolean(takenAt))
   .sort();
 
@@ -267,13 +280,22 @@ const dates = photos
 export const journalDays = new Set(dates.map((iso) => iso.slice(0, 10))).size;
 
 /**
+ * Whether the page states the day for itself. It does once there is a
+ * standfirst to state it in and only one day to state, and at that point the
+ * captions can stop repeating it.
+ */
+const dayIsUnderstood = journalDays === 1 && visible.length >= 6;
+
+export const photos: Photo[] = visible.map((entry) => toPhoto(entry, dayIsUnderstood));
+
+/**
  * A line the journal writes about itself: how many frames, and the hours they
  * span once the photographs carry capture times. Below a handful of frames
  * there is nothing worth stating.
  */
 export const journalSpan = (() => {
-  if (photos.length < 6) return null;
-  const count = `${photos.length} frames`;
+  if (visible.length < 6) return null;
+  const count = `${visible.length} frames`;
   if (dates.length < 2) return `${count}.`;
   const first = captureParts(dates[0]!);
   const last = captureParts(dates[dates.length - 1]!);
