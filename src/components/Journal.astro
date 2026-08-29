@@ -1,12 +1,12 @@
 ---
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
-import { gallery, buildRows, buckets } from '../data/gallery';
+import { journalRows, journalContents, contentsDepth } from '../data/gallery';
 import { journalDays, journalSpan } from '../data/photos';
 
-const rows = buildRows(gallery);
+const rows = journalRows;
 /** A contents line, once the journal covers enough of the meeting to need one. */
-const contents = buckets(rows);
+const contents = journalContents;
 
 // The headline follows the photographs: one day until Sunday's frames arrive.
 const title =
@@ -20,15 +20,20 @@ const MAX_CONTENT = 1320;
 /** Nothing in the grid is ever laid out wider than ~880 CSS px, so a camera
  *  original is never encoded above what a 2x screen can actually use. */
 const MAX_LADDER = 1800;
+/** A plate is sized by height, so its width follows its shape. See the CSS. */
+const PLATE_H = 480;
 
 let cursor = 0;
 const indexed = rows.map((row) => ({
   ...row,
   items: row.items.map((photo) => {
     const share = row.kind === 'lead' ? 1 : photo.ratio / row.span;
+    // A plate runs to the viewport edges on a phone and is sized by height on
+    // a wider screen, so a landscape plate asks for far more than a portrait one.
+    const plateWidth = Math.round(Math.min(photo.image.width, photo.ratio * PLATE_H));
     const sizes =
       row.kind === 'lead'
-        ? '(min-width: 48rem) 30rem, calc(100vw - 2.5rem)'
+        ? `(min-width: 48rem) ${plateWidth}px, 100vw`
         : [
             `(min-width: 82.5rem) ${Math.round(share * MAX_CONTENT)}px`,
             `(min-width: 40rem) ${Math.round(share * 92)}vw`,
@@ -52,13 +57,20 @@ const indexed = rows.map((row) => ({
         where the actual conference happens, which is to say the coffee.
       </p>
       {journalSpan && <p class="journal__span">{journalSpan}</p>}
-      {contents.length > 2 && (
-        <nav class="contents" aria-label="Jump to a part of the day">
-          <ul>
-            {contents.map((entry) => (
-              <li><a href={`#${entry.id}`}>{entry.label}</a></li>
+      {contentsDepth > 2 && (
+        <nav class="contents" aria-label="Jump to a part of the meeting">
+          <ol>
+            {contents.map((day) => (
+              <li class="contents__day">
+                <span class="contents__label label">{day.day}</span>
+                <ul class="contents__parts">
+                  {day.parts.map((part) => (
+                    <li><a href={`#${part.id}`}>{part.label}</a></li>
+                  ))}
+                </ul>
+              </li>
             ))}
-          </ul>
+          </ol>
         </nav>
       )}
     </SectionHead>
@@ -79,7 +91,7 @@ const indexed = rows.map((row) => ({
           <figure
             class="shot reveal"
             id={`photo-${photo.id}`}
-            style={`--grow:${(photo.ratio * 4).toFixed(3)};--master-w:${photo.image.width}px`}
+            style={`--grow:${(photo.ratio * 4).toFixed(3)};--ratio:${photo.ratio.toFixed(4)};--master-w:${photo.image.width}px`}
           >
             <button
               class="shot__btn"
@@ -136,9 +148,17 @@ const indexed = rows.map((row) => ({
     color: var(--ink-3);
   }
 
-  /* A contents line, the way a long feature carries one. */
-  .contents { margin-top: 1.25rem; }
-  .contents ul {
+  /* A contents line, the way a long feature carries one. A day and its halves
+     is a line of type; four links each beginning "Saturday" is a list. */
+  .contents { margin-top: 1.25rem; display: grid; gap: 0.35rem; }
+  .contents__day {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.1rem;
+  }
+  .contents__label { min-width: 5.5rem; }
+  .contents__parts {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem 1.1rem;
@@ -184,20 +204,44 @@ const indexed = rows.map((row) => ({
     .jrow--lead .shot { flex: 0 1 100%; }
   }
 
-  /* A plate is a photograph at its own resolution with its caption in the
-     column beside it — never a stretched frame in a half-empty row. */
+  /* On a phone a plate is the one frame allowed to touch the edges of the
+     page. It is the only hierarchy a single-column layout has, and used once
+     every eight or nine frames it reads as punctuation rather than decoration. */
+  @media (max-width: 39.999rem) {
+    .jrow--lead { margin-block: clamp(0.5rem, 3vw, 1.5rem); }
+    .jrow--lead .shot__btn {
+      margin-inline: calc(50% - 50vw);
+      width: 100vw;
+    }
+    .jrow--lead .shot__cap { padding-top: 0.15rem; }
+  }
+
+  /* A plate is sized by height, the way a picture editor sizes one: a
+     landscape frame runs wide and a portrait frame runs narrow, and both sit
+     in the same band of the page. Never a stretched frame in a half-empty row. */
   @media (min-width: 48rem) {
-    .jrow--lead { max-width: 50rem; }
+    .jrow--lead { --plate-h: clamp(19rem, 34vw, 30rem); }
     .jrow--lead .shot {
       flex: 1 1 100%;
       width: 100%;
       display: grid;
-      grid-template-columns: min(30rem, var(--master-w)) minmax(0, 1fr);
+      grid-template-columns:
+        min(100%, var(--master-w), calc(var(--plate-h) * var(--ratio)))
+        minmax(0, 1fr);
       column-gap: clamp(1.75rem, 4vw, 3.5rem);
       align-items: end;
     }
     .jrow--lead .shot__btn { grid-column: 1; }
-    .jrow--lead .shot__cap { grid-column: 2; margin-top: 0; padding-bottom: 0.35rem; }
+    /* The caption goes to the far edge of the measure rather than sitting
+       against the frame, so the air between them is a line across the page
+       instead of a hole beside a photograph. */
+    .jrow--lead .shot__cap {
+      grid-column: 2;
+      justify-self: end;
+      max-width: 18rem;
+      margin-top: 0;
+      padding-bottom: 0.35rem;
+    }
   }
   .shot__note {
     display: block;

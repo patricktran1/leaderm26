@@ -140,11 +140,11 @@ export function captureBucket(iso: string | null): string | null {
 /* --------------------------------------------------------------- assembly */
 
 /**
- * Down a page of forty frames the day is said once, by the standfirst and by
- * the half-day headings; printing "Saturday," above every photograph is
- * repetition, not information. So a journal that covers a single day captions
- * its frames with the time alone. As soon as it covers two, the day is
- * load-bearing on every frame and comes back.
+ * Down a page of forty frames the day is said once by the standfirst and again
+ * by every half-day heading; printing "Saturday," above each photograph as well
+ * is repetition, not information. So a journal long enough to carry those
+ * captions its frames with the time alone, and the viewer supplies the day for
+ * anyone who arrives at a single photograph from a shared link.
  */
 export function defaultCaption(entry: IndexEntry, dayIsUnderstood: boolean): string {
   const parts = captureParts(entry.takenAt);
@@ -280,11 +280,13 @@ const dates = visible
 export const journalDays = new Set(dates.map((iso) => iso.slice(0, 10))).size;
 
 /**
- * Whether the page states the day for itself. It does once there is a
- * standfirst to state it in and only one day to state, and at that point the
- * captions can stop repeating it.
+ * Whether the page states the day for itself. Once there are enough frames
+ * for a standfirst, it does — and again at every half-day heading the journal
+ * grows — so the captions can stop repeating it. In a two-day journal that is
+ * the difference between a column of "Saturday, 12:21 p.m." and a column of
+ * times under a heading that already says which afternoon this is.
  */
-const dayIsUnderstood = journalDays === 1 && visible.length >= 6;
+const dayIsUnderstood = visible.length >= 6;
 
 export const photos: Photo[] = visible.map((entry) => toPhoto(entry, dayIsUnderstood));
 

@@ -91,7 +91,7 @@ describe('defaultCaption', () => {
     expect(defaultCaption(frame, true)).toBe('8:19 a.m.');
   });
 
-  it('keeps the day as soon as the journal covers more than one', () => {
+  it('keeps the day while the journal is too short to state it anywhere else', () => {
     expect(defaultCaption(frame, false)).toBe('Saturday, 8:19 a.m.');
   });
 

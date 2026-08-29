@@ -1,5 +1,13 @@
 ---
 import { sections, sectionNumber, conference } from '../data/site';
+import { journalContents, contentsDepth } from '../data/gallery';
+
+/**
+ * On a phone the journal is the longest thing on the site by an order of
+ * magnitude, so the index that is already there becomes its table of contents
+ * too — the only way back to Sunday morning from forty screens down.
+ */
+const showParts = contentsDepth > 2;
 ---
 
 <header class="masthead" id="masthead">
@@ -39,6 +47,18 @@ import { sections, sectionNumber, conference } from '../data/site';
               <span class="index-panel__num">{sectionNumber(item.id)}</span>
               <span>{item.label}</span>
             </a>
+            {item.id === 'journal' && showParts && (
+              <ul class="index-panel__parts">
+                {journalContents.map((day) => (
+                  <li>
+                    <span class="index-panel__day label">{day.day}</span>
+                    {day.parts.map((part) => (
+                      <a href={`/#${part.id}`} data-menu-link>{part.label}</a>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ol>
@@ -188,6 +208,32 @@ import { sections, sectionNumber, conference } from '../data/site';
     line-height: 1.1;
     letter-spacing: -0.02em;
   }
+  .index-panel__parts {
+    display: grid;
+    gap: 0.15rem;
+    padding-block: 0.5rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .index-panel__parts > li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1.1rem;
+  }
+  .index-panel__day { min-width: 5.5rem; }
+  .index-panel__parts a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding-block: 0;
+    border-bottom: 0;
+    font-size: 1.0625rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .index-panel__parts a:hover { color: var(--pine); }
   .index-panel__num {
     font-family: var(--sans);
     font-size: 0.6875rem;

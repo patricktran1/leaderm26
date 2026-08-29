@@ -90,10 +90,23 @@ describe('buildRows — stranded frames', () => {
   it('promotes a frame with nowhere to fold into a plate', () => {
     const rows = buildRows([
       make('lead-a', 0.75, 'lead'),
+      make('a', 0.75, 'minor'),
+      make('b', 0.75, 'minor'),
+      make('stranded', 0.75, 'minor'),
+    ]);
+    // The stranded frame folds back into the run rather than standing alone.
+    expect(rows.map((r) => r.kind)).toEqual(['lead', 'run']);
+    expect(rows[1]!.items).toHaveLength(3);
+  });
+
+  it('refuses to make a third plate out of a frame caught between two', () => {
+    // A page that gives every other frame the full measure has stopped
+    // choosing, so a stranded frame between two plates stays in the run.
+    const rows = buildRows([
+      make('lead-a', 0.75, 'lead'),
       make('stranded', 0.75, 'minor'),
       make('lead-b', 0.75, 'lead'),
     ]);
-    expect(rows.map((r) => r.kind)).toEqual(['lead', 'lead', 'lead']);
-    expect(rows.every((r) => r.fill === 1)).toBe(true);
+    expect(rows.map((r) => r.kind)).toEqual(['lead', 'run', 'lead']);
   });
 });
