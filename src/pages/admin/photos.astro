@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { gallery } from '../../data/gallery';
-import { photoIndexMeta } from '../../data/photos';
+import { captureParts, photoIndexMeta } from '../../data/photos';
 import { conference } from '../../data/site';
 
 const needsAlt = gallery.filter((photo) => photo.altIsGenerated);
@@ -11,18 +11,68 @@ const superseded = gallery.flatMap((photo) =>
   photo.supersedes.map((source) => ({ id: photo.id, source })),
 );
 
-/** A paste-ready block for `photos/captions.json`, pre-filled for the gaps. */
+const untouched = gallery.filter((photo) => !photo.hasOverride);
+const waiting = gallery.filter((photo) => photo.altIsGenerated || photo.captionIsGenerated);
+/** One sitting's worth. A hundred photographs is not a batch, it is a weekend. */
+const BATCH = 30;
+const batch = waiting.slice(0, BATCH);
+const more = waiting.length - batch.length;
+
+const clock = (iso: string | null): string => {
+  const parts = captureParts(iso);
+  return parts ? `${parts.day} ${parts.time}` : 'no capture time';
+};
+
+/**
+ * Everything Claude needs to write the editorial treatment for a batch, in one
+ * block: what to do, the rule that matters, and a line per photograph carrying
+ * the facts the file already knows. Nothing here describes what is in a frame —
+ * that is the one thing metadata cannot tell you and the reason the photographs
+ * themselves have to be looked at.
+ */
+const brief = [
+  `${batch.length} photograph${batch.length === 1 ? '' : 's'} from LEADderm 2026 need editorial treatment.`,
+  '',
+  'Open each file listed below, look at it, and write:',
+  '  caption — a short editorial line, in the voice already in photos/captions.json',
+  '  alt     — what is actually in the frame, for someone who cannot see it',
+  '',
+  'Describe only what is in the photograph. Never name a person. Never invent a',
+  'session, a speaker, a statistic or anything else about the conference.',
+  'Add the result to the "photos" object in photos/captions.json, then run the checks.',
+  '',
+  ...batch.map((photo) =>
+    [
+      `${photo.id}  ${photo.source}  ${photo.sourceWidth}x${photo.sourceHeight}  ` +
+        `${clock(photo.takenAt)}  ${photo.camera ?? 'camera unknown'}` +
+        (photo.featured ? '  [opens the journal]' : ''),
+      `    caption: ${photo.captionIsGenerated ? '—' : photo.caption}`,
+      `    alt:     ${photo.altIsGenerated ? '—' : photo.alt}`,
+    ].join('\n'),
+  ),
+].join('\n');
+
+/** The same gaps as bare JSON, for filling in by hand. */
 const draft = Object.fromEntries(
-  gallery
-    .filter((photo) => photo.altIsGenerated || photo.captionIsGenerated)
-    .map((photo) => [
-      photo.id,
-      {
-        caption: photo.captionIsGenerated ? '' : photo.caption,
-        alt: photo.altIsGenerated ? '' : photo.alt,
-      },
-    ]),
+  batch.map((photo) => [
+    photo.id,
+    {
+      caption: photo.captionIsGenerated ? '' : photo.caption,
+      alt: photo.altIsGenerated ? '' : photo.alt,
+    },
+  ]),
 );
+
+/** What still wants attention, said in three words rather than a paragraph. */
+const marks = (photo: (typeof gallery)[number]): string[] => {
+  const out: string[] = [];
+  if (!photo.hasOverride) out.push('untouched');
+  if (photo.captionIsGenerated) out.push('needs caption');
+  if (photo.altIsGenerated) out.push('needs alt');
+  if (out.length === 0) out.push('written');
+  if (photo.featured) out.push('opens the journal');
+  return out;
+};
 
 /**
  * Pins are seat numbers. A block of pinned frames with no capture time holds
@@ -60,6 +110,7 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
         </div>
         <div><dt>Need alt text</dt><dd class:list={[{ flag: needsAlt.length > 0 }]}>{needsAlt.length}</dd></div>
         <div><dt>Need a caption</dt><dd class:list={[{ flag: needsCaption.length > 0 }]}>{needsCaption.length}</dd></div>
+        <div><dt>Untouched</dt><dd class:list={[{ flag: untouched.length > 0 }]}>{untouched.length}</dd></div>
       </dl>
 
       {(photoIndexMeta.captions.error || photoIndexMeta.captions.problems.length > 0) && (
@@ -139,15 +190,36 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
         </section>
       )}
 
+      {waiting.length > 0 && (
+        <section class="block">
+          <h2 class="h3">Hand this batch to Claude</h2>
+          <p class="prose">
+            Everything Claude needs for {more > 0 ? `the next ${batch.length} of the ${waiting.length}` : `the ${batch.length}`}{' '}
+            frame{batch.length === 1 ? '' : 's'} still on automatic text: the instruction, the rule
+            that matters, and the facts each file already carries. It has to look at the
+            photographs to write the rest — that is the point, and it is why nothing here guesses
+            at what is in them.
+          </p>
+          {more > 0 && (
+            <p class="prose">
+              Thirty is one sitting. When these are written, reload this page and the next
+              {' '}{Math.min(more, BATCH)} are here.
+            </p>
+          )}
+          <button class="copy" type="button" data-copy="brief">Copy the brief</button>
+          <pre class="draft" data-block="brief" tabindex="0" role="region" aria-label="Editorial brief">{brief}</pre>
+        </section>
+      )}
+
       {Object.keys(draft).length > 0 && (
         <section class="block">
-          <h2 class="h3">Paste-ready caption block</h2>
+          <h2 class="h3">Or fill it in by hand</h2>
           <p class="prose">
-            Copy this into the <code>photos</code> object in <code>photos/captions.json</code> and
-            fill in the blanks — or hand it to Claude with the photographs.
+            The same gaps as bare JSON, for the one caption you want to write yourself. It goes in
+            the <code>photos</code> object in <code>photos/captions.json</code>.
           </p>
-          <button class="copy" type="button" data-copy>Copy</button>
-          <pre class="draft" data-draft tabindex="0" role="region" aria-label="Caption block">{JSON.stringify(draft, null, 2)}</pre>
+          <button class="copy" type="button" data-copy="json">Copy the JSON</button>
+          <pre class="draft" data-block="json" tabindex="0" role="region" aria-label="Caption block">{JSON.stringify(draft, null, 2)}</pre>
         </section>
       )}
 
@@ -161,11 +233,15 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
               </div>
               <div class="sheet__meta">
                 <p class="sheet__id"><strong>{photo.id}</strong> <span>#{i + 1}</span></p>
+                <p class="sheet__marks">
+                  {marks(photo).map((mark) => (
+                    <span class:list={['mark', { 'mark--gap': mark.startsWith('needs') || mark === 'untouched' }]}>
+                      {mark}
+                    </span>
+                  ))}
+                </p>
                 <p class:list={[{ sheet__gap: photo.captionIsGenerated }]}>
                   {photo.captionIsGenerated ? 'caption: generated' : `caption: ${photo.caption}`}
-                </p>
-                <p class:list={[{ sheet__gap: photo.altIsGenerated }]}>
-                  {photo.altIsGenerated ? 'alt: generated — needs writing' : 'alt: written'}
                 </p>
                 <p class="sheet__dim">
                   {photo.sourceWidth}×{photo.sourceHeight} source · {photo.image.width}×
@@ -189,17 +265,19 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
 </Base>
 
 <script>
-  const button = document.querySelector<HTMLButtonElement>('[data-copy]');
-  const draft = document.querySelector<HTMLElement>('[data-draft]');
-  button?.addEventListener('click', async () => {
-    if (!draft?.textContent) return;
-    try {
-      await navigator.clipboard.writeText(draft.textContent);
-      button.textContent = 'Copied';
-      window.setTimeout(() => (button.textContent = 'Copy'), 1600);
-    } catch {
-      button.textContent = 'Select it manually';
-    }
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+    const block = document.querySelector<HTMLElement>(`[data-block="${button.dataset.copy}"]`);
+    const label = button.textContent ?? 'Copy';
+    button.addEventListener('click', async () => {
+      if (!block?.textContent) return;
+      try {
+        await navigator.clipboard.writeText(block.textContent);
+        button.textContent = 'Copied';
+        window.setTimeout(() => (button.textContent = label), 1600);
+      } catch {
+        button.textContent = 'Select it manually';
+      }
+    });
   });
 </script>
 
@@ -266,6 +344,14 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
   .sheet__meta p { overflow-wrap: anywhere; }
   .sheet__id span { color: var(--ink-3); }
   .sheet__gap { color: #8a3d1f; }
+  .sheet__marks { display: flex; flex-wrap: wrap; gap: 0.3rem 0.75rem; }
+  .mark {
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .mark--gap { color: #8a3d1f; }
   .sheet__dim { color: var(--ink-3); font-size: 0.8125rem; }
 
   .foot { margin-top: 3rem; font-size: 0.8125rem !important; }

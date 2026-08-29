@@ -96,6 +96,8 @@ export interface Photo {
   featured: boolean;
   /** The seat this photograph was pinned to in captions.json, if any. */
   pinnedAt: number | null;
+  /** Whether captions.json mentions this photograph at all — i.e. untouched. */
+  hasOverride: boolean;
   /** A quiet second line for the viewer: when it was taken, on what. */
   meta: string;
 }
@@ -188,6 +190,7 @@ function toPhoto(entry: IndexEntry, dayIsUnderstood = false): Photo {
     supersedes: entry.supersedes,
     featured: override.featured === true,
     pinnedAt: pinnedAt(entry),
+    hasOverride: Object.keys(override).length > 0,
     meta: viewerMeta(entry, Boolean(caption), dayIsUnderstood),
   };
 }
