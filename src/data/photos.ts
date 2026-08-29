@@ -191,16 +191,30 @@ export const photos: Photo[] = sortPhotos(index.photos.filter((entry) => !entry.
   toPhoto,
 );
 
-/** The span the journal covers, when capture times are known. */
+const dates = photos
+  .map((photo) => photo.takenAt)
+  .filter((takenAt): takenAt is string => Boolean(takenAt))
+  .sort();
+
+/** How many calendar days the journal covers, from capture times. */
+export const journalDays = new Set(dates.map((iso) => iso.slice(0, 10))).size;
+
+/**
+ * A line the journal writes about itself: how many frames, and the hours they
+ * span once the photographs carry capture times. Below a handful of frames
+ * there is nothing worth stating.
+ */
 export const journalSpan = (() => {
-  const dated = photos.filter((photo) => photo.takenAt).map((photo) => photo.takenAt!);
-  if (dated.length < 2) return null;
-  const first = captureParts(dated.reduce((a, b) => (a < b ? a : b)));
-  const last = captureParts(dated.reduce((a, b) => (a > b ? a : b)));
-  if (!first || !last) return null;
+  if (photos.length < 6) return null;
+  const count = `${photos.length} frames`;
+  if (dates.length < 2) return `${count}.`;
+  const first = captureParts(dates[0]!);
+  const last = captureParts(dates[dates.length - 1]!);
+  if (!first || !last) return `${count}.`;
+  // The times already end in "a.m." / "p.m.", so no full stop is added.
   return first.day === last.day
-    ? `${photos.length} frames, ${first.day} ${first.time} to ${last.time}.`
-    : `${photos.length} frames, ${first.day} ${first.time} to ${last.day} ${last.time}.`;
+    ? `${count}, ${first.day} ${first.time} to ${last.time}`
+    : `${count}, ${first.day} ${first.time} to ${last.day} ${last.time}`;
 })();
 
 export const photoIndexMeta = {

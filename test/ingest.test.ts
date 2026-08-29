@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import {
   photoId,
   hammingDistance,
+  hashIsDistinctive,
   resolveDuplicates,
   validateOverrides,
 } from '../scripts/ingest-photos.mjs';
@@ -12,6 +13,7 @@ const frame = (id: string, pixels: number, hash = '0'.repeat(64)) => ({
   source: `photos/${id}`,
   pixels,
   hash,
+  takenAt: null as string | null,
 });
 
 describe('photoId', () => {
@@ -40,6 +42,18 @@ describe('photoId', () => {
   it('never returns an empty or unsafe id', () => {
     expect(photoId('....jpg')).toBe('photo');
     expect(photoId('a photo/with spaces & symbols!.jpg')).toBe('with-spaces--symbols');
+  });
+});
+
+describe('hashIsDistinctive', () => {
+  it('rejects a hash with almost nothing in it', () => {
+    expect(hashIsDistinctive('0'.repeat(64))).toBe(false);
+    expect(hashIsDistinctive('1'.repeat(64))).toBe(false);
+    expect(hashIsDistinctive(null)).toBe(false);
+  });
+
+  it('accepts a hash with real structure', () => {
+    expect(hashIsDistinctive('10'.repeat(32))).toBe(true);
   });
 });
 
@@ -108,5 +122,46 @@ describe('captions.json', () => {
       .map((entry) => entry.order)
       .filter((order): order is number => order !== undefined);
     expect(new Set(orders).size).toBe(orders.length);
+  });
+});
+
+describe('telling similar photographs apart', () => {
+  const flat = '0'.repeat(64);
+  const busy = '1010110010110100101101001011010010110100101101001011010010110101';
+
+  it('does not merge featureless frames on their hash alone', () => {
+    // A blank projector screen and a blank wall hash almost identically. Only
+    // the filename may claim they are the same photograph.
+    const groups = resolveDuplicates([
+      { ...frame('DSC01900.JPG', 1000, flat) },
+      { ...frame('DSC01901.JPG', 1000, flat) },
+    ]);
+    expect(groups).toHaveLength(2);
+  });
+
+  it('does not merge near-identical frames the camera timed a minute apart', () => {
+    const groups = resolveDuplicates([
+      { ...frame('DSC01900.JPG', 1000, busy), takenAt: '2026-08-29T13:00:00.000Z' },
+      { ...frame('DSC01901.JPG', 1000, busy), takenAt: '2026-08-29T13:05:00.000Z' },
+    ]);
+    expect(groups).toHaveLength(2);
+  });
+
+  it('still merges the same frame re-exported at the same moment', () => {
+    const groups = resolveDuplicates([
+      { ...frame('DSC01900.JPG', 1000, busy), takenAt: '2026-08-29T13:00:00.000Z' },
+      { ...frame('arrival-hires.jpg', 9000, busy), takenAt: '2026-08-29T13:00:00.000Z' },
+    ]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]!.winner.source).toBe('photos/arrival-hires.jpg');
+  });
+
+  it('always merges on the filename, whatever the picture looks like', () => {
+    const groups = resolveDuplicates([
+      { ...frame('DSC01900.webp', 1000, flat) },
+      { ...frame('DSC01900.JPG', 9000, busy) },
+    ]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]!.winner.pixels).toBe(9000);
   });
 });

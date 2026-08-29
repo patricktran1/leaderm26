@@ -84,7 +84,7 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
             fill in the blanks — or hand it to Claude with the photographs.
           </p>
           <button class="copy" type="button" data-copy>Copy</button>
-          <pre class="draft" data-draft>{JSON.stringify(draft, null, 2)}</pre>
+          <pre class="draft" data-draft tabindex="0" role="region" aria-label="Caption block">{JSON.stringify(draft, null, 2)}</pre>
         </section>
       )}
 

@@ -12,21 +12,32 @@ const ok = (c, m) => { console.log(c ? 'PASS' : 'FAIL', m); if (!c) fails.push(m
   page.on('pageerror', e => errs.push(String(e)));
   await page.goto(base, { waitUntil: 'networkidle' });
 
+  const total = await page.locator('[data-lightbox]').count();
+  const pad = (n) => String(n).padStart(2, '0');
   await page.locator('[data-lightbox="0"]').scrollIntoViewIfNeeded();
   await page.locator('[data-lightbox="0"]').click();
   await page.waitForTimeout(500);
   ok(await page.locator('#lightbox').isVisible(), 'lightbox opens on click');
-  ok((await page.locator('[data-lb-count]').textContent()).trim() === '01 / 13', 'counter reads 01 / 13');
+  ok(
+    (await page.locator('[data-lb-count]').textContent()).trim() === `01 / ${pad(total)}`,
+    `counter reads 01 / ${pad(total)}`,
+  );
   const firstSrc = await page.locator('[data-lb-image]').getAttribute('src');
   await page.keyboard.press('ArrowRight');
   await page.waitForTimeout(350);
-  ok((await page.locator('[data-lb-count]').textContent()).trim() === '02 / 13', 'arrow-right advances');
+  ok(
+    (await page.locator('[data-lb-count]').textContent()).trim() === `02 / ${pad(total)}`,
+    'arrow-right advances',
+  );
   ok(await page.locator('[data-lb-image]').getAttribute('src') !== firstSrc, 'image changes');
   ok((await page.locator('[data-lb-caption]').textContent()).trim().length > 0, 'caption present');
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowLeft');
   await page.waitForTimeout(300);
-  ok((await page.locator('[data-lb-count]').textContent()).trim() === '13 / 13', 'wraps backwards to last');
+  ok(
+    (await page.locator('[data-lb-count]').textContent()).trim() === `${pad(total)} / ${pad(total)}`,
+    'wraps backwards to the last photograph',
+  );
   await page.keyboard.press('Escape');
   await page.waitForTimeout(500);
   ok(await page.locator('#lightbox').isHidden(), 'escape closes lightbox');

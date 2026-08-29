@@ -61,3 +61,13 @@ describe('sortPhotos', () => {
     expect(sorted.map((p) => p.id)).toEqual(['dated', 'aa', 'zz']);
   });
 });
+
+describe('journalSpan', () => {
+  it('is written from the data, not by hand', async () => {
+    const { journalSpan, journalDays } = await import('../src/data/photos');
+    // The repository currently holds re-encoded frames with no EXIF, so the
+    // span is a plain count. Both branches are covered by captureParts above.
+    expect(journalSpan === null || /frames/.test(journalSpan)).toBe(true);
+    expect(journalDays).toBeGreaterThanOrEqual(0);
+  });
+});

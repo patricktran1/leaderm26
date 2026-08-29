@@ -1,10 +1,16 @@
 ---
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
-import { gallery, buildRows } from '../data/gallery';
-import { journalSpan } from '../data/photos';
+import { gallery, buildRows, buckets } from '../data/gallery';
+import { journalDays, journalSpan } from '../data/photos';
 
 const rows = buildRows(gallery);
+/** A contents line, once the journal covers enough of the meeting to need one. */
+const contents = buckets(rows);
+
+// The headline follows the photographs: one day until Sunday's frames arrive.
+const title =
+  journalDays > 1 ? 'Two days, in the order they happened.' : 'A day, in the order it happened.';
 
 // Stable index across the whole gallery so the lightbox can step through it.
 // `sizes` is derived from each frame's share of its row, because in a justified
@@ -29,7 +35,7 @@ const indexed = rows.map((row) => ({
             'calc(100vw - 2.5rem)',
           ].join(', ');
     const ceiling = Math.min(photo.image.width, MAX_LADDER);
-    const ladder = [240, 320, 400, 480, 600, 800, 1200, 1600, ceiling]
+    const ladder = [320, 480, 640, 900, 1250, ceiling]
       .filter((w) => w <= ceiling)
       .filter((w, i, all) => all.indexOf(w) === i);
     return { photo, index: cursor++, sizes, widths: ladder };
@@ -39,13 +45,22 @@ const indexed = rows.map((row) => ({
 
 <section class="section rule-top" id="journal" aria-labelledby="journal-title">
   <div class="shell">
-    <SectionHead section="journal" title="A day, in the order it happened.">
+    <SectionHead section="journal" title={title}>
       <p class="prose">
         Photographed on a small camera between sessions. No staging, no press pass — the
         arrival, the empty room, the boards people leave behind, and the twenty minutes
         where the actual conference happens, which is to say the coffee.
       </p>
       {journalSpan && <p class="journal__span">{journalSpan}</p>}
+      {contents.length > 2 && (
+        <nav class="contents" aria-label="Jump to a part of the day">
+          <ul>
+            {contents.map((entry) => (
+              <li><a href={`#${entry.id}`}>{entry.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      )}
     </SectionHead>
   </div>
 
@@ -57,7 +72,9 @@ const indexed = rows.map((row) => ({
     )}
     {indexed.map((row) => (
       <div class={`jrow jrow--${row.kind}`} style={`--fill:${row.fill}`}>
-        {row.bucket && <p class="jrow__bucket label">{row.bucket}</p>}
+        {row.bucket && (
+          <h3 class="jrow__bucket label" id={row.bucketId}>{row.bucket}</h3>
+        )}
         {row.items.map(({ photo, index, sizes, widths }) => (
           <figure
             class="shot reveal"
@@ -117,6 +134,25 @@ const indexed = rows.map((row) => ({
     font-size: 0.8125rem;
     color: var(--ink-3);
   }
+
+  /* A contents line, the way a long feature carries one. */
+  .contents { margin-top: 1.25rem; }
+  .contents ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    font-size: 0.8125rem;
+  }
+  .contents a {
+    color: var(--ink-2);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    box-shadow: inset 0 -1px 0 var(--rule-strong);
+    transition: box-shadow 0.25s var(--ease), color 0.25s var(--ease);
+  }
+  .contents a:hover { color: var(--pine); box-shadow: inset 0 -1px 0 var(--pine); }
 
   .journal__empty {
     color: var(--ink-3);

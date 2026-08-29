@@ -39,7 +39,20 @@ const MAX_EDGE = 2560;
 const JPEG_QUALITY = 88;
 const READABLE = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.heic', '.heif', '.tif', '.tiff']);
 /** Two photographs within this Hamming distance are treated as the same frame. */
-const HASH_DISTANCE = 6;
+const HASH_DISTANCE = 5;
+/**
+ * A hash of a nearly featureless frame — a blank projector screen, a wall —
+ * carries almost no information and will collide with every other flat frame.
+ * Below this many set bits (or above its mirror) the hash is not trusted and
+ * only the filename can establish identity.
+ */
+const HASH_MIN_BITS = 8;
+/**
+ * Two frames the camera timestamped more than a minute apart are different
+ * photographs, however alike they look. This is what keeps a burst from the
+ * same seat from collapsing into one frame.
+ */
+const SAME_MOMENT_MS = 60 * 1000;
 
 const log = (...args) => console.info('[photos]', ...args);
 const warn = (...args) => console.warn('[photos]', ...args);
@@ -89,6 +102,26 @@ export function hammingDistance(a, b) {
   let distance = 0;
   for (let i = 0; i < a.length; i += 1) if (a[i] !== b[i]) distance += 1;
   return distance;
+}
+
+/** Whether a hash says enough about a picture to identify it. */
+export function hashIsDistinctive(hash) {
+  if (!hash) return false;
+  const ones = [...hash].filter((bit) => bit === '1').length;
+  return ones >= HASH_MIN_BITS && hash.length - ones >= HASH_MIN_BITS;
+}
+
+/** Whether two frames could be the same photograph, on the evidence available. */
+export function looksLikeSameFrame(a, b) {
+  if (a.id === b.id) return true;
+  if (!hashIsDistinctive(a.hash) || !hashIsDistinctive(b.hash)) return false;
+  if (hammingDistance(a.hash, b.hash) > HASH_DISTANCE) return false;
+  // The camera clock is the tie-breaker: near-identical frames a minute apart
+  // are two photographs, not one.
+  if (a.takenAt && b.takenAt) {
+    return Math.abs(new Date(a.takenAt).valueOf() - new Date(b.takenAt).valueOf()) <= SAME_MOMENT_MS;
+  }
+  return true;
 }
 
 function readExif(metadata) {
@@ -163,7 +196,7 @@ export function resolveDuplicates(entries) {
     const match = groups.find(
       (group) =>
         group.ids.has(entry.id) ||
-        group.members.some((member) => hammingDistance(member.hash, entry.hash) <= HASH_DISTANCE),
+        group.members.some((member) => looksLikeSameFrame(member, entry)),
     );
     if (match) {
       match.members.push(entry);
@@ -360,4 +393,4 @@ if (invokedDirectly) {
   });
 }
 
-export { MAX_EDGE, HASH_DISTANCE };
+export { MAX_EDGE, HASH_DISTANCE, HASH_MIN_BITS, SAME_MOMENT_MS };

@@ -73,7 +73,8 @@ That is the whole job. Nothing to rename, nothing to edit, no code.
 | **Timeline** | Once there are photographs from more than one half-day, the journal breaks itself into *Saturday morning*, *Saturday afternoon*, *Sunday morning* and so on. |
 | **Caption** | Defaults to the capture time — "Saturday, 2:41 p.m." |
 | **Alt text** | Defaults to an honest placeholder that says the frame has not been described yet. It never invents a description. |
-| **Duplicates** | Upload a full-resolution version of something already on the site and it **replaces** it rather than appearing twice — matched first on the filename, then on a perceptual hash of the picture itself, so a rename or re-export is still caught. The better copy wins and inherits the old caption. |
+| **Duplicates** | Upload a full-resolution version of something already on the site and it **replaces** it rather than appearing twice — matched first on the filename, then on a perceptual hash of the picture itself, so a rename or re-export is still caught. The better copy wins and inherits the old caption. Two frames the camera timed a minute apart are never merged, however alike they look, and a hash of a nearly featureless frame is not trusted at all — so a burst from one seat stays a burst. |
+| **Navigation** | Once the journal covers three or more half-days it grows its own contents line, and the headline changes from "A day" to "Two days" on its own. |
 
 ### The photo desk
 

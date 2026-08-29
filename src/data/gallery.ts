@@ -83,6 +83,8 @@ export interface GalleryRow {
   fill: number;
   /** Set on the first row of a new half-day, when capture times are known. */
   bucket?: string;
+  /** Anchor for the contents rail. */
+  bucketId?: string;
 }
 
 const BUDGET: Record<'major' | 'minor', number> = { major: 2.0, minor: 2.6 };
@@ -156,7 +158,16 @@ function markBuckets(rows: GalleryRow[]): GalleryRow[] {
     const bucket = captureBucket(row.items[0]?.takenAt ?? null);
     if (!bucket || seen.includes(bucket)) return row;
     seen.push(bucket);
-    return { ...row, bucket };
+    return { ...row, bucket, bucketId: bucketAnchor(bucket) };
   });
   return seen.length > 1 ? marked : rows;
 }
+
+export const bucketAnchor = (bucket: string): string =>
+  `journal-${bucket.toLowerCase().replace(/\s+/g, '-')}`;
+
+/** The half-days the journal covers, for the contents rail. */
+export const buckets = (rows: GalleryRow[]): { label: string; id: string }[] =>
+  rows
+    .filter((row): row is GalleryRow & { bucket: string; bucketId: string } => Boolean(row.bucket))
+    .map((row) => ({ label: row.bucket, id: row.bucketId }));
