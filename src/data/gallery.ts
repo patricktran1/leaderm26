@@ -108,10 +108,16 @@ const MAX_PER_ROW = 4;
 
 /** A row never spans a pause this much longer than the day's own rhythm. */
 const MOMENT_GAP = 2.5;
-/** Quiet on both sides, measured the same way, earns a photograph a plate. */
+/** A pause this much longer than usual before a frame earns it a plate. */
 const QUIET_GAP = 3;
 /** At most one earned plate per this many frames, so a plate still means one. */
 const PLATE_RATIO = 9;
+/**
+ * And no two plates closer together than this. Keeping them merely
+ * non-adjacent is not enough: a plate, one frame, a plate, two frames, a plate
+ * is a page that has stopped choosing, and it is what the ratio alone produced.
+ */
+const PLATE_SPACING = 7;
 /** Below this the journal is short enough to read without any pacing at all. */
 const RHYTHM_MIN = 12;
 /**
@@ -130,11 +136,11 @@ interface Beat {
 }
 
 /**
- * Groups the journal into moments and scores how much quiet surrounds each
- * frame — both in units of the journal's own median gap. Undated frames carry
- * no evidence either way and are never broken on or promoted.
+ * Groups the journal into moments and measures the pause before each frame —
+ * both in units of the journal's own median gap. Undated frames carry no
+ * evidence either way and are never broken on or promoted.
  */
-function readTheDay(items: ResolvedPhoto[]): { beats: Beat[]; solitude: number[] } {
+function readTheDay(items: ResolvedPhoto[]): { beats: Beat[]; pause: number[] } {
   const at = items.map((photo) => (photo.takenAt ? new Date(photo.takenAt).valueOf() : null));
   const gap = (i: number): number | null => {
     const a = at[i - 1];
@@ -154,13 +160,12 @@ function readTheDay(items: ResolvedPhoto[]): { beats: Beat[]; solitude: number[]
     return { photo, moment };
   });
 
-  const solitude = items.map((_, i) => {
-    const before = i === 0 ? 0 : (gap(i) ?? 0);
-    const after = i === items.length - 1 ? 0 : (gap(i + 1) ?? 0);
-    return Math.min(before, after) / unit;
-  });
+  // The pause before a photograph, which is what makes it the start of
+  // something. The first frame of the journal has no pause before it and needs
+  // none: it is already an opener.
+  const pause = items.map((_, i) => (i === 0 ? 0 : (gap(i) ?? 0) / unit));
 
-  return { beats, solitude };
+  return { beats, pause };
 }
 
 /**
@@ -168,12 +173,12 @@ function readTheDay(items: ResolvedPhoto[]): { beats: Beat[]; solitude: number[]
  *
  * Two things earn a plate. The first frame of a half-day gets one because it
  * opens a section, which is a claim about sequence and needs no judgement from
- * anyone. And a photograph with real quiet on both sides of it gets one
- * because it stood alone in the day — the frame taken walking back from a
- * session nobody photographed. Those stay rare on purpose: a plate that
- * happens every third row is not a plate, it is a column width.
+ * anyone. And the frame that follows the longest pauses in the day gets one,
+ * because after an hour of nobody lifting a camera the next photograph is the
+ * start of something. Those stay rare on purpose: a plate that happens every
+ * third row is not a plate, it is a column width.
  */
-function editorialWeights(items: ResolvedPhoto[], solitude: number[]): ResolvedPhoto[] {
+function editorialWeights(items: ResolvedPhoto[], pause: number[]): ResolvedPhoto[] {
   const plate = new Set<number>();
   let bucket: string | null = null;
   items.forEach((photo, i) => {
@@ -186,16 +191,22 @@ function editorialWeights(items: ResolvedPhoto[], solitude: number[]): ResolvedP
   });
 
   if (items.length >= RHYTHM_MIN) {
-    let earned = Math.floor(items.length / PLATE_RATIO);
+    // The half-day openers are structural and already spend part of the
+    // allowance; only what is left over can be earned.
+    let earned = Math.max(0, Math.floor(items.length / PLATE_RATIO) - plate.size);
     const candidates = items
-      .map((photo, i) => ({ i, weight: photo.weight, quiet: solitude[i]! }))
+      .map((photo, i) => ({ i, weight: photo.weight, quiet: pause[i]! }))
       .filter((c) => c.weight === 'minor' && !plate.has(c.i) && c.quiet >= QUIET_GAP)
       .sort((a, b) => b.quiet - a.quiet || a.i - b.i);
 
+    const clear = (i: number): boolean => {
+      for (let k = i - PLATE_SPACING; k <= i + PLATE_SPACING; k += 1) if (plate.has(k)) return false;
+      return true;
+    };
+
     for (const candidate of candidates) {
       if (earned <= 0) break;
-      // Two plates in succession read as a layout that has lost its nerve.
-      if (plate.has(candidate.i - 1) || plate.has(candidate.i + 1)) continue;
+      if (!clear(candidate.i)) continue;
       plate.add(candidate.i);
       earned -= 1;
     }
@@ -205,8 +216,8 @@ function editorialWeights(items: ResolvedPhoto[], solitude: number[]): ResolvedP
 }
 
 export function buildRows(input: ResolvedPhoto[]): GalleryRow[] {
-  const { beats, solitude } = readTheDay(input);
-  const items = editorialWeights(input, solitude).map((photo, i) => ({
+  const { beats, pause } = readTheDay(input);
+  const items = editorialWeights(input, pause).map((photo, i) => ({
     photo,
     moment: beats[i]!.moment,
   }));
@@ -300,7 +311,24 @@ function settle(rows: GalleryRow[]): GalleryRow[] {
       continue;
     }
 
-    const crowded = previous?.kind === 'lead' || next?.kind === 'lead';
+    // Nothing to fold into, but the line above is full: bring its last frame
+    // down and make a pair, the way a widow is fixed by pulling a word over.
+    // The order survives, because that frame directly precedes this one.
+    if (previous?.kind === 'run' && previous.items.length >= 3) {
+      const pulled = previous.items.pop()!;
+      previous.span -= pulled.ratio;
+      previous.fill = 1;
+      row.items.unshift(pulled);
+      row.span += pulled.ratio;
+      row.fill = 1;
+      settled.push(row);
+      continue;
+    }
+
+    // Two plates running is a failure of nerve in the middle of a page and a
+    // closing gesture at the end of one, so the last frame is allowed it.
+    const last = i === queue.length - 1;
+    const crowded = !last && (previous?.kind === 'lead' || next?.kind === 'lead');
     settled.push(crowded ? row : { ...row, kind: 'lead', fill: 1 });
   }
 
