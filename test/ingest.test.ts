@@ -156,12 +156,37 @@ describe('telling similar photographs apart', () => {
     expect(groups[0]!.winner.source).toBe('photos/arrival-hires.jpg');
   });
 
-  it('always merges on the filename, whatever the picture looks like', () => {
+  it('falls back to the filename when neither hash says anything', () => {
     const groups = resolveDuplicates([
       { ...frame('DSC01900.webp', 1000, flat) },
-      { ...frame('DSC01900.JPG', 9000, busy) },
+      { ...frame('DSC01900.JPG', 9000, flat) },
     ]);
     expect(groups).toHaveLength(1);
     expect(groups[0]!.winner.pixels).toBe(9000);
+  });
+
+  it('keeps two different photographs that happen to share a filename', () => {
+    // What happens the moment a shoot is sorted into folders.
+    const other = '0101001101001011010010110100101101001011010010110100101101001010';
+    const groups = resolveDuplicates([
+      { ...frame('IMG_001.jpg', 9000, busy), source: 'photos/saturday/IMG_001.jpg' },
+      { ...frame('IMG_001.jpg', 9000, other), source: 'photos/sunday/IMG_001.jpg' },
+    ]);
+    expect(groups).toHaveLength(2);
+    // Distinct ids, or one would overwrite the other's master on disk.
+    expect(new Set(groups.map((g) => g.winner.id)).size).toBe(2);
+    expect(groups[1]!.winner.id).toBe('sunday-IMG_001');
+  });
+
+  it('produces the same result whatever order the files are read in', () => {
+    const other = '0101001101001011010010110100101101001011010010110100101101001010';
+    const input = [
+      { ...frame('b.jpg', 400, busy) },
+      { ...frame('a.jpg', 900, other) },
+      { ...frame('b-copy.jpg', 100, busy) },
+    ];
+    const ids = (list: typeof input) =>
+      resolveDuplicates(list).map((g) => `${g.winner.id}:${g.winner.pixels}`);
+    expect(ids([...input].reverse()).sort()).toEqual(ids(input).sort());
   });
 });

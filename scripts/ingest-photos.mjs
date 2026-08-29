@@ -111,17 +111,53 @@ export function hashIsDistinctive(hash) {
   return ones >= HASH_MIN_BITS && hash.length - ones >= HASH_MIN_BITS;
 }
 
-/** Whether two frames could be the same photograph, on the evidence available. */
+/**
+ * Whether two frames are the same photograph, on the evidence available.
+ *
+ * The picture outranks the filename in both directions. Two files that share a
+ * name but show different things — `saturday/IMG_001.jpg` and
+ * `sunday/IMG_001.jpg`, which is what happens the moment anyone sorts a shoot
+ * into folders — are two photographs, and merging them would silently lose one.
+ */
 export function looksLikeSameFrame(a, b) {
-  if (a.id === b.id) return true;
-  if (!hashIsDistinctive(a.hash) || !hashIsDistinctive(b.hash)) return false;
-  if (hammingDistance(a.hash, b.hash) > HASH_DISTANCE) return false;
-  // The camera clock is the tie-breaker: near-identical frames a minute apart
-  // are two photographs, not one.
-  if (a.takenAt && b.takenAt) {
-    return Math.abs(new Date(a.takenAt).valueOf() - new Date(b.takenAt).valueOf()) <= SAME_MOMENT_MS;
+  if (hashIsDistinctive(a.hash) && hashIsDistinctive(b.hash)) {
+    if (hammingDistance(a.hash, b.hash) > HASH_DISTANCE) return false;
+    // The camera clock is the tie-breaker: near-identical frames a minute apart
+    // are two photographs, not one.
+    if (a.takenAt && b.takenAt) {
+      return Math.abs(new Date(a.takenAt).valueOf() - new Date(b.takenAt).valueOf()) <= SAME_MOMENT_MS;
+    }
+    return true;
   }
-  return true;
+  // With no trustworthy hash, the filename is the only evidence there is.
+  return a.id === b.id;
+}
+
+/**
+ * Two photographs can still want the same id. Give the later one a name drawn
+ * from its folder, so `sunday/IMG_001.jpg` becomes `sunday-IMG_001` rather
+ * than overwriting the file already written.
+ */
+export function disambiguate(groups) {
+  const taken = new Set();
+  for (const group of groups) {
+    let id = group.winner.id;
+    if (taken.has(id)) {
+      const folder = path.basename(path.dirname(group.winner.source));
+      const prefixed = folder && folder !== 'photos' ? photoId(`${folder}-${id}`) : id;
+      id = prefixed;
+      let suffix = 2;
+      while (taken.has(id)) {
+        id = `${prefixed}-${suffix}`;
+        suffix += 1;
+      }
+      warn(`two photographs both wanted the id "${group.winner.id}"; ${group.winner.source} is published as "${id}".`);
+      group.winner = { ...group.winner, id };
+      group.aliases = [id, ...group.aliases];
+    }
+    taken.add(id);
+  }
+  return groups;
 }
 
 function readExif(metadata) {
@@ -193,10 +229,11 @@ async function describe(file) {
 export function resolveDuplicates(entries) {
   const groups = [];
   for (const entry of entries) {
-    const match = groups.find(
-      (group) =>
-        group.ids.has(entry.id) ||
-        group.members.some((member) => looksLikeSameFrame(member, entry)),
+    // Identity is decided by `looksLikeSameFrame`, which prefers the picture
+    // and falls back to the filename. Matching on the id alone here would
+    // re-merge the very collisions that rule exists to keep apart.
+    const match = groups.find((group) =>
+      group.members.some((member) => looksLikeSameFrame(member, entry)),
     );
     if (match) {
       match.members.push(entry);
@@ -206,17 +243,23 @@ export function resolveDuplicates(entries) {
     }
   }
 
-  return groups.map((group) => {
-    const ranked = [...group.members].sort((a, b) => b.pixels - a.pixels || a.id.localeCompare(b.id));
-    const winner = ranked[0];
-    return {
-      winner,
-      // Every name this photograph has ever had, so a caption written against
-      // the old low-resolution file survives the high-resolution upload.
-      aliases: [...new Set(group.members.map((member) => member.id))],
-      superseded: ranked.slice(1).map((entry) => ({ id: entry.id, source: entry.source, pixels: entry.pixels })),
-    };
-  });
+  return disambiguate(
+    groups.map((group) => {
+      const ranked = [...group.members].sort(
+        (a, b) => b.pixels - a.pixels || a.id.localeCompare(b.id) || a.source.localeCompare(b.source),
+      );
+      const winner = ranked[0];
+      return {
+        winner,
+        // Every name this photograph has ever had, so a caption written against
+        // the old low-resolution file survives the high-resolution upload.
+        aliases: [...new Set(group.members.map((member) => member.id))],
+        superseded: ranked
+          .slice(1)
+          .map((entry) => ({ id: entry.id, source: entry.source, pixels: entry.pixels })),
+      };
+    }),
+  );
 }
 
 async function writeMaster(entry) {
