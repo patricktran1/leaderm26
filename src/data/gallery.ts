@@ -90,7 +90,23 @@ export interface GalleryRow {
 const BUDGET: Record<'major' | 'minor', number> = { major: 2.0, minor: 2.6 };
 const MAX_PER_ROW = 4;
 
-export function buildRows(items: ResolvedPhoto[]): GalleryRow[] {
+/**
+ * The frame that opens a new half-day gets more of the measure, the way a
+ * section opener does in print. It is a claim about sequence, not about
+ * importance, so it needs no judgement from anyone.
+ */
+function openSections(items: ResolvedPhoto[]): ResolvedPhoto[] {
+  let current: string | null = null;
+  return items.map((photo) => {
+    const bucket = captureBucket(photo.takenAt);
+    if (!bucket || bucket === current) return photo;
+    current = bucket;
+    return photo.weight === 'minor' ? { ...photo, weight: 'major' as const } : photo;
+  });
+}
+
+export function buildRows(input: ResolvedPhoto[]): GalleryRow[] {
+  const items = openSections(input);
   const rows: GalleryRow[] = [];
   let buffer: ResolvedPhoto[] = [];
   let budget = BUDGET.minor;

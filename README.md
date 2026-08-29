@@ -88,6 +88,7 @@ anything larger.
 | **Alt text** | Defaults to an honest placeholder that says the frame has not been described yet. It never invents a description. |
 | **Duplicates** | Upload a full-resolution version of something already on the site and it **replaces** it rather than appearing twice — matched first on the filename, then on a perceptual hash of the picture itself, so a rename or re-export is still caught. The better copy wins and inherits the old caption. Two frames the camera timed a minute apart are never merged, however alike they look, and a hash of a nearly featureless frame is not trusted at all — so a burst from one seat stays a burst. |
 | **Navigation** | Once the journal covers three or more half-days it grows its own contents line, and the headline changes from "A day" to "Two days" on its own. |
+| **Rhythm** | The first photograph of each half-day is given more of the measure, the way a section opener is in print — a claim about sequence, not about importance, so it needs no judgement from anyone. |
 
 ### The photo desk
 
