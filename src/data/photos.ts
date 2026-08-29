@@ -1,150 +1,196 @@
 /**
- * PHOTO MANIFEST
+ * THE PHOTO MODEL
  * ----------------------------------------------------------------------------
- * This is the only file you edit to publish a new photograph.
+ * Nothing in this file needs editing to publish a photograph. `photos/` is the
+ * inbox; `scripts/ingest-photos.mjs` reads it before every build and writes
+ * `src/generated/photo-index.json`. This module turns that index into the typed
+ * records the page renders, applying whatever is in `photos/captions.json`.
  *
- *   1. Drop the image file into `src/assets/photos/` (webp, jpg or png).
- *      Use the highest resolution you have — the build downsizes it.
- *   2. Add an entry below whose `id` matches the filename without extension.
- *   3. Commit. That's it.
- *
- * `weight` drives the editorial grid, not a hard column count:
- *   lead   — a full-width or double-width moment (use sparingly, 1–3 total)
- *   major  — a strong image given extra room
- *   minor  — supporting frames
- *
- * `feature: true` promotes the photograph into the hero / full-bleed slots.
- * Entries are rendered in array order; `category` powers the gallery filter
- * label and the lightbox metadata line.
+ * A photograph with no caption entry still appears — dated, ordered and with
+ * honest alt text — so a new batch can never break the build.
  */
+import rawIndex from '../generated/photo-index.json';
 
-export const CATEGORIES = ['venue', 'room', 'people', 'artifact'] as const;
+export const CATEGORIES = ['venue', 'room', 'people', 'artifact', 'unfiled'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-export type Weight = 'lead' | 'major' | 'minor';
-
-export interface Photo {
-  /** Filename in `src/assets/photos/` without its extension. */
-  id: string;
-  /** Short editorial caption shown under the frame and in the lightbox. */
-  caption: string;
-  /** Screen-reader description. Describe the frame, never guess identities. */
-  alt: string;
-  /** Optional second line, lightbox only. */
-  note?: string;
-  category: Category;
-  weight: Weight;
-  /** Eligible for hero / full-bleed placement. */
-  feature?: boolean;
-}
+export const WEIGHTS = ['lead', 'major', 'minor'] as const;
+export type Weight = (typeof WEIGHTS)[number];
 
 export const CATEGORY_LABEL: Record<Category, string> = {
   venue: 'Venue',
   room: 'The room',
   people: 'People',
   artifact: 'From the floor',
+  unfiled: 'From the conference',
 };
 
-export const photos: Photo[] = [
-  {
-    id: 'DSC01757',
-    caption: 'Arrival',
-    alt: 'The covered entrance of the Pendry Newport Beach, looking through to a sunlit courtyard.',
-    note: 'Eight in the morning, before the badges.',
-    category: 'venue',
-    weight: 'lead',
-    feature: true,
-  },
-  {
-    id: 'DSC01758',
-    caption: 'An indoor garden',
-    alt: 'A tall potted palm and low planting beds in a stone-floored interior courtyard off the hotel lobby.',
-    category: 'venue',
-    weight: 'minor',
-  },
-  {
-    id: 'DSC01775',
-    caption: 'Breakfast, first',
-    alt: 'Attendees serving themselves from a breakfast buffet laid out on a long wooden counter.',
-    category: 'people',
-    weight: 'minor',
-  },
-  {
-    id: 'IMG_7879',
-    caption: 'Before the room fills',
-    alt: 'An empty ballroom set with round banquet tables, projection screens lit and waiting.',
-    note: 'Twenty tables, set for twenty conversations.',
-    category: 'room',
-    weight: 'minor',
-  },
-  {
-    id: 'DSC01762',
-    caption: 'Geometry overhead',
-    alt: 'A hexagonal light sculpture of nested illuminated tubes suspended in a dark stairwell.',
-    category: 'venue',
-    weight: 'lead',
-    feature: true,
-  },
-  {
-    id: 'IMG_7878',
-    caption: 'The floor plan',
-    alt: 'A printed floor plan of the ballroom showing twenty round tables arranged in front of a stage.',
-    category: 'artifact',
-    weight: 'minor',
-  },
-  {
-    id: 'IMG_7877',
-    caption: 'The table themes board',
-    alt: 'A printed board titled "Table Themes" listing twenty numbered tables, each with a faculty host and a discussion topic.',
-    note: 'The full list is transcribed further down this page.',
-    category: 'artifact',
-    weight: 'minor',
-  },
-  {
-    id: 'IMG_7885',
-    caption: 'Opening remarks',
-    alt: 'A speaker stands beside a projection screen reading "Welcome to LEADderm" in a hotel ballroom.',
-    note: 'The first slide of the third annual meeting.',
-    category: 'room',
-    weight: 'minor',
-    feature: true,
-  },
-  {
-    id: 'IMG_7886',
-    caption: 'The floor',
-    alt: 'A faculty member in a tweed jacket and bow tie speaking from notes in front of a red stage curtain.',
-    category: 'people',
-    weight: 'minor',
-  },
-  {
-    id: 'IMG_7884',
-    caption: 'Mid-session',
-    alt: 'A wide view across banquet tables toward a lit stage during a talk, a coffee cup in the foreground.',
-    category: 'room',
-    weight: 'minor',
-  },
-  {
-    id: 'DSC01774',
-    caption: 'Between sessions',
-    alt: 'A small group of attendees talking around a cocktail table beneath a chandelier in a hotel foyer.',
-    category: 'people',
-    weight: 'minor',
-  },
-  {
-    id: 'DSC01778',
-    caption: '\u201cOne thing that keeps me grounded\u2026\u201d',
-    alt: 'An easel holding a poster with a hand-drawn thought bubble reading "One thing that keeps me grounded is...", surrounded by sticky notes left by attendees.',
-    note: 'The 2026 meeting is themed Strong Ground.',
-    category: 'artifact',
-    weight: 'minor',
-    feature: true,
-  },
-  {
-    id: 'DSC01783',
-    caption: '\u201cLeadership isn\u2019t always quiet.\u201d',
-    alt: 'A printed table card reading "Leadership isn\'t always quiet. Sometimes the best ideas make a little noise."',
-    note: 'Left on the entrepreneurship table, beside a bowl of Pop Rocks.',
-    category: 'artifact',
-    weight: 'minor',
-  },
-];
+/** What `photos/captions.json` may say about a photograph. Every key optional. */
+export interface PhotoOverride {
+  caption?: string;
+  alt?: string;
+  note?: string;
+  category?: Category;
+  weight?: Weight;
+  /** Pins the photograph to a position; unpinned photographs sort by capture time. */
+  order?: number;
+  /** Keeps a frame in the repository but off the page. */
+  hidden?: boolean;
+}
+
+interface IndexEntry {
+  id: string;
+  aliases: string[];
+  file: string;
+  width: number;
+  height: number;
+  sourceWidth: number;
+  sourceHeight: number;
+  sourceBytes: number;
+  source: string;
+  takenAt: string | null;
+  camera: string | null;
+  lens: string | null;
+  supersedes: string[];
+  override?: PhotoOverride;
+}
+
+interface PhotoIndex {
+  generatedAt: string;
+  maxEdge: number;
+  counts: { files: number; photos: number; superseded: number; unreadable: number };
+  unreadable: { source: string; reason: string }[];
+  photos: IndexEntry[];
+}
+
+export interface Photo {
+  id: string;
+  /** Filename inside `src/generated/photos/`. */
+  file: string;
+  caption: string;
+  alt: string;
+  note?: string;
+  category: Category;
+  weight: Weight;
+  /** True when no one has written real alt text for this frame yet. */
+  altIsGenerated: boolean;
+  captionIsGenerated: boolean;
+  takenAt: string | null;
+  camera: string | null;
+  source: string;
+  sourceWidth: number;
+  sourceHeight: number;
+  supersedes: string[];
+}
+
+const index = rawIndex as PhotoIndex;
+
+/* ------------------------------------------------------------------- time */
+
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/**
+ * EXIF capture times carry no time zone: they are the camera's wall clock,
+ * which is the local time we want to print. So the ISO string is read back in
+ * UTC deliberately — converting it would shift every caption by seven hours.
+ */
+export function captureParts(iso: string | null): { day: string; time: string; date: string } | null {
+  if (!iso) return null;
+  const at = new Date(iso);
+  if (Number.isNaN(at.valueOf())) return null;
+  const hours = at.getUTCHours();
+  const minutes = String(at.getUTCMinutes()).padStart(2, '0');
+  const suffix = hours < 12 ? 'a.m.' : 'p.m.';
+  const twelve = hours % 12 === 0 ? 12 : hours % 12;
+  return {
+    day: DAYS[at.getUTCDay()]!,
+    time: `${twelve}:${minutes} ${suffix}`,
+    date: `${at.getUTCDate()} ${
+      ['January','February','March','April','May','June','July','August','September','October','November','December'][at.getUTCMonth()]
+    }`,
+  };
+}
+
+/** A half-day bucket, used to break the journal into a legible timeline. */
+export function captureBucket(iso: string | null): string | null {
+  const parts = captureParts(iso);
+  if (!parts) return null;
+  const hour = new Date(iso!).getUTCHours();
+  const period = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+  return `${parts.day} ${period}`;
+}
+
+/* --------------------------------------------------------------- assembly */
+
+function defaultCaption(entry: IndexEntry): string {
+  const parts = captureParts(entry.takenAt);
+  return parts ? `${parts.day}, ${parts.time}` : entry.id;
+}
+
+/**
+ * Honest alt text: it states where the photograph came from rather than
+ * pretending to describe a frame nobody has looked at. Replace it by writing
+ * `alt` into captions.json — `/admin/photos` lists everything still on this.
+ */
+function defaultAlt(entry: IndexEntry): string {
+  const parts = captureParts(entry.takenAt);
+  return parts
+    ? `Undescribed photograph from LEADderm 2026, taken on ${parts.day} ${parts.date} at ${parts.time}.`
+    : 'Undescribed photograph from LEADderm 2026.';
+}
+
+function toPhoto(entry: IndexEntry): Photo {
+  const override = entry.override ?? {};
+  const caption = override.caption?.trim();
+  const alt = override.alt?.trim();
+  return {
+    id: entry.id,
+    file: entry.file,
+    caption: caption || defaultCaption(entry),
+    alt: alt || defaultAlt(entry),
+    note: override.note?.trim() || undefined,
+    category: CATEGORIES.includes(override.category as Category)
+      ? (override.category as Category)
+      : 'unfiled',
+    weight: WEIGHTS.includes(override.weight as Weight) ? (override.weight as Weight) : 'minor',
+    altIsGenerated: !alt,
+    captionIsGenerated: !caption,
+    takenAt: entry.takenAt,
+    camera: entry.camera,
+    source: entry.source,
+    sourceWidth: entry.sourceWidth,
+    sourceHeight: entry.sourceHeight,
+    supersedes: entry.supersedes,
+  };
+}
+
+/**
+ * Reading order: photographs pinned with `order` lead, in that order; the rest
+ * follow in the order they were taken; anything with neither falls back to its
+ * filename, so the sequence is always deterministic.
+ */
+export function sortPhotos(entries: IndexEntry[]): IndexEntry[] {
+  return [...entries].sort((a, b) => {
+    const pinA = a.override?.order;
+    const pinB = b.override?.order;
+    if (pinA !== undefined && pinB !== undefined) return pinA - pinB;
+    if (pinA !== undefined) return -1;
+    if (pinB !== undefined) return 1;
+    if (a.takenAt && b.takenAt && a.takenAt !== b.takenAt) return a.takenAt < b.takenAt ? -1 : 1;
+    if (a.takenAt && !b.takenAt) return -1;
+    if (!a.takenAt && b.takenAt) return 1;
+    return a.id.localeCompare(b.id, 'en');
+  });
+}
+
+export const photos: Photo[] = sortPhotos(index.photos.filter((entry) => !entry.override?.hidden)).map(
+  toPhoto,
+);
+
+export const photoIndexMeta = {
+  generatedAt: index.generatedAt,
+  maxEdge: index.maxEdge,
+  counts: index.counts,
+  unreadable: index.unreadable,
+  hidden: index.photos.filter((entry) => entry.override?.hidden).map((entry) => entry.id),
+};

@@ -1,9 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import { conference, author } from '../data/site';
-import { byPhotoId } from '../data/gallery';
+import { pick } from '../data/gallery';
 
-const cover = byPhotoId('IMG_7885');
+// Falls back through the journal so the opening never depends on one filename.
+const cover = pick('IMG_7885', 'DSC01757');
 
 const dateline = [
   conference.dates,
@@ -30,20 +31,22 @@ const dateline = [
       </p>
     </div>
 
-    <figure class="hero__figure reveal" style="--reveal-delay:200ms">
-      <div class="frame hero__frame">
-        <Image
-          src={cover.image}
-          alt={cover.alt}
-          widths={[400, 600]}
-          sizes="(min-width: 62rem) 27rem, min(26rem, calc(100vw - 2.5rem))"
-          quality={82}
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-      <figcaption class="hero__cap">{cover.caption}</figcaption>
-    </figure>
+    {cover && (
+      <figure class="hero__figure reveal" style="--reveal-delay:200ms">
+        <div class="frame hero__frame">
+          <Image
+            src={cover.image}
+            alt={cover.alt}
+            widths={[400, 600, 864]}
+            sizes="(min-width: 62rem) 27rem, min(26rem, calc(100vw - 2.5rem))"
+            quality={82}
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+        <figcaption class="hero__cap">{cover.caption}</figcaption>
+      </figure>
+    )}
   </div>
 
   <div class="shell">

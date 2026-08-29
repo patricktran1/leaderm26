@@ -1,15 +1,18 @@
 import type { ImageMetadata } from 'astro';
-import { photos, type Photo } from './photos';
+import { photos, captureBucket, type Photo } from './photos';
 
-const files = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/photos/*.{webp,avif,jpg,jpeg,png}',
-  { eager: true },
-);
+/**
+ * Every normalised master, keyed by id. These files are written by
+ * `scripts/ingest-photos.mjs` before the build; the folder is generated, so it
+ * always matches whatever is in `photos/`.
+ */
+const files = import.meta.glob<{ default: ImageMetadata }>('../generated/photos/*.jpg', {
+  eager: true,
+});
 
 const byId = new Map<string, ImageMetadata>();
-for (const [path, mod] of Object.entries(files)) {
-  const id = path.split('/').pop()!.replace(/\.[^.]+$/, '');
-  byId.set(id, mod.default);
+for (const [filePath, module] of Object.entries(files)) {
+  byId.set(filePath.split('/').pop()!.replace(/\.[^.]+$/, ''), module.default);
 }
 
 export interface ResolvedPhoto extends Photo {
@@ -18,40 +21,49 @@ export interface ResolvedPhoto extends Photo {
   ratio: number;
 }
 
-function resolve(photo: Photo): ResolvedPhoto {
+/**
+ * A photograph in the index with no file on disk means an interrupted build,
+ * not a mistake worth stopping for — it is skipped and reported.
+ */
+export const missingFiles: string[] = [];
+
+export const gallery: ResolvedPhoto[] = photos.flatMap((photo) => {
   const image = byId.get(photo.id);
   if (!image) {
-    throw new Error(
-      `Photo manifest references "${photo.id}" but src/assets/photos/${photo.id}.* does not exist.`,
-    );
+    missingFiles.push(photo.id);
+    return [];
   }
   const ratio = image.width / image.height;
-  return {
-    ...photo,
-    image,
-    ratio,
-    orientation: ratio > 1.05 ? 'landscape' : ratio < 0.95 ? 'portrait' : 'square',
-  };
-}
+  return [
+    {
+      ...photo,
+      image,
+      ratio,
+      orientation: ratio > 1.05 ? 'landscape' : ratio < 0.95 ? 'portrait' : 'square',
+    },
+  ];
+});
 
-export const gallery: ResolvedPhoto[] = photos.map(resolve);
+export const byPhotoId = (id: string): ResolvedPhoto | undefined => gallery.find((p) => p.id === id);
 
-export const byPhotoId = (id: string): ResolvedPhoto => {
-  const found = gallery.find((p) => p.id === id);
-  if (!found) throw new Error(`No photo with id "${id}" in the manifest.`);
-  return found;
+/**
+ * The first photograph matching any of the given ids, so an editorial slot on
+ * the page keeps working when the frame it wanted has been superseded, renamed
+ * or removed.
+ */
+export const pick = (...ids: string[]): ResolvedPhoto | undefined => {
+  for (const id of ids) {
+    const found = byPhotoId(id);
+    if (found) return found;
+  }
+  return gallery[0];
 };
-
-/** Files present on disk but absent from the manifest — surfaced during build. */
-export const unlistedFiles: string[] = [...byId.keys()].filter(
-  (id) => !photos.some((p) => p.id === id),
-);
 
 /* -------------------------------------------------------------------------
  * Justified gallery rows.
  * Photographs keep their true aspect ratio; each row shares a common height,
- * so widths are distributed in proportion to ratio. Nothing is cropped to a
- * square, and adding a photograph simply re-flows the rhythm.
+ * so widths are distributed in proportion to ratio. Nothing is cropped, and
+ * adding a photograph simply re-flows the rhythm.
  * ---------------------------------------------------------------------- */
 
 export interface GalleryRow {
@@ -61,6 +73,8 @@ export interface GalleryRow {
   span: number;
   /** 0–1 fill factor used to stop a short final row stretching full width. */
   fill: number;
+  /** Set on the first row of a new half-day, when capture times are known. */
+  bucket?: string;
 }
 
 const BUDGET: Record<'major' | 'minor', number> = { major: 2.0, minor: 2.6 };
@@ -91,7 +105,7 @@ export function buildRows(items: ResolvedPhoto[]): GalleryRow[] {
   }
   flush();
 
-  return settle(rows);
+  return markBuckets(settle(rows));
 }
 
 /**
@@ -122,4 +136,19 @@ function settle(rows: GalleryRow[]): GalleryRow[] {
   }
 
   return settled;
+}
+
+/**
+ * Where capture times exist, the journal breaks itself into half-days. A single
+ * bucket across the whole gallery is not a timeline, so it stays unmarked.
+ */
+function markBuckets(rows: GalleryRow[]): GalleryRow[] {
+  const seen: string[] = [];
+  const marked = rows.map((row) => {
+    const bucket = captureBucket(row.items[0]?.takenAt ?? null);
+    if (!bucket || seen.includes(bucket)) return row;
+    seen.push(bucket);
+    return { ...row, bucket };
+  });
+  return seen.length > 1 ? marked : rows;
 }

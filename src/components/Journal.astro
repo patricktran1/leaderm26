@@ -10,6 +10,9 @@ const rows = buildRows(gallery);
 // row a landscape frame takes far more of the measure than a portrait one — a
 // single flat value under-declares for one and over-declares for the other.
 const MAX_CONTENT = 1320;
+/** Nothing in the grid is ever laid out wider than ~880 CSS px, so a camera
+ *  original is never encoded above what a 2x screen can actually use. */
+const MAX_LADDER = 1800;
 
 let cursor = 0;
 const indexed = rows.map((row) => ({
@@ -24,8 +27,9 @@ const indexed = rows.map((row) => ({
             `(min-width: 40rem) ${Math.round(share * 92)}vw`,
             'calc(100vw - 2.5rem)',
           ].join(', ');
-    const ladder = [240, 320, 400, 480, 600, 800, photo.image.width]
-      .filter((w) => w <= photo.image.width)
+    const ceiling = Math.min(photo.image.width, MAX_LADDER);
+    const ladder = [240, 320, 400, 480, 600, 800, 1200, 1600, ceiling]
+      .filter((w) => w <= ceiling)
       .filter((w, i, all) => all.indexOf(w) === i);
     return { photo, index: cursor++, sizes, widths: ladder };
   }),
@@ -44,8 +48,14 @@ const indexed = rows.map((row) => ({
   </div>
 
   <div class="shell journal__body">
+    {indexed.length === 0 && (
+      <p class="journal__empty">
+        No photographs yet. Drop them into the <code>photos</code> folder and they appear here.
+      </p>
+    )}
     {indexed.map((row) => (
       <div class={`jrow jrow--${row.kind}`} style={`--fill:${row.fill}`}>
+        {row.bucket && <p class="jrow__bucket label">{row.bucket}</p>}
         {row.items.map(({ photo, index, sizes, widths }) => (
           <figure
             class="shot reveal"
@@ -92,7 +102,28 @@ const indexed = rows.map((row) => ({
   .jrow { display: grid; gap: clamp(2rem, 6vw, 3rem); }
   .shot { margin: 0; }
 
+  /* Where capture times exist the journal breaks itself into half-days. */
+  .jrow__bucket {
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    padding-bottom: 0.35rem;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-2);
+  }
+
+  .journal__empty {
+    color: var(--ink-3);
+    font-size: 0.9375rem;
+    padding-block: 2rem;
+  }
+  .journal__empty code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.875em;
+    background: var(--paper-sunk);
+    padding: 0.1em 0.35em;
+  }
+
   @media (min-width: 40rem) {
+    .jrow__bucket { flex-basis: 100%; }
     .jrow {
       display: flex;
       flex-wrap: wrap;

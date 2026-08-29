@@ -45,6 +45,19 @@ for (const v of [{n:'1440', w:1440, h:900}, {n:'390', w:390, h:844, m:true}]) {
   await ctx.close();
 }
 
+// the photo desk
+{
+  for (const w of [1440, 390]) {
+    const ctx = await b.newContext({ viewport:{width:w,height:900}, isMobile: w < 500 });
+    const page = await ctx.newPage();
+    await page.goto(base + 'admin/photos', {waitUntil:'networkidle'});
+    await page.addStyleTag({content:'*,*::before,*::after{transition:none!important}'});
+    await axe(page, `photo desk ${w}`);
+    ok(!(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)), `photo desk ${w} has no horizontal overflow`);
+    await ctx.close();
+  }
+}
+
 // mobile index panel trap
 {
   const ctx = await b.newContext({ viewport:{width:390,height:844}, isMobile:true, hasTouch:true });

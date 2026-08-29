@@ -10,12 +10,23 @@ import Practice from '../components/Practice.astro';
 import Colophon from '../components/Colophon.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Lightbox from '../components/Lightbox.astro';
-import { unlistedFiles } from '../data/gallery';
+import { gallery, missingFiles } from '../data/gallery';
+import { photoIndexMeta } from '../data/photos';
 
-if (unlistedFiles.length > 0) {
+// Build-time nudges. None of these stop a build; they are what to fix next.
+const undescribed = gallery.filter((photo) => photo.altIsGenerated).map((photo) => photo.id);
+if (undescribed.length > 0) {
   console.warn(
-    `[photos] Not in the manifest and therefore not published: ${unlistedFiles.join(', ')}`,
+    `[photos] ${undescribed.length} photograph(s) still have generated alt text. ` +
+      `Open /admin/photos to see them: ${undescribed.slice(0, 8).join(', ')}` +
+      (undescribed.length > 8 ? ', …' : ''),
   );
+}
+if (missingFiles.length > 0) {
+  console.warn(`[photos] indexed but not on disk, skipped: ${missingFiles.join(', ')}`);
+}
+for (const item of photoIndexMeta.unreadable) {
+  console.warn(`[photos] could not read ${item.source} — ${item.reason}`);
 }
 ---
 

@@ -9,11 +9,16 @@ export default [
   ...ts.configs.recommended,
   ...astro.configs.recommended,
   {
+    files: ['scripts/**/*.mjs', 'tools/**/*.mjs', '*.config.{js,mjs}'],
+    languageOptions: { globals: { ...globals.node } },
+    rules: { 'no-console': 'off' },
+  },
+  {
     languageOptions: {
       globals: { ...globals.browser },
     },
     rules: {
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },

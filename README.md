@@ -22,7 +22,7 @@ Checks:
 ```bash
 npm run check      # astro check — TypeScript across .ts and .astro
 npm run lint       # eslint
-npm test           # vitest — photo manifest + gallery layout
+npm test           # vitest — ingestion, ordering and gallery layout
 ```
 
 Browser harnesses (start `npm run preview` first — they drive :4321):
@@ -40,71 +40,129 @@ full-page screenshots are deterministic. `tools/interact.mjs` and
 
 ---
 
-## Adding photographs
+## ADD PHOTOS IN 30 SECONDS
 
-This is the whole workflow.
+**On a Mac, at the conference, with no developer tools open.**
 
-1. **Drop the file** into `src/assets/photos/` — `.webp`, `.jpg`, `.png` or `.avif`.
-   Use the largest version you have. The build downsizes and re-encodes; it will
-   never upscale, so a small source stays small.
-2. **Add one entry** to the array in [`src/data/photos.ts`](src/data/photos.ts),
-   with `id` matching the filename without its extension:
+1. Open **https://github.com/patricktran1/leaderm26/upload/main/photos** — that link
+   is a drop zone for the `photos` folder. (Or: repo → `photos` → *Add file* →
+   *Upload files*.)
+2. Drag the photographs in. Straight from the camera roll or the SD card is
+   fine — JPG, JPEG, PNG, WebP, AVIF, TIFF. Any size, any orientation, any
+   number at once.
+3. Leave **"Commit directly to the `main` branch"** selected and click
+   **Commit changes**.
+4. Vercel rebuilds on its own. Roughly **one to three minutes** later they are
+   live at **https://leaderm26.vercel.app**.
 
-   ```ts
-   {
-     id: 'DSC01912',
-     caption: 'The last session',
-     alt: 'Attendees packing up as the screens go dark in the ballroom.',
-     note: 'Optional second line, shown only in the lightbox.',
-     category: 'room',        // venue | room | people | artifact
-     weight: 'major',         // lead | major | minor
-     feature: true,           // optional: eligible for hero placement
-   }
-   ```
-3. **Commit and push.** Vercel rebuilds.
+That is the whole job. Nothing to rename, nothing to edit, no code.
 
-Order in the array is the order on the page and in the lightbox, so the journal
-reads chronologically.
+> **iPhone photographs:** shoot or export JPEG. HEIC is read when the build
+> server can decode it and skipped with a note when it cannot — the site still
+> builds either way, the frame just does not appear. To stop thinking about it:
+> **Settings → Camera → Formats → Most Compatible.**
 
-`weight` is a hint, not a column count:
+### What happens on its own
 
-| weight  | effect |
-| ------- | ------ |
-| `lead`  | a centred plate on a row of its own — keep these rare |
-| `major` | opens a row and gets more of it |
-| `minor` | fills out a row |
+| | |
+| --- | --- |
+| **Identity** | Each photograph is keyed by its filename without the extension, so `DSC01757.JPG` is `DSC01757`. |
+| **Orientation** | EXIF rotation is baked in. Nothing arrives sideways. |
+| **Size** | The long edge is capped at 2560px for the build; your original stays untouched in the repo. |
+| **Order** | Photographs sort by the time they were taken, read from EXIF. A batch uploaded at midnight still lands in the order you shot it. |
+| **Timeline** | Once there are photographs from more than one half-day, the journal breaks itself into *Saturday morning*, *Saturday afternoon*, *Sunday morning* and so on. |
+| **Caption** | Defaults to the capture time — "Saturday, 2:41 p.m." |
+| **Alt text** | Defaults to an honest placeholder that says the frame has not been described yet. It never invents a description. |
+| **Duplicates** | Upload a full-resolution version of something already on the site and it **replaces** it rather than appearing twice — matched first on the filename, then on a perceptual hash of the picture itself, so a rename or re-export is still caught. The better copy wins and inherits the old caption. |
 
-The build fails loudly if the manifest names a file that does not exist, and
-`npm test` fails if a file on disk is missing from the manifest — so a photo can
-never be silently dropped or silently published without alt text.
+### The photo desk
 
-### Guardrails worth keeping
+**https://leaderm26.vercel.app/admin/photos** — unlisted, not indexed, works on
+your phone. It shows every frame, what was read from EXIF, which files were
+superseded, anything that could not be read, and which photographs still need a
+real caption or alt text. It also prints a paste-ready block for the captions
+file. Open it after a batch upload; it is the fastest way to see what is worth
+ten more seconds of attention.
 
-- `alt` is a description of the frame, not a caption. Never name a person in a
-  photograph unless the identity is genuinely known.
-- Captions are editorial and short. Facts about the conference belong in
-  `src/data/site.ts` or `src/data/tables.ts`, where they can be checked.
+### Captions, alt text and featured photographs
 
----
+One file, and only for the photographs that deserve it:
+[`photos/captions.json`](photos/captions.json). Everything else keeps the
+automatic defaults.
+
+```json
+{
+  "photos": {
+    "DSC01912": {
+      "caption": "The last session",
+      "alt": "Attendees packing up as the screens go dark in the ballroom.",
+      "note": "Shown only in the photograph viewer.",
+      "category": "room",
+      "weight": "lead",
+      "order": 14,
+      "hidden": false
+    }
+  }
+}
+```
+
+| Field | Does |
+| --- | --- |
+| `caption` | The line under the frame. Omit for the capture time. |
+| `alt` | What is actually in the frame, for screen readers. **Worth writing.** |
+| `note` | A second line, shown only in the photograph viewer. |
+| `category` | `venue`, `room`, `people` or `artifact`. |
+| `weight` | `lead` gives a full plate with its caption alongside; `major` opens a row; `minor` is the default. |
+| `order` | Pins the photograph. Pinned frames lead, in the order given; everything else follows by capture time. |
+| `hidden` | `true` keeps the file in the repository but off the page. |
+
+A caption written against an old filename **follows the photograph** when a
+higher-resolution version replaces it, even if the new file is named
+differently. You never have to rewrite one.
+
+The easiest way to fill these in: open the photo desk, hit **Copy**, and hand
+the block to Claude along with the photographs.
 
 ## Architecture
 
 ```
+photos/                THE INBOX — drop photographs here, nothing else to do
+  captions.json        optional overrides, only for frames that need them
+scripts/
+  ingest-photos.mjs    reads the inbox before every dev/build/check/test run
 src/
-  assets/photos/       photograph masters — the only place image files live
+  generated/           written by the ingest script, git-ignored, never edited
+    photos/*.jpg         normalised masters (rotated, capped at 2560px)
+    photo-index.json     dimensions, capture time, camera, fingerprints
   components/          one file per page section, each with scoped styles
   data/
-    photos.ts          the photo manifest (edit this)
-    gallery.ts         resolves the manifest against disk, builds gallery rows
+    photos.ts          turns the index into typed records; ordering and defaults
+    gallery.ts         joins records to image files, builds the justified rows
     tables.ts          the twenty table themes, transcribed on site
-    site.ts            conference facts, contact details, navigation
+    site.ts            conference facts, contact details, section sequence
   layouts/Base.astro   <head>, metadata, JSON-LD
-  pages/index.astro    section order
+  pages/
+    index.astro        section order
+    404.astro
+    admin/photos.astro the photo desk — unlisted ingestion status
   scripts/ui.ts        the only client-side JavaScript
   styles/global.css    design tokens and shared primitives
-tools/                 screenshot, interaction and performance harnesses
+tools/                 screenshot, interaction, accessibility, perf harnesses
 test/                  vitest specs
 ```
+
+### Why the inbox is a build step, not a manifest
+
+`photos/` is the single source of truth. `scripts/ingest-photos.mjs` runs from
+npm `pre` hooks before `dev`, `build`, `check` and `test`, so it is never
+something to remember. It decodes each file (baking in EXIF rotation), caps the
+long edge, reads capture time and camera, fingerprints the picture, resolves
+duplicates and writes `src/generated/`.
+
+`src/generated/` is git-ignored and rebuilt every time, so it can never drift
+from the originals. The script is written so that **nothing it meets can fail
+the build**: an unreadable file is reported, skipped, and shown on the photo
+desk.
 
 ### Gallery layout
 
@@ -118,15 +176,17 @@ to wrap two-up; a wrapped single frame runs full width.
 
 ### Photograph resolution
 
-The frames in this repository came from a source that had already compressed
-them to 300–400px on the long edge; they were upscaled once, with a sharpening
-pass, to the masters now in `src/assets/photos/`. That ceiling is why the
-layout leans on scale contrast and whitespace rather than full-bleed hero
-imagery, why display widths are capped in `Hero`, `Gathering` and `Journal`,
-and why the viewer enlarges only to 1.35x. `tools/shot.mjs` plus a quick DOM
-measurement will tell you if a change starts stretching a frame past its
-master. None of this constrains future photographs — drop in full-resolution
-files and the same components will serve larger derivatives with no edits.
+The original thirteen frames reached this repository already compressed to
+300–400px on the long edge, and were upscaled once with a sharpening pass. That
+ceiling is why the layout leans on scale contrast and whitespace rather than
+full-bleed hero imagery, why display widths are capped in `Hero`, `Gathering`
+and `Journal`, and why the viewer enlarges only to 1.35x — nothing is ever
+stretched past what its file can carry.
+
+Upload a camera original of any of them and it takes over automatically: the
+supersede rule replaces the low-resolution copy, keeps its caption, and the
+larger derivatives appear with no edit anywhere. The display caps stay as they
+are; they are generous enough that a 2560px master is never the limit.
 
 ### Design decisions
 

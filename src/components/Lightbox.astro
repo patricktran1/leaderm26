@@ -3,18 +3,21 @@ import { getImage } from 'astro:assets';
 import { gallery } from '../data/gallery';
 import { CATEGORY_LABEL } from '../data/photos';
 
+/** The viewer panel tops out at 62rem, so 2000px covers a 2x screen. */
+const VIEWER_MAX = 2000;
+
 const slides = await Promise.all(
   gallery.map(async (photo) => {
     const full = await getImage({
       src: photo.image,
-      width: photo.image.width,
+      width: Math.min(photo.image.width, VIEWER_MAX),
       format: 'webp',
-      quality: 88,
+      quality: 86,
     });
     return {
       src: full.src,
-      w: photo.image.width,
-      h: photo.image.height,
+      w: full.attributes.width ?? photo.image.width,
+      h: full.attributes.height ?? photo.image.height,
       alt: photo.alt,
       caption: photo.caption,
       note: photo.note ?? '',

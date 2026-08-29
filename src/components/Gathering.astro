@@ -2,9 +2,9 @@
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
 import { conference } from '../data/site';
-import { byPhotoId } from '../data/gallery';
+import { pick } from '../data/gallery';
 
-const grounded = byPhotoId('DSC01778');
+const grounded = pick('DSC01778', 'IMG_7877');
 
 /** The meeting's four stated objectives, as published on leadderm.org/about. */
 const objectives = [
@@ -53,25 +53,27 @@ const objectives = [
         ))}
       </ol>
 
-      <figure class="grounded reveal">
-        <div class="frame grounded__frame">
-          <Image
-            src={grounded.image}
-            alt={grounded.alt}
-            widths={[400, 480]}
-            sizes="(min-width: 62rem) 22rem, min(24rem, calc(100vw - 2.5rem))"
-            quality={82}
-            loading="lazy"
-          />
-        </div>
-        <figcaption>
-          <p class="serif-note">
-            An easel by the door asked everyone the same question. By mid-morning it was
-            covered in answers.
-          </p>
-          <p class="grounded__meta">{grounded.caption}</p>
-        </figcaption>
-      </figure>
+      {grounded && (
+        <figure class="grounded reveal">
+          <div class="frame grounded__frame">
+            <Image
+              src={grounded.image}
+              alt={grounded.alt}
+              widths={[400, 480, 704]}
+              sizes="(min-width: 62rem) 22rem, min(24rem, calc(100vw - 2.5rem))"
+              quality={82}
+              loading="lazy"
+            />
+          </div>
+          <figcaption>
+            <p class="serif-note">
+              An easel by the door asked everyone the same question. By mid-morning it was
+              covered in answers.
+            </p>
+            <p class="grounded__meta">{grounded.caption}</p>
+          </figcaption>
+        </figure>
+      )}
     </div>
   </div>
 </section>

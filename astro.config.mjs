@@ -10,6 +10,6 @@ export default defineConfig({
     // encoder honest so faces and slide text do not smear.
     service: { entrypoint: 'astro/assets/services/sharp', config: { limitInputPixels: false } },
   },
-  integrations: [sitemap({ filter: (page) => !page.includes('/404') })],
+  integrations: [sitemap({ filter: (page) => !/\/(404|admin)/.test(page) })],
   devToolbar: { enabled: false },
 });

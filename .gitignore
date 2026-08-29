@@ -5,3 +5,6 @@ dist/
 .DS_Store
 *.log
 tools/_scratch/
+
+# Regenerated from photos/ before every dev, build, check and test run.
+src/generated/

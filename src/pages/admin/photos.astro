@@ -1,0 +1,209 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { gallery } from '../../data/gallery';
+import { photoIndexMeta } from '../../data/photos';
+import { conference } from '../../data/site';
+
+const needsAlt = gallery.filter((photo) => photo.altIsGenerated);
+const needsCaption = gallery.filter((photo) => photo.captionIsGenerated);
+const superseded = gallery.flatMap((photo) =>
+  photo.supersedes.map((source) => ({ id: photo.id, source })),
+);
+
+/** A paste-ready block for `photos/captions.json`, pre-filled for the gaps. */
+const draft = Object.fromEntries(
+  gallery
+    .filter((photo) => photo.altIsGenerated || photo.captionIsGenerated)
+    .map((photo) => [
+      photo.id,
+      {
+        caption: photo.captionIsGenerated ? '' : photo.caption,
+        alt: photo.altIsGenerated ? '' : photo.alt,
+      },
+    ]),
+);
+
+const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(/\..*$/, '') : '—');
+---
+
+<Base title="Photo desk — LEADderm 2026 Field Notes" description="Ingestion status." noindex>
+  <main id="main" class="desk">
+    <div class="shell">
+      <p class="label">Photo desk</p>
+      <h1 class="h2">{gallery.length} photograph{gallery.length === 1 ? '' : 's'} on the page.</h1>
+      <p class="prose">
+        Everything here is generated from the <code>photos</code> folder. This page is not linked
+        from the journal and is not indexed — it exists so the gaps are visible.
+      </p>
+
+      <dl class="stats">
+        <div><dt>Files read</dt><dd>{photoIndexMeta.counts.files}</dd></div>
+        <div><dt>Published</dt><dd>{gallery.length}</dd></div>
+        <div><dt>Superseded</dt><dd>{photoIndexMeta.counts.superseded}</dd></div>
+        <div><dt>Unreadable</dt><dd>{photoIndexMeta.counts.unreadable}</dd></div>
+        <div><dt>Need alt text</dt><dd class={needsAlt.length ? 'flag' : ''}>{needsAlt.length}</dd></div>
+        <div><dt>Need a caption</dt><dd class={needsCaption.length ? 'flag' : ''}>{needsCaption.length}</dd></div>
+      </dl>
+
+      {photoIndexMeta.unreadable.length > 0 && (
+        <section class="block">
+          <h2 class="h3">Could not be read</h2>
+          <p class="prose">
+            These were skipped and the build carried on. HEIC from an iPhone is the usual cause —
+            re-export as JPEG.
+          </p>
+          <ul class="plain">
+            {photoIndexMeta.unreadable.map((item) => (
+              <li><code>{item.source}</code> — {item.reason}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {superseded.length > 0 && (
+        <section class="block">
+          <h2 class="h3">Replaced by a better copy</h2>
+          <p class="prose">
+            A higher-resolution version of each of these arrived, so the older file is no longer
+            published. It is safe to delete from the repository whenever you like.
+          </p>
+          <ul class="plain">
+            {superseded.map((item) => (
+              <li><code>{item.source}</code> → published as <strong>{item.id}</strong></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {Object.keys(draft).length > 0 && (
+        <section class="block">
+          <h2 class="h3">Paste-ready caption block</h2>
+          <p class="prose">
+            Copy this into the <code>photos</code> object in <code>photos/captions.json</code> and
+            fill in the blanks — or hand it to Claude with the photographs.
+          </p>
+          <button class="copy" type="button" data-copy>Copy</button>
+          <pre class="draft" data-draft>{JSON.stringify(draft, null, 2)}</pre>
+        </section>
+      )}
+
+      <section class="block">
+        <h2 class="h3">Every frame</h2>
+        <ol class="sheet">
+          {gallery.map((photo, i) => (
+            <li class="sheet__item">
+              <div class="sheet__frame frame">
+                <Image src={photo.image} alt="" widths={[180]} sizes="180px" quality={70} loading="lazy" />
+              </div>
+              <div class="sheet__meta">
+                <p class="sheet__id"><strong>{photo.id}</strong> <span>#{i + 1}</span></p>
+                <p class={photo.captionIsGenerated ? 'sheet__gap' : ''}>
+                  {photo.captionIsGenerated ? 'caption: generated' : `caption: ${photo.caption}`}
+                </p>
+                <p class={photo.altIsGenerated ? 'sheet__gap' : ''}>
+                  {photo.altIsGenerated ? 'alt: generated — needs writing' : 'alt: written'}
+                </p>
+                <p class="sheet__dim">
+                  {photo.sourceWidth}×{photo.sourceHeight} source · {photo.image.width}×
+                  {photo.image.height} master · {photo.weight}
+                </p>
+                <p class="sheet__dim">{dt(photo.takenAt)} · {photo.camera ?? 'camera unknown'}</p>
+                <p class="sheet__dim"><code>{photo.source}</code></p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <p class="prose foot">
+        Index generated {dt(photoIndexMeta.generatedAt)} · masters capped at
+        {' '}{photoIndexMeta.maxEdge}px · <a class="link" href="/">back to the journal</a> ·
+        {' '}<a class="link" href={conference.official} target="_blank" rel="noopener noreferrer">leadderm.org</a>
+      </p>
+    </div>
+  </main>
+</Base>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const draft = document.querySelector<HTMLElement>('[data-draft]');
+  button?.addEventListener('click', async () => {
+    if (!draft?.textContent) return;
+    try {
+      await navigator.clipboard.writeText(draft.textContent);
+      button.textContent = 'Copied';
+      window.setTimeout(() => (button.textContent = 'Copy'), 1600);
+    } catch {
+      button.textContent = 'Select it manually';
+    }
+  });
+</script>
+
+<style>
+  .desk { padding-block: clamp(2.5rem, 6vw, 5rem) 6rem; }
+  .desk .h2 { margin-block: 0.5rem 1rem; }
+  .desk code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    color: var(--ink-2);
+    background: var(--paper-sunk);
+    padding: 0.1em 0.35em;
+  }
+
+  .stats {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    border-top: 1px solid var(--ink);
+  }
+  .stats > div { padding-block: 0.9rem; border-bottom: 1px solid var(--rule); }
+  .stats dt { font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .stats dd { font-family: var(--serif); font-size: 1.5rem; margin-top: 0.2rem; }
+  .stats .flag { color: #8a3d1f; }
+
+  .block { margin-top: clamp(2.5rem, 5vw, 4rem); display: grid; gap: 0.85rem; justify-items: start; }
+  .plain { display: grid; gap: 0.4rem; font-size: 0.875rem; color: var(--ink-2); }
+
+  .copy {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    padding: 0 0 0.18em;
+    min-height: 2.75rem;
+    cursor: pointer;
+  }
+  .draft {
+    width: 100%;
+    max-height: 22rem;
+    overflow: auto;
+    background: var(--night);
+    color: var(--ink-on-night);
+    padding: 1rem 1.25rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .sheet { display: grid; gap: 1.25rem; width: 100%; }
+  .sheet__item {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
+  }
+  .sheet__frame { width: 5.5rem; aspect-ratio: 1; }
+  .sheet__meta { display: grid; gap: 0.2rem; font-size: 0.8125rem; color: var(--ink-2); min-width: 0; }
+  .sheet__meta p { overflow-wrap: anywhere; }
+  .sheet__id span { color: var(--ink-3); }
+  .sheet__gap { color: #8a3d1f; }
+  .sheet__dim { color: var(--ink-3); font-size: 0.8125rem; }
+
+  .foot { margin-top: 3rem; font-size: 0.8125rem !important; }
+</style>

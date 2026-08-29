@@ -1,0 +1,104 @@
+{
+  "_readme": [
+    "Optional. Only list photographs that need something better than the default.",
+    "Keys are the photo id: the filename without its extension (DSC01757.JPG -> DSC01757).",
+    "Every field is optional:",
+    "  caption  short editorial line under the frame (default: the capture time)",
+    "  alt      what is actually in the frame, for screen readers. Please write these.",
+    "  note     a second line, shown only in the photograph viewer",
+    "  category venue | room | people | artifact",
+    "  weight   lead (a full plate) | major (opens a row) | minor (default)",
+    "  order    pins the photograph; unpinned frames sort by the time they were taken",
+    "  hidden   true keeps the file in the repo but off the page",
+    "A caption written against an old filename follows the photograph when a",
+    "higher-resolution version replaces it. See /admin/photos for what needs work."
+  ],
+  "photos": {
+    "DSC01757": {
+      "caption": "Arrival",
+      "alt": "The covered entrance of the Pendry Newport Beach, looking through to a sunlit courtyard.",
+      "note": "Eight in the morning, before the badges.",
+      "category": "venue",
+      "weight": "lead",
+      "order": 1
+    },
+    "DSC01758": {
+      "caption": "An indoor garden",
+      "alt": "A tall potted palm and low planting beds in a stone-floored interior courtyard off the hotel lobby.",
+      "category": "venue",
+      "order": 2
+    },
+    "DSC01775": {
+      "caption": "Breakfast, first",
+      "alt": "Attendees serving themselves from a breakfast buffet laid out on a long wooden counter.",
+      "category": "people",
+      "order": 3
+    },
+    "IMG_7879": {
+      "caption": "Before the room fills",
+      "alt": "An empty ballroom set with round banquet tables, projection screens lit and waiting.",
+      "note": "Twenty tables, set for twenty conversations.",
+      "category": "room",
+      "order": 4
+    },
+    "DSC01762": {
+      "caption": "Geometry overhead",
+      "alt": "A hexagonal light sculpture of nested illuminated tubes suspended in a dark stairwell.",
+      "category": "venue",
+      "weight": "lead",
+      "order": 5
+    },
+    "IMG_7878": {
+      "caption": "The floor plan",
+      "alt": "A printed floor plan of the ballroom showing twenty round tables arranged in front of a stage.",
+      "category": "artifact",
+      "order": 6
+    },
+    "IMG_7877": {
+      "caption": "The table themes board",
+      "alt": "A printed board titled \"Table Themes\" listing twenty numbered tables, each with a faculty host and a discussion topic.",
+      "note": "The full list is transcribed further down this page.",
+      "category": "artifact",
+      "order": 7
+    },
+    "IMG_7885": {
+      "caption": "Opening remarks",
+      "alt": "A speaker stands beside a projection screen reading \"Welcome to LEADderm\" in a hotel ballroom.",
+      "note": "The first slide of the third annual meeting.",
+      "category": "room",
+      "order": 8
+    },
+    "IMG_7886": {
+      "caption": "The floor",
+      "alt": "A faculty member in a tweed jacket and bow tie speaking from notes in front of a red stage curtain.",
+      "category": "people",
+      "order": 9
+    },
+    "IMG_7884": {
+      "caption": "Mid-session",
+      "alt": "A wide view across banquet tables toward a lit stage during a talk, a coffee cup in the foreground.",
+      "category": "room",
+      "order": 10
+    },
+    "DSC01774": {
+      "caption": "Between sessions",
+      "alt": "A small group of attendees talking around a cocktail table beneath a chandelier in a hotel foyer.",
+      "category": "people",
+      "order": 11
+    },
+    "DSC01778": {
+      "caption": "“One thing that keeps me grounded…”",
+      "alt": "An easel holding a poster with a hand-drawn thought bubble reading \"One thing that keeps me grounded is...\", surrounded by sticky notes left by attendees.",
+      "note": "The 2026 meeting is themed Strong Ground.",
+      "category": "artifact",
+      "order": 12
+    },
+    "DSC01783": {
+      "caption": "“Leadership isn’t always quiet.”",
+      "alt": "A printed table card reading \"Leadership isn't always quiet. Sometimes the best ideas make a little noise.\"",
+      "note": "Left on the entrepreneurship table, beside a bowl of Pop Rocks.",
+      "category": "artifact",
+      "order": 13
+    }
+  }
+}
