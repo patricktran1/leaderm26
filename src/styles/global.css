@@ -176,7 +176,7 @@ button { font: inherit; color: inherit; }
   line-height: 1.35;
   letter-spacing: -0.012em;
   color: var(--ink);
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 /* ------------------------------------------------------- section heads -- */
