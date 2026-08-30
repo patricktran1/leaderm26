@@ -18,90 +18,91 @@
   "photos": {
     "DSC01757": {
       "caption": "Arrival",
-      "alt": "The covered entrance of the Pendry Newport Beach, looking through to a sunlit courtyard.",
-      "note": "Eight in the morning, before the badges.",
+      "alt": "A covered hotel entrance passage with dark timber beams and tall potted palms, a brass luggage cart at the left and daylight falling across the tiled floor.",
+      "note": "Before the badges.",
       "category": "venue",
       "weight": "lead",
       "order": 1
     },
     "DSC01758": {
       "caption": "An indoor garden",
-      "alt": "A tall potted palm and low planting beds in a stone-floored interior courtyard off the hotel lobby.",
+      "alt": "A tall palm in a grey planter above a bed of low leafy planting, on a pale stone floor, with a lit display window behind and daylight coming from an opening above.",
       "category": "venue",
       "order": 2
     },
     "DSC01775": {
       "caption": "Breakfast, first",
-      "alt": "Attendees serving themselves from a breakfast buffet laid out on a long wooden counter.",
+      "alt": "People serving themselves at a breakfast buffet — pastries and fruit on wooden boards, serving tongs, a tall dark urn behind, a backpack set down on the floor.",
       "category": "people",
       "order": 3
     },
     "IMG_7879": {
       "caption": "Before the room fills",
-      "alt": "An empty ballroom set with round banquet tables, projection screens lit and waiting.",
+      "alt": "A ballroom set with round banquet tables and cream chairs, one projection screen lit against a dark stage curtain, a few people already seated at the far side.",
       "note": "Twenty tables, set for twenty conversations.",
       "category": "room",
       "order": 4
     },
     "DSC01762": {
       "caption": "Geometry overhead",
-      "alt": "A hexagonal light sculpture of nested illuminated tubes suspended in a dark stairwell.",
+      "alt": "A hexagonal light fitting of lit tubes, its mirrored interior repeating the shape inward, set against a ceiling of dark vertical slats.",
       "category": "venue",
       "weight": "lead",
       "order": 5
     },
     "IMG_7878": {
       "caption": "The floor plan",
-      "alt": "A printed floor plan of the ballroom showing twenty round tables arranged in front of a stage.",
+      "alt": "A printed floor plan pinned to a wall, showing twenty numbered round tables in front of a stage, with the AV positions marked.",
       "category": "artifact",
       "order": 6
     },
     "IMG_7877": {
       "caption": "The table themes board",
-      "alt": "A printed board titled \"Table Themes\" listing twenty numbered tables, each with a faculty host and a discussion topic.",
+      "alt": "A printed board headed “Table Themes”, listing twenty numbered tables against a faculty name and a discussion topic.",
       "note": "The full list is transcribed further down this page.",
       "category": "artifact",
       "order": 7
     },
     "IMG_7885": {
       "caption": "Opening remarks",
-      "alt": "A speaker stands beside a projection screen reading \"Welcome to LEADderm\" in a hotel ballroom.",
-      "note": "The first slide of the third annual meeting.",
+      "alt": "A person stands on a low stage beside a projection screen reading “Welcome to LEADderm”, seen over the heads of seated attendees.",
+      "note": "The welcome slide of the third annual meeting.",
       "category": "room",
       "order": 8,
       "featured": true
     },
     "IMG_7886": {
       "caption": "The floor",
-      "alt": "A faculty member in a tweed jacket and bow tie speaking from notes in front of a red stage curtain.",
+      "alt": "A bearded man in a mustard jacket and a patterned bow tie, holding notes, in front of a dark red stage curtain.",
       "category": "people",
       "order": 9
     },
     "IMG_7884": {
       "caption": "Mid-session",
-      "alt": "A wide view across banquet tables toward a lit stage during a talk, a coffee cup in the foreground.",
+      "alt": "A wide view across banquet tables toward the lit screen, a coffee cup and a pen on the table in the foreground and a table card at the right.",
       "category": "room",
       "order": 10
     },
     "DSC01774": {
       "caption": "Between sessions",
-      "alt": "A small group of attendees talking around a cocktail table beneath a chandelier in a hotel foyer.",
+      "alt": "Half a dozen people standing and talking around a cloth-draped high table in a hotel foyer, a chandelier overhead and a second table in the foreground.",
       "category": "people",
       "order": 11
     },
     "DSC01778": {
       "caption": "“One thing that keeps me grounded…”",
-      "alt": "An easel holding a poster with a hand-drawn thought bubble reading \"One thing that keeps me grounded is...\", surrounded by sticky notes left by attendees.",
+      "alt": "A board on an easel printed with a thought bubble reading “One thing that keeps me grounded is…”, five sticky notes added around it, and someone walking past behind.",
       "note": "The 2026 meeting is themed Strong Ground.",
       "category": "artifact",
       "order": 12
     },
     "DSC01783": {
       "caption": "“Leadership isn’t always quiet.”",
-      "alt": "A printed table card reading \"Leadership isn't always quiet. Sometimes the best ideas make a little noise.\"",
-      "note": "Left on the entrepreneurship table, beside a bowl of Pop Rocks.",
+      "alt": "A printed card standing on a table: “Leadership isn’t always quiet. Sometimes the best ideas make a little noise. Keep challenging assumptions. Keep asking questions. Keep sparking conversations. Keep making an impact. Enjoy the Pop Rocks… and make some noise!” A second card behind it reads Entrepreneurship.",
+      "note": "Left on the entrepreneurship table.",
       "category": "artifact",
-      "order": 13
+      "order": 13,
+      "weight": "lead"
     }
   }
 }
