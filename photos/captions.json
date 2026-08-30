@@ -70,7 +70,7 @@
       "category": "room",
       "weight": "lead",
       "order": 8,
-      "takenAt": "unknown"
+      "takenAt": "2026-08-29T08:29"
     },
     "IMG_7885": {
       "caption": "Opening remarks",
@@ -111,6 +111,123 @@
       "category": "artifact",
       "order": 14,
       "weight": "lead"
+    },
+    "DSC01784": {
+      "alt": "A man in a dark suit and glasses stands alone at the centre of a low stage, a lavalier microphone on his shirt, between two warm uplights on the dark curtain, seen over the heads of the audience.",
+      "takenAt": "2026-08-29T10:01",
+      "category": "room"
+    },
+    "DSC01790": {
+      "alt": "An arm’s-length selfie of four men in front of a projection screen showing a QR code and “Download the LEADderm mobile app”, all smiling, the frame soft with motion.",
+      "takenAt": "2026-08-29T10:47",
+      "category": "people"
+    },
+    "DSC01793": {
+      "caption": "“Download the LEADderm mobile app.”",
+      "alt": "Four men stand in a row with arms around each other’s shoulders in front of a projection screen showing a large QR code and “Download the LEADderm mobile app — www.leadderm.org/mobile”, the two at the ends giving a thumbs-up and a shaka.",
+      "note": "Take two, twenty-five seconds after the selfie.",
+      "takenAt": "2026-08-29T10:47",
+      "category": "people"
+    },
+    "DSC01801": {
+      "alt": "Three men pose side by side in a bright, daylit lounge, arms around each other’s backs, two framed botanical prints on the wall behind them and a patterned carpet underfoot.",
+      "takenAt": "2026-08-29T14:52",
+      "category": "people"
+    },
+    "DSC01824": {
+      "caption": "Under the string lights",
+      "alt": "Two men pose arm in arm at an outdoor evening gathering, one pointing a thumb at the other, string lights and an umbrella against a deep blue dusk sky, a wine glass on the cloth-draped table behind.",
+      "takenAt": "2026-08-29T20:05",
+      "category": "people"
+    },
+    "DSC01827": {
+      "alt": "A night-time arm’s-length photograph of three people seated close together on white folding chairs, strings of warm bulbs crossing the darkening sky above them, palms silhouetted behind.",
+      "takenAt": "2026-08-29T21:19",
+      "category": "people"
+    },
+    "DSC01838": {
+      "alt": "Two people pose side by side in front of a dark curtain washed with purple light, both wearing lanyards, one giving a thumbs-up.",
+      "takenAt": "2026-08-30T12:54",
+      "category": "people"
+    },
+    "DSC01841": {
+      "alt": "A woman in a periwinkle-blue coat over a black dress laughs with her hands clasped, standing on a carpeted stage in front of a black drape with a band of violet light.",
+      "takenAt": "2026-08-30T12:54",
+      "category": "people"
+    },
+    "DSC01846": {
+      "alt": "An arm’s-length group photograph of four people shoulder to shoulder in front of a dark drape, all smiling, name badges on their lanyards.",
+      "takenAt": "2026-08-30T12:55",
+      "category": "people"
+    },
+    "DSC01849": {
+      "alt": "Photographed from low in the audience, a woman in a white blazer dress stands mid-sentence on stage with both arms spread wide, a black drape lit purple behind her.",
+      "takenAt": "2026-08-30T12:58",
+      "category": "room"
+    },
+    "DSC01853": {
+      "alt": "A woman in a white blazer dress and a taller man in an olive polo shirt stand together on the stage riser, arms around each other’s backs, purple uplights spaced along the drape behind.",
+      "takenAt": "2026-08-30T12:59",
+      "category": "people"
+    },
+    "DSC01855": {
+      "alt": "Four people stand arm in arm on the stage riser in front of the dark drape, one giving a thumbs-up, two bags set down on the platform edge beside them.",
+      "takenAt": "2026-08-30T13:00",
+      "category": "people"
+    },
+    "DSC01862": {
+      "caption": "“Heart-led entrepreneurship”",
+      "alt": "A woman smiles at the camera holding a printed table card reading “Dr. Manju Dawkins — Heart-led Entrepreneurship”, the projection screen glowing behind her.",
+      "note": "One of the twenty table themes, held up for the record.",
+      "takenAt": "2026-08-30T13:05",
+      "category": "people"
+    },
+    "DSC01868": {
+      "caption": "Back in the lobby",
+      "alt": "Two people smile at the camera in the hotel lobby — one crouched with a thumbs-up, one seated on a velvet sofa with a straw tote bag beside her — the plant-filled shelves and lamps of the lounge glowing behind them.",
+      "takenAt": "2026-08-30T13:24",
+      "weight": "lead",
+      "category": "venue"
+    },
+    "IMG_7886-2": {
+      "hidden": true
+    },
+    "IMG_7900": {
+      "alt": "A person in black stands mid-gesture on the stage in front of the dark curtain, both hands raised, a warm streak of light on the drape at the left.",
+      "category": "room"
+    },
+    "IMG_7925": {
+      "alt": "A bald man with glasses, in a navy blazer and patterned tie, gestures with a raised open hand on stage, the tops of banquet chairs soft in the foreground.",
+      "category": "room"
+    },
+    "IMG_7934": {
+      "alt": "A man in a light blue shirt and pale trousers speaks on stage, both hands blurred mid-gesture, dark curtain folds behind him.",
+      "category": "room"
+    },
+    "IMG_7940": {
+      "alt": "A bald man with glasses speaks into a handheld microphone on the low stage, his free hand raised, warm light raking the dark curtain.",
+      "category": "room"
+    },
+    "IMG_7943": {
+      "alt": "A woman in a blue-and-white floral dress stands mid-sentence on the stage riser, both hands raised, a coppery band of light in the curtain behind her.",
+      "category": "room"
+    },
+    "IMG_7948": {
+      "alt": "A man in a blue suit and dark red tie speaks with an open palm turned upward, a clicker in the other hand, seen past the back of a head in the audience.",
+      "category": "room"
+    },
+    "IMG_8001": {
+      "alt": "A woman with long blonde hair, in a black top with white trim, looks off-frame with a hand raised to her chest, the dark curtain behind her washed purple.",
+      "category": "room"
+    },
+    "IMG_8002": {
+      "alt": "A woman with long blonde hair stands with hands clasped, smiling toward the side of the room, a lavalier microphone at her neckline and purple light in the curtain folds.",
+      "category": "room"
+    },
+    "CC13772F-BFE0-4388-86CD-08DE8C40C09C": {
+      "alt": "A night-time selfie of two men giving thumbs-up under strings of warm bulbs, hedges and empty chairs in the darkness behind them.",
+      "note": "Sent over from another phone.",
+      "category": "people"
     }
   }
 }
