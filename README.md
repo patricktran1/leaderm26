@@ -146,7 +146,7 @@ automatic defaults.
 | `category` | `venue`, `room`, `people` or `artifact`. |
 | `weight` | `lead` gives a full plate with its caption alongside; `major` opens a row; `minor` is the default. |
 | `order` | A seat number, counting from 1. The frame sits in that position and everything unpinned flows around it by capture time — so pinning one photograph does not push the rest of the day down the page. |
-| `takenAt` | `2026-08-29T14:20`, for a frame whose file lost its EXIF. Read as the camera's own wall clock, never converted into a time zone. |
+| `takenAt` | `2026-08-29T14:20`, for a frame whose file lost its EXIF. Read as the camera's own wall clock, never converted into a time zone. Or `"unknown"`, when the camera's clock is plainly wrong and nobody can state the true time — the bad record is dropped rather than published. |
 | `hidden` | `true` keeps the file in the repository but off the page. |
 | `featured` | `true` opens the journal with this photograph — the hero, and the share card. The first featured frame wins. |
 

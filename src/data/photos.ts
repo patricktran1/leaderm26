@@ -40,7 +40,10 @@ export interface PhotoOverride {
   /**
    * The capture time, for a frame whose file has none — an old export, a
    * screenshot, anything that lost its EXIF. Written as `2026-08-29T14:20`
-   * and read as the camera's own wall clock, never converted.
+   * and read as the camera's own wall clock, never converted. Or `"unknown"`,
+   * for a frame whose camera clock is plainly wrong but whose true time nobody
+   * can state: the bad record is dropped, no time is printed anywhere, and the
+   * frame is placed by its pin or its filename.
    */
   takenAt?: string;
   /** Keeps a frame in the repository but off the page. */
@@ -268,6 +271,9 @@ export function sortPhotos(entries: IndexEntry[]): IndexEntry[] {
 
 /** A time written into captions.json stands in for a file that lost its EXIF. */
 const entries: IndexEntry[] = index.photos.map((entry) => {
+  // "unknown" retires a camera record the photograph itself contradicts —
+  // better no time than a wrong one stated with confidence.
+  if (entry.override?.takenAt === 'unknown') return { ...entry, takenAt: null };
   const stated = statedTime(entry.override?.takenAt);
   return stated ? { ...entry, takenAt: stated } : entry;
 });

@@ -531,8 +531,12 @@ export function validateOverrides(captions) {
         pins.get(value.order).push(id);
       }
     }
-    if (value.takenAt !== undefined && (typeof value.takenAt !== 'string' || !STATED_TIME.test(value.takenAt.trim()))) {
-      problems.push(`${id}.takenAt should read like 2026-08-29T14:20`);
+    if (
+      value.takenAt !== undefined &&
+      value.takenAt !== 'unknown' &&
+      (typeof value.takenAt !== 'string' || !STATED_TIME.test(value.takenAt.trim()))
+    ) {
+      problems.push(`${id}.takenAt should read like 2026-08-29T14:20, or "unknown"`);
     }
     for (const flag of ['hidden', 'featured']) {
       if (value[flag] !== undefined && typeof value[flag] !== 'boolean') {

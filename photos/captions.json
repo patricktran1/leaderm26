@@ -63,45 +63,53 @@
       "category": "artifact",
       "order": 7
     },
+    "DSC01781": {
+      "caption": "“Come for the learning. Stay for the people.”",
+      "alt": "A presenter in white stands on a low stage beside a large screen reading “Welcome to LEADderm — Come for the learning. Stay for the people.”, under a coffered ceiling, a chandelier at the top left.",
+      "note": "The welcome slide, in the meeting’s own words.",
+      "category": "room",
+      "weight": "lead",
+      "order": 8,
+      "takenAt": "unknown"
+    },
     "IMG_7885": {
       "caption": "Opening remarks",
       "alt": "A person stands on a low stage beside a projection screen reading “Welcome to LEADderm”, seen over the heads of seated attendees.",
-      "note": "The welcome slide of the third annual meeting.",
       "category": "room",
-      "order": 8,
+      "order": 9,
       "featured": true
     },
     "IMG_7886": {
       "caption": "The floor",
       "alt": "A bearded man in a mustard jacket and a patterned bow tie, holding notes, in front of a dark red stage curtain.",
       "category": "people",
-      "order": 9
+      "order": 10
     },
     "IMG_7884": {
       "caption": "Mid-session",
       "alt": "A wide view across banquet tables toward the lit screen, a coffee cup and a pen on the table in the foreground and a table card at the right.",
       "category": "room",
-      "order": 10
+      "order": 11
     },
     "DSC01774": {
       "caption": "Between sessions",
       "alt": "Half a dozen people standing and talking around a cloth-draped high table in a hotel foyer, a chandelier overhead and a second table in the foreground.",
       "category": "people",
-      "order": 11
+      "order": 12
     },
     "DSC01778": {
       "caption": "“One thing that keeps me grounded…”",
       "alt": "A board on an easel printed with a thought bubble reading “One thing that keeps me grounded is…”, five sticky notes added around it, and someone walking past behind.",
       "note": "The 2026 meeting is themed Strong Ground.",
       "category": "artifact",
-      "order": 12
+      "order": 13
     },
     "DSC01783": {
       "caption": "“Leadership isn’t always quiet.”",
       "alt": "A printed card standing on a table: “Leadership isn’t always quiet. Sometimes the best ideas make a little noise. Keep challenging assumptions. Keep asking questions. Keep sparking conversations. Keep making an impact. Enjoy the Pop Rocks… and make some noise!” A second card behind it reads Entrepreneurship.",
       "note": "Left on the entrepreneurship table.",
       "category": "artifact",
-      "order": 13,
+      "order": 14,
       "weight": "lead"
     }
   }
