@@ -179,7 +179,9 @@ const jsonLd = {
 
         {evidence.lastAdded && (
           <p class="evidence__stamp reveal">
-            Last photograph added {evidence.lastAdded}. Nobody touched a template to do it.
+            {/* publishedAt already ends in "a.m."/"p.m.", so it supplies the stop. */}
+            This page last rebuilt itself {evidence.lastAdded} Nothing on it was assembled
+            by hand, including that time.
           </p>
         )}
       </div>

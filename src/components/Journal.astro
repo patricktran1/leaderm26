@@ -102,7 +102,12 @@ const indexed = rows.map((row) => ({
               class="shot__btn"
               type="button"
               data-lightbox={index}
-              aria-label={photo.caption ? `Open larger — ${photo.caption}. ${photo.alt}` : `Open larger — ${photo.alt}`}
+              aria-label={[
+                'Open larger —',
+                // Captions end in their own full stop; a second one is read out.
+                photo.caption && (/[.!?”]$/.test(photo.caption) ? photo.caption : `${photo.caption}.`),
+                photo.alt,
+              ].filter(Boolean).join(' ')}
             >
               <span class="frame shot__frame" style={`aspect-ratio:${photo.image.width} / ${photo.image.height}`}>
                 <Image
