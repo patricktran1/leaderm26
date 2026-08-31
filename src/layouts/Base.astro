@@ -21,7 +21,16 @@ const {
   imageAlt = 'LEADderm 2026 — Field Notes, an independent visual journal.',
   jsonLd: jsonLdOverride,
 } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).toString();
+/**
+ * One spelling of every address. A directory-format build reports the path
+ * with a trailing slash while the host serves it without one, so the canonical
+ * tag and the sitemap end up naming two URLs for the same page. Both are
+ * normalised to the form the host actually serves.
+ */
+const canonical = new URL(
+  Astro.url.pathname.replace(/(.+)\/$/, '$1'),
+  Astro.site ?? site.url,
+).toString();
 const ogImage = new URL(image, Astro.site ?? site.url).toString();
 const ogType = jsonLdOverride ? 'website' : 'article';
 

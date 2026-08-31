@@ -55,6 +55,17 @@ ok(
 );
 ok(/dermatolog/i.test(meta.description ?? ''), 'description names the audience');
 ok(meta.canonical?.endsWith('/for-practices'), `canonical points at itself (${meta.canonical})`);
+{
+  // The canonical tag and the sitemap have to name the same URL, or the page
+  // is telling a crawler two different things about where it lives.
+  const map = await ctx.request.get(url('/sitemap-0.xml'));
+  if (map.status() === 200) {
+    const xml = await map.text();
+    ok(xml.includes(`<loc>${meta.canonical}</loc>`), 'the sitemap lists the canonical URL exactly');
+  } else {
+    console.log('SKIP sitemap not built in this mode');
+  }
+}
 ok(/^index/.test(meta.robots ?? ''), `page is indexable (${meta.robots})`);
 ok(meta.ogType === 'website', `og:type is website (${meta.ogType})`);
 ok(meta.ogImage?.endsWith('/og-practices.jpg'), `its own share card (${meta.ogImage})`);
