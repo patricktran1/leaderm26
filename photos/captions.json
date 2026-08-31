@@ -3,7 +3,7 @@
     "Optional. Only list photographs that need something better than the default.",
     "Keys are the photo id: the filename without its extension (DSC01757.JPG -> DSC01757).",
     "Every field is optional:",
-    "  caption  short editorial line under the frame (default: the capture time)",
+    "  caption  short editorial line under the frame (default: none — the frame stands alone)",
     "  alt      what is actually in the frame, for screen readers. Please write these.",
     "  note     a second line, shown only in the photograph viewer",
     "  category venue | room | people | artifact",
@@ -17,51 +17,44 @@
   ],
   "photos": {
     "DSC01757": {
-      "caption": "Arrival",
       "alt": "A covered hotel entrance passage with dark timber beams and tall potted palms, a brass luggage cart at the left and daylight falling across the tiled floor.",
       "note": "Before the badges.",
       "category": "venue",
       "weight": "lead",
-      "order": 1
+      "hidden": true
     },
     "DSC01758": {
-      "caption": "An indoor garden",
       "alt": "A tall palm in a grey planter above a bed of low leafy planting, on a pale stone floor, with a lit display window behind and daylight coming from an opening above.",
       "category": "venue",
-      "order": 2
+      "hidden": true
     },
     "DSC01775": {
-      "caption": "Breakfast, first",
       "alt": "People serving themselves at a breakfast buffet — pastries and fruit on wooden boards, serving tongs, a tall dark urn behind, a backpack set down on the floor.",
       "category": "people",
-      "order": 3
+      "hidden": true
     },
     "IMG_7879": {
-      "caption": "Before the room fills",
       "alt": "A ballroom set with round banquet tables and cream chairs, one projection screen lit against a dark stage curtain, a few people already seated at the far side.",
       "note": "Twenty tables, set for twenty conversations.",
       "category": "room",
-      "order": 4
+      "hidden": true
     },
     "DSC01762": {
-      "caption": "Geometry overhead",
       "alt": "A hexagonal light fitting of lit tubes, its mirrored interior repeating the shape inward, set against a ceiling of dark vertical slats.",
       "category": "venue",
       "weight": "lead",
-      "order": 5
+      "hidden": true
     },
     "IMG_7878": {
-      "caption": "The floor plan",
       "alt": "A printed floor plan pinned to a wall, showing twenty numbered round tables in front of a stage, with the AV positions marked.",
       "category": "artifact",
-      "order": 6
+      "hidden": true
     },
     "IMG_7877": {
-      "caption": "The table themes board",
       "alt": "A printed board headed “Table Themes”, listing twenty numbered tables against a faculty name and a discussion topic.",
       "note": "The full list is transcribed further down this page.",
       "category": "artifact",
-      "order": 7
+      "hidden": true
     },
     "DSC01781": {
       "caption": "“Come for the learning. Stay for the people.”",
@@ -69,61 +62,56 @@
       "note": "The welcome slide, in the meeting’s own words.",
       "category": "room",
       "weight": "lead",
-      "order": 8,
       "takenAt": "2026-08-29T08:29"
     },
     "IMG_7885": {
-      "caption": "Opening remarks",
+      "caption": "The room settles for the welcome.",
       "alt": "A person stands on a low stage beside a projection screen reading “Welcome to LEADderm”, seen over the heads of seated attendees.",
       "category": "room",
-      "order": 9,
       "featured": true
     },
     "IMG_7886": {
-      "caption": "The floor",
+      "caption": "A bow tie and a page of notes.",
       "alt": "A bearded man in a mustard jacket and a patterned bow tie, holding notes, in front of a dark red stage curtain.",
-      "category": "people",
-      "order": 10
+      "category": "people"
     },
     "IMG_7884": {
-      "caption": "Mid-session",
       "alt": "A wide view across banquet tables toward the lit screen, a coffee cup and a pen on the table in the foreground and a table card at the right.",
       "category": "room",
-      "order": 11
+      "hidden": true
     },
     "DSC01774": {
-      "caption": "Between sessions",
       "alt": "Half a dozen people standing and talking around a cloth-draped high table in a hotel foyer, a chandelier overhead and a second table in the foreground.",
       "category": "people",
-      "order": 12
+      "hidden": true
     },
     "DSC01778": {
-      "caption": "“One thing that keeps me grounded…”",
       "alt": "A board on an easel printed with a thought bubble reading “One thing that keeps me grounded is…”, five sticky notes added around it, and someone walking past behind.",
       "note": "The 2026 meeting is themed Strong Ground.",
       "category": "artifact",
-      "order": 13
+      "hidden": true
     },
     "DSC01783": {
-      "caption": "“Leadership isn’t always quiet.”",
       "alt": "A printed card standing on a table: “Leadership isn’t always quiet. Sometimes the best ideas make a little noise. Keep challenging assumptions. Keep asking questions. Keep sparking conversations. Keep making an impact. Enjoy the Pop Rocks… and make some noise!” A second card behind it reads Entrepreneurship.",
       "note": "Left on the entrepreneurship table.",
       "category": "artifact",
-      "order": 14,
-      "weight": "lead"
+      "weight": "lead",
+      "hidden": true
     },
     "DSC01784": {
       "alt": "A man in a dark suit and glasses stands alone at the centre of a low stage, a lavalier microphone on his shirt, between two warm uplights on the dark curtain, seen over the heads of the audience.",
       "takenAt": "2026-08-29T10:01",
-      "category": "room"
+      "category": "room",
+      "caption": "Alone at the centre of the stage."
     },
     "DSC01790": {
       "alt": "An arm’s-length selfie of four men in front of a projection screen showing a QR code and “Download the LEADderm mobile app”, all smiling, the frame soft with motion.",
       "takenAt": "2026-08-29T10:47",
-      "category": "people"
+      "category": "people",
+      "hidden": true
     },
     "DSC01793": {
-      "caption": "“Download the LEADderm mobile app.”",
+      "caption": "Arms around each other, in front of the QR code.",
       "alt": "Four men stand in a row with arms around each other’s shoulders in front of a projection screen showing a large QR code and “Download the LEADderm mobile app — www.leadderm.org/mobile”, the two at the ends giving a thumbs-up and a shaka.",
       "note": "Take two, twenty-five seconds after the selfie.",
       "takenAt": "2026-08-29T10:47",
@@ -132,10 +120,11 @@
     "DSC01801": {
       "alt": "Three men pose side by side in a bright, daylit lounge, arms around each other’s backs, two framed botanical prints on the wall behind them and a patterned carpet underfoot.",
       "takenAt": "2026-08-29T14:52",
-      "category": "people"
+      "category": "people",
+      "caption": "Between sessions, in the daylight."
     },
     "DSC01824": {
-      "caption": "Under the string lights",
+      "caption": "Under the string lights.",
       "alt": "Two men pose arm in arm at an outdoor evening gathering, one pointing a thumb at the other, string lights and an umbrella against a deep blue dusk sky, a wine glass on the cloth-draped table behind.",
       "takenAt": "2026-08-29T20:05",
       "category": "people"
@@ -143,47 +132,54 @@
     "DSC01827": {
       "alt": "A night-time arm’s-length photograph of three people seated close together on white folding chairs, strings of warm bulbs crossing the darkening sky above them, palms silhouetted behind.",
       "takenAt": "2026-08-29T21:19",
-      "category": "people"
+      "category": "people",
+      "caption": "Still out on the chairs."
     },
     "DSC01838": {
       "alt": "Two people pose side by side in front of a dark curtain washed with purple light, both wearing lanyards, one giving a thumbs-up.",
       "takenAt": "2026-08-30T12:54",
-      "category": "people"
+      "category": "people",
+      "caption": "Thumbs up in front of the curtain."
     },
     "DSC01841": {
       "alt": "A woman in a periwinkle-blue coat over a black dress laughs with her hands clasped, standing on a carpeted stage in front of a black drape with a band of violet light.",
       "takenAt": "2026-08-30T12:54",
-      "category": "people"
+      "category": "people",
+      "caption": "Caught laughing."
     },
     "DSC01846": {
       "alt": "An arm’s-length group photograph of four people shoulder to shoulder in front of a dark drape, all smiling, name badges on their lanyards.",
       "takenAt": "2026-08-30T12:55",
-      "category": "people"
+      "category": "people",
+      "caption": "Four of them, at arm’s length."
     },
     "DSC01849": {
-      "alt": "Photographed from low in the audience, a woman in a white blazer dress stands mid-sentence on stage with both arms spread wide, a black drape lit purple behind her.",
+      "alt": "Photographed from low in the room, a woman in a white blazer dress stands on the empty stage riser with both arms spread wide, a black drape lit purple behind her.",
       "takenAt": "2026-08-30T12:58",
-      "category": "room"
+      "category": "room",
+      "caption": "Arms wide, on the empty stage."
     },
     "DSC01853": {
       "alt": "A woman in a white blazer dress and a taller man in an olive polo shirt stand together on the stage riser, arms around each other’s backs, purple uplights spaced along the drape behind.",
       "takenAt": "2026-08-30T12:59",
-      "category": "people"
+      "category": "people",
+      "caption": "Two on the riser."
     },
     "DSC01855": {
       "alt": "Four people stand arm in arm on the stage riser in front of the dark drape, one giving a thumbs-up, two bags set down on the platform edge beside them.",
       "takenAt": "2026-08-30T13:00",
-      "category": "people"
+      "category": "people",
+      "caption": "Bags down, one more photograph."
     },
     "DSC01862": {
-      "caption": "“Heart-led entrepreneurship”",
+      "caption": "Heart-led entrepreneurship, table ten.",
       "alt": "A woman smiles at the camera holding a printed table card reading “Dr. Manju Dawkins — Heart-led Entrepreneurship”, the projection screen glowing behind her.",
       "note": "One of the twenty table themes, held up for the record.",
       "takenAt": "2026-08-30T13:05",
       "category": "people"
     },
     "DSC01868": {
-      "caption": "Back in the lobby",
+      "caption": "Back in the lobby, bag on the sofa.",
       "alt": "Two people smile at the camera in the hotel lobby — one crouched with a thumbs-up, one seated on a velvet sofa with a straw tote bag beside her — the plant-filled shelves and lamps of the lounge glowing behind them.",
       "takenAt": "2026-08-30T13:24",
       "weight": "lead",
@@ -193,134 +189,149 @@
       "hidden": true
     },
     "IMG_7900": {
-      "alt": "A person in black stands mid-gesture on the stage in front of the dark curtain, both hands raised, a warm streak of light on the drape at the left.",
-      "category": "room"
+      "alt": "A woman in a black top and wide black trousers stands mid-sentence on the stage, both hands open at her sides, a warm streak of light down the dark curtain behind her.",
+      "category": "room",
+      "caption": "Both palms open, mid-sentence."
     },
     "IMG_7925": {
       "alt": "A bald man with glasses, in a navy blazer and patterned tie, gestures with a raised open hand on stage, the tops of banquet chairs soft in the foreground.",
-      "category": "room"
+      "category": "room",
+      "caption": "An open hand, making a point."
     },
     "IMG_7934": {
       "alt": "A man in a light blue shirt and pale trousers speaks on stage, both hands blurred mid-gesture, dark curtain folds behind him.",
-      "category": "room"
+      "category": "room",
+      "caption": "Crossing the stage, mid-sentence."
     },
     "IMG_7940": {
       "alt": "A bald man with glasses speaks into a handheld microphone on the low stage, his free hand raised, warm light raking the dark curtain.",
-      "category": "room"
+      "category": "room",
+      "caption": "On the microphone."
     },
     "IMG_7943": {
-      "alt": "A woman in a blue-and-white floral dress stands mid-sentence on the stage riser, both hands raised, a coppery band of light in the curtain behind her.",
-      "category": "room"
+      "alt": "A woman in a blue-and-white floral dress stands on the stage riser holding a presentation clicker, a coppery band of light in the dark curtain behind her and a banquet chair in the foreground.",
+      "category": "room",
+      "caption": "A clicker in one hand."
     },
     "IMG_7948": {
-      "alt": "A man in a blue suit and dark red tie speaks with an open palm turned upward, a clicker in the other hand, seen past the back of a head in the audience.",
-      "category": "room"
+      "alt": "A man in a blue suit and dark red tie stands on stage with both hands open at his sides, seen past the back of a head in the row in front.",
+      "category": "room",
+      "caption": "Hands open, over the row in front."
     },
     "IMG_8001": {
       "alt": "A woman with long blonde hair, in a black top with white trim, looks off-frame with a hand raised to her chest, the dark curtain behind her washed purple.",
-      "category": "room"
+      "category": "room",
+      "caption": "Looking off, hands at her chest."
     },
     "IMG_8002": {
       "alt": "A woman with long blonde hair stands with hands clasped, smiling toward the side of the room, a lavalier microphone at her neckline and purple light in the curtain folds.",
-      "category": "room"
+      "category": "room",
+      "caption": "Hands clasped, turned to the room."
     },
     "CC13772F-BFE0-4388-86CD-08DE8C40C09C": {
       "alt": "A night-time selfie of two men giving thumbs-up under strings of warm bulbs, hedges and empty chairs in the darkness behind them.",
       "note": "Sent over from another phone.",
-      "category": "people"
+      "category": "people",
+      "caption": "Thumbs up, after dark."
     },
     "IMG_7951": {
-      "caption": "Dinner on the lawn",
+      "caption": "Dinner on the lawn.",
       "alt": "A round table laid with white linen and plated dinners, people eating around it, and beyond them standing tables, a clipped hedge, palms and pines against a pale dusk sky, with a string of bulbs running overhead.",
       "category": "people"
     },
     "IMG_7952": {
       "alt": "A white plate seen from above: a glazed dark braised portion topped with halved dark fruit, a fennel and radish salad with capers, a charred half lemon and a crisp-skinned fish fillet, with a tumbler and folded napkin soft in the background.",
-      "category": "artifact"
+      "category": "artifact",
+      "caption": "What arrived on the plate."
     },
     "IMG_7953": {
-      "alt": "A wider view of the outdoor dinner — a long table and a round one on a lawn, thirty or more people seated and talking, a hedge behind them and the hotel rising above the trees against a clear evening sky.",
-      "category": "people"
+      "alt": "A wide view of the outdoor dinner: round tables set on a lawn with thirty or more people seated and talking, a clipped hedge behind them and the hotel rising above the trees against a clear evening sky.",
+      "category": "people",
+      "caption": "Everyone out on the lawn, the hotel behind."
     },
     "IMG_7954": {
       "alt": "The dinner seen past the back of someone’s head from a seat at the table, plates and a wine glass in the foreground, more tables and the hedge beyond.",
-      "category": "people"
+      "category": "people",
+      "caption": "From a seat at the table."
     },
     "IMG_7973": {
       "alt": "A folding wooden screen standing beside a large potted fig in a quiet corridor, on a pale checked carpet.",
-      "category": "venue"
+      "category": "venue",
+      "caption": "A folding screen and a fig tree, on the way back."
     },
     "IMG_7974": {
-      "caption": "Pendry Newport Beach",
+      "caption": "The sign, at the end of the night.",
       "alt": "A dark signage panel with raised gold lettering reading “Pendry — Newport Beach”, mounted on a wall of vertical fluted metal.",
       "category": "venue"
     },
     "IMG_7977": {
-      "caption": "The lobby, late",
+      "caption": "The lounge with nobody in it.",
       "alt": "An empty hotel lounge at night: velvet sofas and cane chairs, black lantern pendants overhead, a model boat in a lit display case and a red armchair by the glass doors.",
       "category": "venue"
     },
     "IMG_7982": {
-      "caption": "Breakfast, second morning",
+      "caption": "Breakfast, the second morning.",
       "alt": "A plate seen from above with scrambled eggs, cured fish, pickled onion and capers, a wedge of terrine, and avocado toast with radish and sprouts, a parfait glass out of focus behind it.",
       "category": "artifact"
     },
     "IMG_7984": {
-      "alt": "A person in a blue-grey blazer stands in front of a dark curtain holding a small object, a badge on a lanyard at the waist, seen over the head of someone seated in front.",
-      "category": "room"
+      "alt": "A bearded man in a blue-grey blazer speaks into a handheld microphone in front of a dark curtain, a badge on a lanyard at his chest, seen past the heads of two people seated in front.",
+      "category": "room",
+      "caption": "Lanyard still on, microphone in hand."
     },
     "IMG_7985": {
-      "caption": "“Burnout aka moral injury”",
+      "caption": "Burnout, by its other name.",
       "alt": "A projection screen showing a dark slide headed “Burnout aka Moral Injury”, listing emotional exhaustion, depersonalization and low personal accomplishment, and what it is associated with. A silhouetted head faces the screen from the foreground.",
       "category": "room"
     },
     "IMG_7986": {
-      "caption": "“Dermatology burnout drivers”",
+      "caption": "The drivers. And a goat.",
       "alt": "A slide headed “Dermatology Burnout Drivers” listing documentation and EHR time, administrative tasks, productivity demands and loss of autonomy, beside a photograph of a person holding a plank pose with a small goat standing on their back.",
       "category": "room"
     },
     "IMG_7987": {
-      "caption": "“Ikigai”",
+      "caption": "Ikigai, in four circles.",
       "alt": "A slide showing four overlapping circles — what you love, what you are good at, what the world needs, what you can be paid for — meeting at the word “Ikigai” in the centre.",
       "category": "room"
     },
     "IMG_7988": {
-      "caption": "“Energy audit”",
+      "caption": "Two weeks of tracking what drains you.",
       "alt": "A slide headed “Energy Audit”: track daily activities for one to two weeks and sort them into energizing, neutral and draining, then delegate, automate or remove what drains.",
       "category": "room"
     },
     "IMG_7989": {
-      "caption": "“Eulogy exercise”",
+      "caption": "The eulogy exercise.",
       "alt": "A slide headed “Eulogy Exercise” — imagine how you will be remembered, to bring clarity to current priorities — under a stepped ceiling and a tiered chandelier.",
       "category": "room"
     },
     "IMG_7991": {
-      "caption": "“Know your tendencies”",
+      "caption": "Baseline, knock, recovery.",
       "alt": "A slide of four stacked colour bars headed “Know your tendencies”: baseline satisfaction, how far feedback knocks you off it, and how long recovery takes. It ends: know yourself, remember others are different.",
       "category": "room"
     },
     "DSC01829": {
-      "caption": "The tables, in use",
+      "caption": "Turned toward the front, table cards still out.",
       "alt": "Three people seated in profile at a round banquet table, watching something off to the left, with printed table cards propped on the linen and rows of empty chair backs across the foreground.",
       "takenAt": "2026-08-30T11:28",
       "category": "room"
     },
     "IMG_7996": {
       "alt": "A projection screen asking “Do you want to get to know yourself better?”, introducing the Enneagram with a nine-pointed diagram, a QR code and a book cover, above rows of empty banquet chairs.",
-      "category": "room"
+      "category": "room",
+      "caption": "“Do you want to get to know yourself better?”"
     },
     "IMG_7997": {
-      "caption": "“Nine styles of leadership”",
+      "caption": "Nine styles, and the gift in each.",
       "alt": "A slide headed “Nine styles of leadership, by Enneagram type”, pairing each type’s stereotype with its true gift, beside a nine-pointed diagram and a QR code.",
       "category": "room"
     },
     "IMG_7998": {
-      "caption": "“Clear is kind”",
+      "caption": "“Clear is kind.”",
       "alt": "A slide headed “Lecture Takeaways”: start small, clear is kind — directness is the highest form of professional empathy — ground feedback in what is observable, and don’t work harder on someone’s growth than they do.",
       "category": "room"
     },
     "IMG_7999": {
-      "caption": "“How success evolves”",
+      "caption": "Capability, perspective, wisdom.",
       "alt": "A slide headed “How Success Evolves”, with a seedling, a tree and a fruiting tree above three columns — early career, mid career, later career — running from capability and expertise through perspective and stewardship to wisdom, legacy and developing others.",
       "category": "room"
     }

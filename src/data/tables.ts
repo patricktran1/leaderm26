@@ -1,7 +1,8 @@
 /**
- * The twenty table themes, transcribed on site from the printed board
- * photographed in the gallery above (`IMG_7877`). Faculty names are recorded
- * exactly as they were printed.
+ * The twenty table themes, transcribed on site from the printed board by the
+ * door. The photograph of that board was a low-resolution phone export and is
+ * no longer published, but the transcription was made from the board itself.
+ * Faculty names are recorded exactly as they were printed.
  */
 export interface TableTheme {
   table: number;

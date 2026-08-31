@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   captureBucket,
   captureParts,
-  defaultCaption,
   sortPhotos,
   statedTime,
 } from '../src/data/photos';
@@ -84,22 +83,6 @@ describe('sortPhotos', () => {
   });
 });
 
-describe('defaultCaption', () => {
-  const frame = { id: 'DSC01900', takenAt: '2026-08-29T08:19:00.000Z' } as never;
-
-  it('drops the day where the page has already said it once', () => {
-    expect(defaultCaption(frame, true)).toBe('8:19 a.m.');
-  });
-
-  it('keeps the day while the journal is too short to state it anywhere else', () => {
-    expect(defaultCaption(frame, false)).toBe('Saturday, 8:19 a.m.');
-  });
-
-  it('falls back to the id rather than inventing a time', () => {
-    expect(defaultCaption({ id: 'DSC01900', takenAt: null } as never, true)).toBe('DSC01900');
-  });
-});
-
 describe('statedTime', () => {
   it('reads a hand-written time as the camera would have stamped it', () => {
     expect(statedTime('2026-08-29T14:20')).toBe('2026-08-29T14:20:00.000Z');
@@ -119,5 +102,30 @@ describe('journalSpan', () => {
     // span is a plain count. Both branches are covered by captureParts above.
     expect(journalSpan === null || /frames/.test(journalSpan)).toBe(true);
     expect(journalDays).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('captions', () => {
+  it('never publishes a capture time as a caption', async () => {
+    const { photos } = await import('../src/data/photos');
+    const clocks = photos.filter((photo) => /^(\w+, )?\d{1,2}:\d{2} [ap]\.m\.$/.test(photo.caption));
+    expect(clocks.map((photo) => photo.id)).toEqual([]);
+  });
+
+  it('leaves an uncaptioned frame bare rather than filling the line', async () => {
+    const { photos } = await import('../src/data/photos');
+    for (const photo of photos) {
+      expect(photo.caption === '' || photo.caption.trim().length > 0).toBe(true);
+      if (photo.captionIsMissing) expect(photo.caption).toBe('');
+    }
+  });
+
+  it('moves the capture time into the viewer, where it belongs', async () => {
+    const { photos } = await import('../src/data/photos');
+    const dated = photos.filter((photo) => photo.takenAt);
+    expect(dated.length).toBeGreaterThan(0);
+    for (const photo of dated) {
+      expect(photo.meta).toMatch(/^\w+day, \d{1,2}:\d{2} [ap]\.m\./);
+    }
   });
 });

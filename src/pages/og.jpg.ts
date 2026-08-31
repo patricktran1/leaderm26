@@ -29,7 +29,7 @@ export const GET: APIRoute = async () => {
 
   let card = plateAtSize;
   try {
-    const photo = heroPhoto('IMG_7885', 'DSC01757');
+    const photo = heroPhoto('IMG_7885', 'DSC01781');
     if (photo) {
       const file = path.join(root, 'src/generated/photos', photo.file);
       const well = await sharp(await readFile(file))

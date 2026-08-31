@@ -2,9 +2,36 @@
 import { Image } from 'astro:assets';
 import SectionHead from './SectionHead.astro';
 import { conference } from '../data/site';
-import { pick } from '../data/gallery';
+import { byPhotoId } from '../data/gallery';
 
-const grounded = pick('DSC01778', 'IMG_7877');
+/**
+ * A frame that puts the meeting's case in its own words. The line beside it is
+ * written for that one photograph, so the two travel together: if a frame is
+ * ever unpublished the next candidate — and its own line — takes the slot,
+ * rather than leaving borrowed prose under an unrelated picture.
+ */
+const candidates = [
+  {
+    id: 'IMG_7999',
+    line: `One slide put a whole career into three columns — capability first, then
+    perspective, then what gets left behind. Four objectives, written as a
+    programme, say much the same thing.`,
+  },
+  {
+    id: 'IMG_7987',
+    line: `Four overlapping circles on a screen: what you love, what you are good at,
+    what the world needs, what you can be paid for. The meeting keeps returning to
+    where they meet.`,
+  },
+  {
+    id: 'DSC01781',
+    line: `The welcome slide put it plainly, and the two days ran in that order:
+    come for the learning, stay for the people.`,
+  },
+];
+
+const chosen = candidates.find((candidate) => byPhotoId(candidate.id));
+const grounded = chosen && byPhotoId(chosen.id);
 
 /** The meeting's four stated objectives, as published on leadderm.org/about. */
 const objectives = [
@@ -66,10 +93,7 @@ const objectives = [
             />
           </div>
           <figcaption>
-            <p class="serif-note">
-              An easel by the door asked everyone the same question. By mid-morning it was
-              covered in answers.
-            </p>
+            <p class="serif-note">{chosen?.line}</p>
             <p class="grounded__meta">{grounded.caption}</p>
           </figcaption>
         </figure>

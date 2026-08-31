@@ -89,7 +89,8 @@ export interface Photo {
   weight: Weight;
   /** True when no one has written real alt text for this frame yet. */
   altIsGenerated: boolean;
-  captionIsGenerated: boolean;
+  /** True when nobody has written a caption for this frame; it publishes bare. */
+  captionIsMissing: boolean;
   takenAt: string | null;
   camera: string | null;
   source: string;
@@ -145,19 +146,6 @@ export function captureBucket(iso: string | null): string | null {
 /* --------------------------------------------------------------- assembly */
 
 /**
- * Down a page of forty frames the day is said once by the standfirst and again
- * by every half-day heading; printing "Saturday," above each photograph as well
- * is repetition, not information. So a journal long enough to carry those
- * captions its frames with the time alone, and the viewer supplies the day for
- * anyone who arrives at a single photograph from a shared link.
- */
-export function defaultCaption(entry: IndexEntry, dayIsUnderstood: boolean): string {
-  const parts = captureParts(entry.takenAt);
-  if (!parts) return entry.id;
-  return dayIsUnderstood ? parts.time : `${parts.day}, ${parts.time}`;
-}
-
-/**
  * Honest alt text: it states where the photograph came from rather than
  * pretending to describe a frame nobody has looked at. Replace it by writing
  * `alt` into captions.json — `/admin/photos` lists everything still on this.
@@ -169,14 +157,14 @@ function defaultAlt(entry: IndexEntry): string {
     : 'Undescribed photograph from LEADderm 2026.';
 }
 
-function toPhoto(entry: IndexEntry, dayIsUnderstood = false): Photo {
+function toPhoto(entry: IndexEntry): Photo {
   const override = entry.override ?? {};
   const caption = override.caption?.trim();
   const alt = override.alt?.trim();
   return {
     id: entry.id,
     file: entry.file,
-    caption: caption || defaultCaption(entry, dayIsUnderstood),
+    caption: caption ?? '',
     alt: alt || defaultAlt(entry),
     note: override.note?.trim() || undefined,
     category: CATEGORIES.includes(override.category as Category)
@@ -184,7 +172,7 @@ function toPhoto(entry: IndexEntry, dayIsUnderstood = false): Photo {
       : 'unfiled',
     weight: WEIGHTS.includes(override.weight as Weight) ? (override.weight as Weight) : 'minor',
     altIsGenerated: !alt,
-    captionIsGenerated: !caption,
+    captionIsMissing: !caption,
     takenAt: entry.takenAt,
     camera: entry.camera,
     source: entry.source,
@@ -194,26 +182,19 @@ function toPhoto(entry: IndexEntry, dayIsUnderstood = false): Photo {
     featured: override.featured === true,
     pinnedAt: pinnedAt(entry),
     hasOverride: Object.keys(override).length > 0,
-    meta: viewerMeta(entry, Boolean(caption), dayIsUnderstood),
+    meta: viewerMeta(entry),
   };
 }
 
 /**
- * The line under the caption in the photograph viewer. When the caption is
- * already the capture time there is no point repeating it, so only the camera
- * is left; when someone has written a caption, both belong.
+ * The line under the caption in the photograph viewer, and the only place the
+ * capture time is printed. Since the page itself no longer carries times, every
+ * frame states the full day and time here, captioned or not.
  */
-function viewerMeta(entry: IndexEntry, hasWrittenCaption: boolean, dayIsUnderstood: boolean): string {
+function viewerMeta(entry: IndexEntry): string {
   const parts = captureParts(entry.takenAt);
   if (!parts) return entry.camera ?? '';
-  // Where the caption is already the time, the viewer adds only what the
-  // caption left out — the day, when the caption dropped it — never the time twice.
-  const when = hasWrittenCaption
-    ? `${parts.day}, ${parts.time}`
-    : dayIsUnderstood
-      ? parts.day
-      : null;
-  return [when, entry.camera].filter(Boolean).join(' · ');
+  return [`${parts.day}, ${parts.time}`, entry.camera].filter(Boolean).join(' · ');
 }
 
 /**
@@ -288,16 +269,7 @@ const dates = visible
 /** How many calendar days the journal covers, from capture times. */
 export const journalDays = new Set(dates.map((iso) => iso.slice(0, 10))).size;
 
-/**
- * Whether the page states the day for itself. Once there are enough frames
- * for a standfirst, it does — and again at every half-day heading the journal
- * grows — so the captions can stop repeating it. In a two-day journal that is
- * the difference between a column of "Saturday, 12:21 p.m." and a column of
- * times under a heading that already says which afternoon this is.
- */
-const dayIsUnderstood = visible.length >= 6;
-
-export const photos: Photo[] = visible.map((entry) => toPhoto(entry, dayIsUnderstood));
+export const photos: Photo[] = visible.map((entry) => toPhoto(entry));
 
 /**
  * A line the journal writes about itself: how many frames, and the hours they

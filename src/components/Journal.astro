@@ -102,7 +102,7 @@ const indexed = rows.map((row) => ({
               class="shot__btn"
               type="button"
               data-lightbox={index}
-              aria-label={`Open larger — ${photo.caption}. ${photo.alt}`}
+              aria-label={photo.caption ? `Open larger — ${photo.caption}. ${photo.alt}` : `Open larger — ${photo.alt}`}
             >
               <span class="frame shot__frame" style={`aspect-ratio:${photo.image.width} / ${photo.image.height}`}>
                 <Image
@@ -115,10 +115,12 @@ const indexed = rows.map((row) => ({
                 />
               </span>
             </button>
-            <figcaption class="shot__cap balance">
-              {photo.caption}
-              {row.kind === 'lead' && photo.note && <span class="shot__note">{photo.note}</span>}
-            </figcaption>
+            {(photo.caption || (row.kind === 'lead' && photo.note)) && (
+              <figcaption class="shot__cap balance">
+                {photo.caption}
+                {row.kind === 'lead' && photo.note && <span class="shot__note">{photo.note}</span>}
+              </figcaption>
+            )}
           </figure>
         ))}
       </div>

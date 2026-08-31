@@ -5,7 +5,7 @@ import { heroPhoto } from '../data/gallery';
 
 // Any photograph marked `"featured": true` in captions.json opens the journal;
 // these are only the fallbacks, so the slot never depends on one filename.
-const cover = heroPhoto('IMG_7885', 'DSC01757');
+const cover = heroPhoto('IMG_7885', 'DSC01781');
 
 const dateline = [
   conference.dates,
@@ -45,7 +45,7 @@ const dateline = [
             fetchpriority="high"
           />
         </div>
-        <figcaption class="hero__cap">{cover.caption}</figcaption>
+        {cover.caption && <figcaption class="hero__cap">{cover.caption}</figcaption>}
       </figure>
     )}
   </div>

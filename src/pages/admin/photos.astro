@@ -6,13 +6,13 @@ import { captureParts, photoIndexMeta } from '../../data/photos';
 import { conference } from '../../data/site';
 
 const needsAlt = gallery.filter((photo) => photo.altIsGenerated);
-const needsCaption = gallery.filter((photo) => photo.captionIsGenerated);
+const needsCaption = gallery.filter((photo) => photo.captionIsMissing);
 const superseded = gallery.flatMap((photo) =>
   photo.supersedes.map((source) => ({ id: photo.id, source })),
 );
 
 const untouched = gallery.filter((photo) => !photo.hasOverride);
-const waiting = gallery.filter((photo) => photo.altIsGenerated || photo.captionIsGenerated);
+const waiting = gallery.filter((photo) => photo.altIsGenerated || photo.captionIsMissing);
 /** One sitting's worth. A hundred photographs is not a batch, it is a weekend. */
 const BATCH = 30;
 const batch = waiting.slice(0, BATCH);
@@ -46,7 +46,7 @@ const brief = [
       `${photo.id}  ${photo.source}  ${photo.sourceWidth}x${photo.sourceHeight}  ` +
         `${clock(photo.takenAt)}  ${photo.camera ?? 'camera unknown'}` +
         (photo.featured ? '  [opens the journal]' : ''),
-      `    caption: ${photo.captionIsGenerated ? '—' : photo.caption}`,
+      `    caption: ${photo.captionIsMissing ? '—' : photo.caption}`,
       `    alt:     ${photo.altIsGenerated ? '—' : photo.alt}`,
     ].join('\n'),
   ),
@@ -57,7 +57,7 @@ const draft = Object.fromEntries(
   batch.map((photo) => [
     photo.id,
     {
-      caption: photo.captionIsGenerated ? '' : photo.caption,
+      caption: photo.captionIsMissing ? '' : photo.caption,
       alt: photo.altIsGenerated ? '' : photo.alt,
     },
   ]),
@@ -67,7 +67,7 @@ const draft = Object.fromEntries(
 const marks = (photo: (typeof gallery)[number]): string[] => {
   const out: string[] = [];
   if (!photo.hasOverride) out.push('untouched');
-  if (photo.captionIsGenerated) out.push('needs caption');
+  if (photo.captionIsMissing) out.push('needs caption');
   if (photo.altIsGenerated) out.push('needs alt');
   if (out.length === 0) out.push('written');
   if (photo.featured) out.push('opens the journal');
@@ -119,7 +119,7 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
           {photoIndexMeta.captions.error && (
             <p class="prose">
               <strong>Ignored:</strong> {photoIndexMeta.captions.error}. Every photograph is
-              keeping its automatic caption until this is fixed — nothing else is affected.
+              publishing without its caption until this is fixed — nothing else is affected.
             </p>
           )}
           {photoIndexMeta.captions.problems.length > 0 && (
@@ -240,8 +240,8 @@ const dt = (iso: string | null): string => (iso ? iso.replace('T', ' ').replace(
                     </span>
                   ))}
                 </p>
-                <p class:list={[{ sheet__gap: photo.captionIsGenerated }]}>
-                  {photo.captionIsGenerated ? 'caption: generated' : `caption: ${photo.caption}`}
+                <p class:list={[{ sheet__gap: photo.captionIsMissing }]}>
+                  {photo.captionIsMissing ? 'caption: none' : `caption: ${photo.caption}`}
                 </p>
                 <p class="sheet__dim">
                   {photo.sourceWidth}×{photo.sourceHeight} source · {photo.image.width}×

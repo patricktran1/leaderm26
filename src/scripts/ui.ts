@@ -9,6 +9,8 @@ interface Slide {
   alt: string;
   caption: string;
   note: string;
+  /** Day, time and camera — the only place the capture time is printed. */
+  meta: string;
   category: string;
 }
 
@@ -135,6 +137,7 @@ function initLightbox(): void {
 
   const panel = root.querySelector<HTMLElement>('.lb__panel');
   const image = root.querySelector<HTMLImageElement>('[data-lb-image]');
+  const stamp = root.querySelector<HTMLElement>('[data-lb-meta]');
   const caption = root.querySelector<HTMLElement>('[data-lb-caption]');
   const note = root.querySelector<HTMLElement>('[data-lb-note]');
   const counter = root.querySelector<HTMLElement>('[data-lb-count]');
@@ -162,9 +165,21 @@ function initLightbox(): void {
     image.width = slide.w;
     image.height = slide.h;
     image.style.setProperty('--natural-w', `${slide.w}px`);
+    // The ratio is set as well so the box is the right shape from the first
+    // frame — before the full-size file arrives the element has no intrinsic
+    // size, and an <img> with none collapses to nothing.
+    image.style.setProperty('--natural-ratio', `${slide.w} / ${slide.h}`);
     image.alt = slide.alt;
+    // Not every photograph carries a caption. An empty <p> would still occupy
+    // its line-height and push the note off the baseline, so it is hidden.
     caption.textContent = slide.caption;
+    caption.hidden = !slide.caption;
     note.textContent = slide.note;
+    note.hidden = !slide.note;
+    if (stamp) {
+      stamp.textContent = slide.meta;
+      stamp.hidden = !slide.meta;
+    }
     counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
     // Paging rewrites the address rather than stacking history: Back should
     // leave the viewer, not walk back through every photograph paged past.

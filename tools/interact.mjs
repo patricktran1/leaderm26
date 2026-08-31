@@ -121,11 +121,17 @@ const ok = (c, m) => { console.log(c ? 'PASS' : 'FAIL', m); if (!c) fails.push(m
 
   await page.locator('[data-lightbox="1"]').scrollIntoViewIfNeeded();
   await page.locator('[data-lightbox="1"]').click();
+  await page.waitForSelector('[data-lb-image][data-ready]');
   await page.waitForTimeout(500);
   ok(await page.locator('#lightbox').isVisible(), 'lightbox opens on phone');
   const before = (await page.locator('[data-lb-count]').textContent()).trim();
   const stage = await page.locator('[data-lb-stage]').boundingBox();
-  await page.touchscreen.tap(stage.x + stage.width - 30, stage.y + stage.height / 2);
+  // Tapping the photograph itself must not dismiss — only the space around it
+  // does, and the <img> box is sized to hug the picture so the two agree.
+  const shown = await page.locator('[data-lb-image]').boundingBox();
+  await page.touchscreen.tap(shown.x + shown.width / 2, shown.y + shown.height / 2);
+  await page.waitForTimeout(250);
+  ok(await page.locator('#lightbox').isVisible(), 'tapping the photograph keeps the viewer open');
   await page.mouse.move(stage.x + stage.width - 40, stage.y + stage.height / 2);
   await page.evaluate(({ x, y, w }) => {
     const el = document.querySelector('[data-lb-stage]');

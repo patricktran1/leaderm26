@@ -21,7 +21,8 @@ const slides = await Promise.all(
       h: full.attributes.height ?? photo.image.height,
       alt: photo.alt,
       caption: photo.caption,
-      note: photo.note ?? photo.meta,
+      note: photo.note ?? '',
+      meta: photo.meta,
       category: CATEGORY_LABEL[photo.category],
     };
   }),
@@ -48,6 +49,7 @@ const slides = await Promise.all(
       <div class="lb__meta" aria-live="polite">
         <p class="lb__caption" data-lb-caption></p>
         <p class="lb__note" data-lb-note></p>
+        <p class="lb__stamp" data-lb-meta></p>
       </div>
       <div class="lb__controls">
         <button class="lb__nav" type="button" data-lb-prev aria-label="Previous photograph">
@@ -85,7 +87,8 @@ const slides = await Promise.all(
     grid-template-rows: auto minmax(0, 1fr) auto;
     width: min(100%, 62rem);
     margin-inline: auto;
-    padding: 0.5rem clamp(0.75rem, 3vw, 2rem) max(0.75rem, env(safe-area-inset-bottom));
+    --lb-gutter: clamp(0.75rem, 3vw, 2rem);
+    padding: 0.5rem var(--lb-gutter) max(0.75rem, env(safe-area-inset-bottom));
     transform: scale(0.985);
     transition: transform 0.34s var(--ease);
   }
@@ -122,6 +125,13 @@ const slides = await Promise.all(
     min-height: 0;
     padding-block: clamp(0.5rem, 2vw, 1.25rem);
   }
+
+  /* On a phone held upright a landscape frame is already down to a quarter of
+     the screen; the gutter is the one thing standing between it and the edges,
+     so the stage takes it back. The caption below keeps its margin. */
+  @media (max-width: 30rem) and (orientation: portrait) {
+    .lb__stage { margin-inline: calc(var(--lb-gutter) * -1); }
+  }
   .lb__figure { width: 100%; }
 
   .lb__figure {
@@ -133,14 +143,24 @@ const slides = await Promise.all(
   }
   /* --natural-w is set per slide. A viewer that shows a smaller picture than
      the page is useless, so allow a modest 1.35x — beyond that these masters
-     have nothing left to give. */
+     have nothing left to give.
+
+     Both axes stay auto so the element box is the photograph and nothing more.
+     Sizing the width to 100% and letting object-fit letterbox a tall frame
+     would leave the <img> spanning the empty gutters either side of it, and
+     those gutters are exactly where someone clicks to dismiss the viewer.
+     --natural-ratio keeps the box the right shape while paging, when the
+     element is still carrying the previous picture's intrinsic size; before
+     anything has loaded it has none and collapses, which is right too —
+     there is no photograph there yet to click on. */
   .lb__figure img {
-    width: min(100%, calc(var(--natural-w, 100%) * 1.35));
-    max-height: 100%;
+    width: auto;
     height: auto;
+    aspect-ratio: var(--natural-ratio, 1);
+    max-width: min(100%, calc(var(--natural-w, 100%) * 1.35));
+    max-height: 100%;
     min-width: 0;
     min-height: 0;
-    object-fit: contain;
     opacity: 0;
     transition: opacity 0.3s var(--ease);
   }
@@ -165,6 +185,8 @@ const slides = await Promise.all(
     letter-spacing: -0.01em;
   }
   .lb__note { font-size: 0.8125rem; color: #9a9da2; max-width: 42rem; }
+  /* Where the capture time lives now that no caption is written from it. */
+  .lb__stamp { font-size: 0.75rem; color: #8d9197; letter-spacing: 0.02em; }
 
   .lb__controls {
     display: flex;
