@@ -1,14 +1,21 @@
 import { chromium } from 'playwright';
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--disable-background-networking','--no-first-run'] });
-for (const v of [{n:'desktop',w:1440,h:900,d:2},{n:'phone',w:390,h:844,d:3}]) {
-  const ctx = await b.newContext({ viewport:{width:v.w,height:v.h}, deviceScaleFactor:v.d, isMobile:v.n==='phone' });
+const base = process.env.URL || 'http://localhost:4321/';
+const runs = [
+  {n:'journal desktop',w:1440,h:900,d:2,path:'/'},
+  {n:'journal phone',w:390,h:844,d:3,path:'/'},
+  // The practice page sells fast mobile rendering, so it is held to it.
+  {n:'practice phone',w:390,h:844,d:3,path:'/for-practices'},
+];
+for (const v of runs) {
+  const ctx = await b.newContext({ viewport:{width:v.w,height:v.h}, deviceScaleFactor:v.d, isMobile:v.n.includes('phone') });
   const page = await ctx.newPage();
   let bytes = 0; const byType = {};
   page.on('response', async r => {
     try { const buf = await r.body(); bytes += buf.length;
       const t = r.request().resourceType(); byType[t] = (byType[t]||0)+buf.length; } catch {}
   });
-  await page.goto('http://localhost:4321/', { waitUntil: 'networkidle' });
+  await page.goto(new URL(v.path, base).href, { waitUntil: 'networkidle' });
   const metrics = await page.evaluate(() => new Promise(res => {
     const out = {};
     const nav = performance.getEntriesByType('navigation')[0];

@@ -58,6 +58,26 @@ for (const v of [{n:'1440', w:1440, h:900}, {n:'390', w:390, h:844, m:true}]) {
   }
 }
 
+// the practice page
+{
+  for (const w of [1440, 390]) {
+    const ctx = await b.newContext({ viewport:{width:w,height:900}, isMobile: w < 500, hasTouch: w < 500 });
+    const page = await ctx.newPage();
+    await page.goto(base + 'for-practices', {waitUntil:'networkidle'});
+    await page.addStyleTag({content:'*,*::before,*::after{transition:none!important;animation:none!important}.reveal{opacity:1!important;transform:none!important}'});
+    await axe(page, `practice page ${w}`);
+    ok(!(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)), `practice page ${w} has no horizontal overflow`);
+    // Keyboard: the primary action must be reachable without a mouse.
+    const stops = [];
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press('Tab');
+      stops.push(await page.evaluate(() => document.activeElement?.getAttribute('data-goal') ?? document.activeElement?.className ?? ''));
+    }
+    ok(stops.some((s) => s.includes('practice-start')), `practice page ${w} reaches the primary action by Tab (${stops.filter(Boolean).slice(0,5).join(' > ')})`);
+    await ctx.close();
+  }
+}
+
 // mobile index panel trap
 {
   const ctx = await b.newContext({ viewport:{width:390,height:844}, isMobile:true, hasTouch:true });

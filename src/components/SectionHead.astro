@@ -2,15 +2,22 @@
 import { sectionNumber, sectionLabel, type SectionId } from '../data/site';
 
 interface Props {
-  section: SectionId;
+  /** A section of the journal: its numeral and label come from site.ts. */
+  section?: SectionId;
+  /** For pages outside the journal, which run their own sequence. */
+  num?: string;
+  label?: string;
+  id?: string;
   title: string;
   /** `quiet` sets the heading at text scale — for sections that should not
       compete with the journal, such as the colophon. */
   scale?: 'display' | 'quiet';
 }
-const { section, title, scale = 'display' } = Astro.props;
-const num = sectionNumber(section);
-const label = sectionLabel(section);
+const props = Astro.props;
+const { section, title, scale = 'display' } = props;
+const num = props.num ?? (section ? sectionNumber(section) : '');
+const label = props.label ?? (section ? sectionLabel(section) : '');
+const headingId = `${props.id ?? section}-title`;
 ---
 
 <div class="sec-head">
@@ -21,7 +28,7 @@ const label = sectionLabel(section);
   <div class="sec-head__body">
     <h2
       class:list={[scale === 'quiet' ? 'h2--quiet' : 'h2', 'balance', 'reveal']}
-      id={`${section}-title`}
+      id={headingId}
       style="--reveal-delay:60ms"
     >
       {title}

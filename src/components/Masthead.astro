@@ -2,6 +2,17 @@
 import { sections, sectionNumber, conference } from '../data/site';
 import { journalContents, contentsDepth } from '../data/gallery';
 
+interface Props {
+  /**
+   * `plain` is for pages that are not the journal. The section index belongs
+   * to the journal's own scroll, so away from it the bar carries the wordmark
+   * and one way back, and nothing else.
+   */
+  variant?: 'journal' | 'plain';
+}
+const { variant = 'journal' } = Astro.props;
+const isJournal = variant === 'journal';
+
 /**
  * On a phone the journal is the longest thing on the site by an order of
  * magnitude, so the index that is already there becomes its table of contents
@@ -10,29 +21,40 @@ import { journalContents, contentsDepth } from '../data/gallery';
 const showParts = contentsDepth > 2;
 ---
 
-<header class="masthead" id="masthead">
+<header class:list={['masthead', { 'masthead--plain': !isJournal }]} id="masthead">
   <div class="shell masthead__inner">
     <a class="wordmark" href="/#top">
       <span class="wordmark__mark">LEAD<span class="wordmark__soft">derm</span> 2026</span>
       <span class="wordmark__sub">Field Notes</span>
     </a>
 
-    <nav class="masthead__nav" aria-label="Sections">
-      {sections.map((item) => (
-        <a href={`/#${item.id}`} data-spy={item.id}>{item.label}</a>
-      ))}
-    </nav>
+    {isJournal && (
+      <nav class="masthead__nav" aria-label="Sections">
+        {sections.map((item) => (
+          <a href={`/#${item.id}`} data-spy={item.id}>{item.label}</a>
+        ))}
+      </nav>
+    )}
 
-    <a class="masthead__official" href={conference.official} target="_blank" rel="noopener noreferrer">
-      Official site <span aria-hidden="true">↗</span>
-    </a>
+    {isJournal ? (
+      <a class="masthead__official" href={conference.official} target="_blank" rel="noopener noreferrer">
+        Official site <span aria-hidden="true">↗</span>
+      </a>
+    ) : (
+      <a class="masthead__back" href="/#top">
+        <span aria-hidden="true">←</span> The journal
+      </a>
+    )}
 
-    <button class="masthead__toggle" type="button" aria-expanded="false" aria-controls="index-panel" data-menu-open>
-      <span>Index</span>
-    </button>
+    {isJournal && (
+      <button class="masthead__toggle" type="button" aria-expanded="false" aria-controls="index-panel" data-menu-open>
+        <span>Index</span>
+      </button>
+    )}
   </div>
 </header>
 
+{isJournal && (
 <div class="index-panel" id="index-panel" role="dialog" aria-modal="true" aria-label="Index" hidden>
   <div class="shell index-panel__inner">
     <div class="index-panel__top">
@@ -71,6 +93,7 @@ const showParts = contentsDepth > 2;
     </div>
   </div>
 </div>
+)}
 
 <style>
   .masthead {
@@ -137,6 +160,29 @@ const showParts = contentsDepth > 2;
     transition: color 0.25s var(--ease);
   }
   .masthead__official:hover { color: var(--pine); }
+
+  /* Always shown: away from the journal this is the only navigation there is,
+     so it must not be the thing that disappears on a phone. */
+  .masthead__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    min-height: 2.75rem;
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.25s var(--ease);
+  }
+  .masthead__back:hover { color: var(--pine); }
+  /* Two items share the bar here rather than one, so the standfirst goes. */
+  @media (max-width: 26rem) {
+    .masthead--plain .wordmark__sub { display: none; }
+  }
+  /* A page with no section index has nothing for a sticky bar to do, and a
+     paper bar riding over a full-height ink section is a band across the
+     design. It scrolls away with everything else. */
+  .masthead--plain { position: static; }
 
   .masthead__toggle,
   .index-panel__close {

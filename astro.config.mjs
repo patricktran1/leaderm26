@@ -10,6 +10,13 @@ export default defineConfig({
     // encoder honest so faces and slide text do not smear.
     service: { entrypoint: 'astro/assets/services/sharp', config: { limitInputPixels: false } },
   },
-  integrations: [sitemap({ filter: (page) => !/\/(404|admin)/.test(page) })],
+  integrations: [
+    sitemap({
+      filter: (page) => !/\/(404|admin)/.test(page),
+      // Vercel serves these paths without a trailing slash and the canonical
+      // tags say so; a sitemap that disagrees just lists a redirect.
+      serialize: (item) => ({ ...item, url: item.url.replace(/(.+)\/$/, '$1') }),
+    }),
+  ],
   devToolbar: { enabled: false },
 });

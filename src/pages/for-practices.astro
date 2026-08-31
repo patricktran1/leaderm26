@@ -1,0 +1,548 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import SectionHead from '../components/SectionHead.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { author, conference, site } from '../data/site';
+import { pick } from '../data/gallery';
+import {
+  boundaries,
+  diagnostic,
+  evidence,
+  figures,
+  offers,
+  proofs,
+  startEmail,
+} from '../data/practice';
+
+const title = 'For dermatology practices — Patrick Tran, MD, FAAD';
+const description =
+  'A dermatologist who builds the website, the intake and the automation around a dermatology practice. The LEADderm 2026 journal on this site is the working demonstration.';
+
+/**
+ * A frame with nobody identifiable in it. This page sells my work, and no one
+ * photographed at the meeting agreed to appear beside a pitch.
+ */
+const opener = pick('IMG_7977', 'IMG_7973', 'IMG_7974');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${site.url}/for-practices#service`,
+      name: `${author.short} — practice websites and systems`,
+      description,
+      url: `${site.url}/for-practices`,
+      email: `mailto:${author.email}`,
+      areaServed: 'US',
+      serviceType: offers.map((offer) => `Dermatology practice ${offer.name.toLowerCase()}`),
+      provider: { '@id': `${site.url}/#person` },
+    },
+    {
+      '@type': 'Person',
+      '@id': `${site.url}/#person`,
+      name: author.name,
+      jobTitle: 'Dermatologist',
+      email: `mailto:${author.email}`,
+      sameAs: [author.instagramUrl],
+    },
+  ],
+};
+---
+
+<Base
+  title={title}
+  description={description}
+  image="/og-practices.jpg"
+  imageAlt="For dermatology practices — Patrick Tran, MD, FAAD. Presence, operations, intelligence."
+  jsonLd={jsonLd}
+>
+  <Masthead variant="plain" />
+
+  <main id="main">
+    <!-- ------------------------------------------------------------ open -->
+    <section class="hero" aria-labelledby="open-title">
+      <div class="shell hero__grid">
+        <div class="hero__type">
+          <p class="label reveal">For dermatology practices</p>
+          <h1 class="display reveal" id="open-title" style="--reveal-delay:80ms">
+            A dermatologist who builds the software.
+          </h1>
+          <p class="lede reveal" style="--reveal-delay:160ms">
+            The journal on this site — the photographs, the writing, and the system that
+            publishes them — was built here at {conference.name}, between sessions. I build
+            the same for a practice: the site, the work around it, and the automation that
+            is genuinely worth having.
+          </p>
+
+          <div class="start reveal" style="--reveal-delay:220ms">
+            <a class="cta" href={startEmail} data-goal="practice-start">
+              Show me <span class="cta__chev" aria-hidden="true">→</span>
+            </a>
+            <p class="start__note">
+              Opens an email with four lines to fill in — your practice, your city, your
+              current site, and the one thing you would fix first. It usually starts with a
+              single page for a fixed fee. I reply with specifics, not a deck.
+            </p>
+          </div>
+
+          <p class="byline reveal" style="--reveal-delay:260ms">
+            {author.name} · Dermatologist
+          </p>
+        </div>
+
+        {opener && (
+          <figure class="hero__figure reveal" style="--reveal-delay:200ms">
+            <div class="frame hero__frame">
+              {/* A single decorative frame on a page that argues for fast pages:
+                  the ladder stops at what a 22rem slot can use on a 3x phone. */}
+              <Image
+                src={opener.image}
+                alt={opener.alt}
+                widths={[352, 528, 704]}
+                sizes="(min-width: 62rem) 24rem, min(22rem, calc(100vw - 2.5rem))"
+                quality={76}
+                loading="eager"
+                fetchpriority="high"
+              />
+            </div>
+            <figcaption class="hero__cap">
+              One of {evidence.published} photographs in{' '}
+              <a class="link" href="/#journal">the journal on this site</a>. Everything you
+              are about to read is counted from it.
+            </figcaption>
+          </figure>
+        )}
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------- the work -->
+    <section class="section rule-top" id="work" aria-labelledby="work-title">
+      <div class="shell">
+        <SectionHead num="01" label="The work" id="work" title="Three kinds of work.">
+          <p class="prose">
+            The useful part is not that I can build all three. It is knowing which one a
+            practice actually needs — a clinic question before it is a software one.
+          </p>
+          <p class="prose">
+            Most need one. Some need two. Nobody needs all three at once, and anyone who
+            says otherwise is selling a retainer.
+          </p>
+        </SectionHead>
+
+        <div class="offers">
+          {offers.map((offer, i) => (
+            <article class="offer reveal" id={offer.id} style={`--reveal-delay:${i * 70}ms`}>
+              <h3 class="offer__name">{offer.name}</h3>
+              <p class="offer__sum">{offer.summary}</p>
+              <ul class="offer__list">
+                {offer.items.map((item) => (
+                  <li class="offer__item">{item}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------ case study -->
+    <section class="section rule-top on-night" id="evidence" aria-labelledby="evidence-title">
+      <div class="shell">
+        <SectionHead num="02" label="Built in public" id="evidence" title="This site is the case study.">
+          <p class="prose">
+            I am not going to show you a portfolio of somebody else's work. Every figure
+            below is counted from this page as it stands, at the moment it was built — which
+            is the only kind of number worth putting on a page like this.
+          </p>
+        </SectionHead>
+
+        <dl class="figures reveal">
+          {figures.map((f) => (
+            <div class="figure">
+              <dt class="figure__n">{f.n}</dt>
+              <dd class="figure__k">{f.k}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <ol class="proofs">
+          {proofs.map((proof, i) => (
+            <li class="proof reveal" style={`--reveal-delay:${Math.min(i, 5) * 50}ms`}>
+              <p class="proof__does">{proof.does}</p>
+              <p class="proof__means">{proof.means}</p>
+            </li>
+          ))}
+        </ol>
+
+        {evidence.lastAdded && (
+          <p class="evidence__stamp reveal">
+            Last photograph added {evidence.lastAdded}. Nobody touched a template to do it.
+          </p>
+        )}
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------ diagnostic -->
+    <section class="section rule-top" id="diagnostic" aria-labelledby="diagnostic-title">
+      <div class="shell">
+        <SectionHead num="03" label="A short exam" id="diagnostic" title="What I would look at first.">
+          <p class="prose">
+            Open your own site on your phone and go through these. It takes two minutes and
+            it will tell you more than any proposal I could write.
+          </p>
+        </SectionHead>
+
+        <ol class="exam">
+          {diagnostic.map((q, i) => (
+            <li class="exam__row reveal" style={`--reveal-delay:${Math.min(i, 5) * 50}ms`}>
+              <span class="exam__n">{String(i + 1).padStart(2, '0')}</span>
+              <p class="exam__q">{q}</p>
+            </li>
+          ))}
+        </ol>
+
+        <p class="serif-note exam__close reveal">
+          If more than two of those made you wince, that is the work — and it is almost
+          always smaller than it looks from inside.
+        </p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------- boundaries -->
+    <section class="section rule-top" id="terms" aria-labelledby="terms-title">
+      <div class="shell">
+        <SectionHead
+          num="04"
+          label="Terms"
+          id="terms"
+          title="What I will not do."
+        >
+          <p class="prose">
+            Worth saying plainly, because a lot of this industry does all five.
+          </p>
+        </SectionHead>
+
+        <ul class="wont">
+          {boundaries.map((line, i) => (
+            <li class="wont__row reveal" style={`--reveal-delay:${i * 50}ms`}>
+              <span class="wont__dash" aria-hidden="true">—</span>
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div class="how reveal">
+          <h3 class="h3">How it usually starts</h3>
+          <p class="prose">
+            A conversation, then one page — normally the homepage — built properly and for a
+            fixed fee, so you can see the standard before committing to anything else. If it
+            is not better than what you have, we stop there and you keep the page.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------ close -->
+    <section class="section rule-top" id="start" aria-labelledby="start-title">
+      <div class="shell">
+        <SectionHead num="05" label="Next" id="start" title="Show me.">
+          <p class="prose">
+            Tell me the practice and the one thing that bothers you most about the site you
+            have. That is enough for me to say something useful back.
+          </p>
+        </SectionHead>
+
+        <div class="close">
+          <div class="close__act reveal">
+            <a class="cta" href={startEmail} data-goal="practice-start-foot">
+              Show me <span class="cta__chev" aria-hidden="true">→</span>
+            </a>
+            <p class="start__note">
+              Opens an email with four lines to fill in. No form, no newsletter, and nobody
+              else holding your address.
+            </p>
+            <div class="close__links">
+              <a class="arrow-link" href={`mailto:${author.email}`} data-goal="email">
+                <span>{author.email}</span> <span class="chev" aria-hidden="true">→</span>
+              </a>
+              <a
+                class="arrow-link"
+                href={author.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-goal="instagram"
+              >
+                <span>@{author.instagram}</span> <span class="chev" aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="who reveal">
+            <h3 class="h3">{author.name}</h3>
+            <p class="who__body">
+              Dermatologist. I work at the seam between medicine and software — practice
+              technology, workflow, design and photography — and I built this journal on site
+              at a conference to find out how far two days would go.
+            </p>
+            <p class="who__fine">
+              Field Notes is an independent journal by an attendee. It was not commissioned
+              by {conference.name} or the {conference.organizer}, and it is not affiliated
+              with or endorsed by either; the official meeting is at{' '}
+              <a class="link" href={conference.official} target="_blank" rel="noopener noreferrer"
+                >leadderm.org</a
+              >. It appears here because it is my own work, shown with my own photographs.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Base>
+
+<script>
+  import '../scripts/ui';
+</script>
+
+<style>
+  /* ------------------------------------------------------------ opening -- */
+  /* The section below opens with its own rule and full top padding, so this
+     end only has to clear the last baseline rather than open a second gap. */
+  .hero { padding-block: clamp(2.25rem, 6vw, 5rem) clamp(1.5rem, 3vw, 2.5rem); }
+  .hero__grid { display: grid; gap: clamp(2.25rem, 5vw, 4rem); align-items: start; }
+  @media (min-width: 62rem) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr) clamp(17rem, 24vw, 24rem);
+      gap: clamp(2.5rem, 5vw, 5rem);
+    }
+  }
+  .hero__type { display: grid; gap: clamp(1.25rem, 2.6vw, 2rem); }
+  .hero .display { margin-block: 0.1em -0.06em; }
+  @media (min-width: 62rem) {
+    /* Shares the row with the photograph, so it scales off the column. */
+    .hero .display { font-size: clamp(3rem, 5.4vw, 5.75rem); }
+  }
+  .hero__figure { margin: 0; max-width: 22rem; }
+  @media (min-width: 62rem) { .hero__figure { max-width: none; } }
+  .hero__frame { aspect-ratio: 4 / 5; }
+  .hero__cap {
+    margin-top: 0.85rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink-3);
+    max-width: 24rem;
+    text-wrap: pretty;
+  }
+  .byline { font-size: 0.8125rem; color: var(--ink-3); }
+
+  /* The one loud element on the page, and it is a rectangle of ink. */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    min-height: 3.25rem;
+    padding-inline: clamp(1.5rem, 4vw, 2.25rem);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: background-color 0.3s var(--ease);
+  }
+  .cta:hover { background: var(--pine); }
+  .cta__chev { transition: transform 0.35s var(--ease); }
+  .cta:hover .cta__chev { transform: translateX(0.25em); }
+
+  .start { display: grid; gap: 0.9rem; justify-items: start; }
+  .start__note {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--ink-3);
+    max-width: 30rem;
+    text-wrap: pretty;
+  }
+
+  /* --------------------------------------------------------------- work -- */
+  .offers {
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+  }
+  @media (min-width: 56rem) {
+    .offers { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 3.5rem); }
+  }
+  .offer { padding-top: 1.25rem; border-top: 1px solid var(--ink); }
+  .offer__name {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+  }
+  .offer__sum {
+    margin-top: 0.6rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .offer__list { margin-top: 1.25rem; display: grid; }
+  .offer__item {
+    padding-block: 0.7rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  /* ----------------------------------------------------------- evidence -- */
+  .figures {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  @media (min-width: 48rem) { .figures { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .figure { border-top: 1px solid var(--rule-on-night); padding-top: 0.9rem; }
+  .figure__n {
+    font-family: var(--serif);
+    font-weight: 200;
+    font-size: clamp(2.5rem, 6vw, 3.75rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .figure__k {
+    margin-top: 0.55rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--ink-2-on-night);
+    text-wrap: pretty;
+  }
+
+  .proofs { margin-top: clamp(3rem, 7vw, 5rem); display: grid; }
+  .proof {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: clamp(1.25rem, 2.6vw, 1.6rem);
+    border-top: 1px solid var(--rule-on-night);
+  }
+  .proof:last-child { border-bottom: 1px solid var(--rule-on-night); }
+  @media (min-width: 56rem) {
+    .proof {
+      grid-template-columns: minmax(0, 21rem) minmax(0, 1fr);
+      gap: clamp(1.5rem, 4vw, 3.5rem);
+      align-items: baseline;
+    }
+  }
+  .proof__does {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--ink-on-night);
+    text-wrap: pretty;
+  }
+  .proof__means {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--ink-2-on-night);
+    max-width: 40rem;
+    text-wrap: pretty;
+  }
+  .evidence__stamp {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    font-size: 0.8125rem;
+    color: var(--ink-2-on-night);
+  }
+
+  /* ----------------------------------------------------------- the exam -- */
+  .exam { margin-top: clamp(2.5rem, 6vw, 4rem); display: grid; max-width: 52rem; }
+  .exam__row {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+    padding-block: clamp(0.9rem, 2vw, 1.25rem);
+    border-top: 1px solid var(--rule);
+  }
+  .exam__row:last-child { border-bottom: 1px solid var(--rule); }
+  .exam__n {
+    font-family: var(--serif);
+    font-size: 0.9375rem;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .exam__q {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    line-height: 1.3;
+    letter-spacing: -0.012em;
+    text-wrap: pretty;
+  }
+  .exam__close { margin-top: clamp(2rem, 4vw, 3rem); max-width: 34rem; }
+
+  /* --------------------------------------------------------------- terms -- */
+  .wont { margin-top: clamp(2rem, 5vw, 3.5rem); display: grid; max-width: 44rem; }
+  .wont__row {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: 0.25rem;
+    padding-block: 0.85rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .wont__dash { color: var(--ink-3); }
+  .wont__row:last-child { border-bottom: 1px solid var(--rule); }
+  .how { margin-top: clamp(2.5rem, 5vw, 3.5rem); display: grid; gap: 0.9rem; }
+
+  /* --------------------------------------------------------------- close -- */
+  .close {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  @media (min-width: 62rem) {
+    .close { grid-template-columns: minmax(0, 1fr) 26rem; align-items: start; }
+  }
+  .close__act { display: grid; gap: clamp(1.1rem, 2.4vw, 1.6rem); justify-items: start; }
+  .close__links { margin-top: 0.5rem; }
+  .close__links { display: grid; justify-items: start; }
+
+
+  .who { display: grid; gap: 0.9rem; }
+  .who__body { font-size: 1rem; line-height: 1.7; color: var(--ink-2); text-wrap: pretty; }
+  .who__fine {
+    font-size: 0.8125rem;
+    line-height: 1.65;
+    color: var(--ink-3);
+    text-wrap: pretty;
+  }
+
+  /* The case study is set on ink, and this is a page someone may well print or
+     save as a PDF to show a partner. These live here rather than with the
+     other print rules because a scoped selector outranks a global one. */
+  @media print {
+    .figure__n,
+    .proof__does { color: #000; }
+    .figure__k,
+    .proof__means,
+    .evidence__stamp { color: #333; }
+    .cta { background: none; color: #000; border: 1px solid #000; }
+    .offer,
+    .proof,
+    .exam__row,
+    .wont__row { break-inside: avoid; }
+  }
+</style>
