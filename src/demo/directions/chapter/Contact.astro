@@ -1,0 +1,61 @@
+---
+import Plate from '../../Plate.astro';
+import { type Concept, placeName, primaryAction, instagramUrl } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const phone = concept.contact.phone ?? concept.practice.phone;
+const instagram = instagramUrl(concept);
+---
+
+<section class="band">
+  <div class="wrap">
+    <div class="ch-sec">
+      <p class="ch-label rise">Visit</p>
+      <div class="ch-sec__body">
+        <h1 class="ch-h2 rise">
+          {concept.contact.address ?? where ?? 'Where to find the practice'}
+        </h1>
+        {action && <p class="rise"><a class="ch-act" href={action.href}>{action.label}</a></p>}
+      </div>
+    </div>
+
+    <div class="ch-rule-note rise" style="margin-top:clamp(2.5rem,6vw,4rem)">
+      <p class="ch-label">Reach the desk</p>
+      <div>
+        <p class="ch-prose">
+          {phone ? <><a class="ch-link" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a><br /></> : null}
+          {concept.practice.email && (
+            <><a class="ch-link" href={`mailto:${concept.practice.email}`}>{concept.practice.email}</a><br /></>
+          )}
+          {instagram && (
+            <a class="ch-link" href={instagram} target="_blank" rel="noopener noreferrer">
+              {concept.practice.instagram}
+            </a>
+          )}
+          {!phone && !concept.practice.email && !instagram && (
+            <>Contact details to be confirmed with the practice.</>
+          )}
+        </p>
+      </div>
+    </div>
+
+    {concept.contact.hours && concept.contact.hours.length > 0 && (
+      <div class="ch-rule-note rise">
+        <p class="ch-label">Hours</p>
+        <div>
+          {concept.contact.hours.map((line) => <p class="ch-prose">{line}</p>)}
+        </div>
+      </div>
+    )}
+
+    <Plate
+      slug={concept.slug}
+      class="ch-wide rise"
+      label="The building, or the way in"
+      sizes="100vw"
+    />
+  </div>
+</section>

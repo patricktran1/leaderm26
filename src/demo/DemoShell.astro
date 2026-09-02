@@ -1,0 +1,126 @@
+---
+/**
+ * The document around every practice concept.
+ *
+ * Nothing here comes from the journal's Base layout on purpose. A concept is
+ * somebody else's practice, so it carries their name, their structured data
+ * and none of Patrick's — and it carries `noindex, nofollow` on every surface,
+ * always, with no way to turn it off. A concept is a thing you send to one
+ * person, not a thing that should ever appear in a search result beside the
+ * practice's real website.
+ */
+import './base.css';
+import { type Concept, shortName, placeName } from './schema';
+
+interface Props {
+  concept: Concept;
+  title: string;
+  description?: string | undefined;
+  /** Direction stylesheet is imported by the caller; this is for the flag. */
+  chrome?: 'direction' | 'factory';
+}
+
+const { concept, title, description, chrome = 'direction' } = Astro.props;
+const where = placeName(concept);
+
+/**
+ * Local business data for the practice, not for Patrick. Only fields the
+ * practice actually published are emitted — an address invented to satisfy a
+ * schema validator is still an invented address.
+ */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: concept.practice.name,
+  ...(concept.practice.phone ? { telephone: concept.practice.phone } : {}),
+  ...(concept.practice.existingSite ? { url: concept.practice.existingSite } : {}),
+  ...(where ? { areaServed: where } : {}),
+  medicalSpecialty: 'Dermatology',
+};
+---
+
+<!doctype html>
+<html lang="en" data-direction={chrome === 'direction' ? concept.direction : undefined} data-chrome={chrome}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <!-- Not negotiable, and not a prop: a concept is never indexed. -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    {chrome === 'direction' && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+    )}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    {concept.status === 'synthetic' && (
+      <aside class="demo-flag" aria-label="Status of this concept">
+        <strong>Synthetic example.</strong> {shortName(concept)} is an invented practice used to
+        test this layout. Nobody of this name asked for it, and none of it is real.
+      </aside>
+    )}
+    {concept.status === 'draft' && (
+      <aside class="demo-flag demo-flag--draft" aria-label="Status of this concept">
+        <strong>Draft concept.</strong> Not checked against the pre-send list — do not share.
+      </aside>
+    )}
+
+    <slot />
+
+    <aside class="demo-foot" aria-label="About this concept">
+      A design concept for {concept.practice.name}, prepared by Patrick Tran, MD, FAAD.
+      Not affiliated with{' '}
+      {concept.practice.existingSite ? (
+        <a href={concept.practice.existingSite} rel="noopener noreferrer nofollow" target="_blank">the practice</a>
+      ) : (
+        <>the practice</>
+      )}. Every recommendation on these pages is a proposal, not a statement about the practice.
+    </aside>
+
+    <script>
+      import '../demo/ui';
+    </script>
+
+    <style is:global>
+      /* The two lines that belong to the factory rather than to any direction:
+         a flag on anything unfinished, and a footer that says whose proposal
+         this is. Both stay legible on light and dark grounds. */
+      .demo-flag,
+      .demo-foot {
+        margin: 0;
+        /* Honest, and small: on a phone this must not eat the first screen. */
+        padding: 0.5rem var(--gutter, 1.25rem);
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        font-size: 0.6875rem;
+        line-height: 1.45;
+        text-align: center;
+        text-wrap: pretty;
+      }
+      .demo-flag {
+        position: relative;
+        z-index: 70;
+        background: #f6e6c8;
+        color: #3d2f10;
+        border-bottom: 1px solid #e0c68c;
+      }
+      .demo-flag--draft { background: #e8ecef; color: #26333c; border-bottom-color: #c3cfd6; }
+      .demo-flag strong { font-weight: 700; }
+      .demo-foot {
+        background: #101315;
+        color: #a9b1b6;
+        border-top: 1px solid #23292d;
+      }
+      .demo-foot a { color: #d4dbdf; }
+    </style>
+  </body>
+</html>

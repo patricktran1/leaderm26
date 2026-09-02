@@ -1,0 +1,48 @@
+---
+import { type Concept } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const categories = [...new Set(concept.services.map((s) => s.category).filter(Boolean))] as string[];
+---
+
+<section class="band">
+  <div class="wrap">
+    <h1 class="cl-h2 rise">What we treat</h1>
+    <p class="cl-prose rise" style="margin-top:0.6rem">
+      {concept.services.length} things, grouped so you do not have to already know the name of
+      yours. If you are not sure, start with the first group.
+    </p>
+
+    <div class="cl-finder rise" data-finder style="margin-top:clamp(1.5rem,3vw,2.25rem)">
+      <div class="cl-filter">
+        <label class="vh" for="svc">Filter services</label>
+        <input id="svc" type="search" placeholder="Search — acne, biopsy, psoriasis…" data-finder-input />
+        {categories.map((cat) => (
+          <button class="cl-chip" type="button" aria-pressed="false" data-finder-cat={cat}>{cat}</button>
+        ))}
+      </div>
+      <p class="cl-label" aria-live="polite" data-finder-count></p>
+
+      <div class="cl-cards">
+        {concept.services.map((service) => (
+          <article
+            class="cl-card"
+            data-service={`${service.name} ${service.shortDescription ?? ''} ${service.category ?? ''}`}
+            data-category={service.category ?? ''}
+          >
+            {service.category && <p class="cl-card__cat">{service.category}</p>}
+            <h2 class="cl-h3">{service.name}</h2>
+            {service.shortDescription && <p>{service.shortDescription}</p>}
+          </article>
+        ))}
+      </div>
+      <p class="cl-empty" data-finder-empty hidden>
+        Nothing matches that. Call the desk and describe it — that is faster than guessing the name.
+      </p>
+      {concept.services.length === 0 && (
+        <p class="cl-prose">No services have been recorded in this concept yet.</p>
+      )}
+    </div>
+  </div>
+</section>

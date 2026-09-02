@@ -1,0 +1,64 @@
+---
+import '../chapter.css';
+import { SURFACES, surfaceHref } from '../../registry';
+import { type Concept, shortName, placeName, primaryAction } from '../../schema';
+
+interface Props { concept: Concept; surface: string }
+const { concept, surface } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const phone = concept.contact.phone ?? concept.practice.phone;
+---
+
+<header class="ch-head">
+  <div class="wrap">
+    <a class="ch-head__name" href={surfaceHref(concept.slug, '')}>{concept.practice.name}</a>
+    <p class="ch-head__where">
+      {where}
+      {where && phone && <span aria-hidden="true"> · </span>}
+      {phone && <a class="ch-head__tel" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>}
+    </p>
+    <nav class="ch-nav" aria-label="Sections">
+      {SURFACES.map((item) => (
+        <a
+          href={surfaceHref(concept.slug, item.path)}
+          aria-current={item.path === surface ? 'page' : undefined}
+        >{item.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <slot />
+</main>
+
+<footer class="ch-foot">
+  <div class="wrap">
+    <dl class="ch-foot__grid">
+      <div>
+        <dt>{shortName(concept)}</dt>
+        <dd>
+          {concept.contact.address ?? where ?? 'Address to be confirmed'}
+          {phone && <><br />{phone}</>}
+        </dd>
+      </div>
+      {concept.contact.hours && concept.contact.hours.length > 0 && (
+        <div>
+          <dt>Hours</dt>
+          <dd>{concept.contact.hours.map((line) => <span>{line}<br /></span>)}</dd>
+        </div>
+      )}
+      <div>
+        <dt>Appointments</dt>
+        <dd>
+          {action ? (
+            <a class="ch-link" href={action.href}>{action.label}</a>
+          ) : (
+            <>Booking details to be confirmed with the practice.</>
+          )}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</footer>

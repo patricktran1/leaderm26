@@ -1,0 +1,69 @@
+---
+import '../clinic.css';
+import { SURFACES, surfaceHref } from '../../registry';
+import { type Concept, shortName, placeName, primaryAction } from '../../schema';
+
+interface Props { concept: Concept; surface: string }
+const { concept, surface } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const phone = concept.contact.phone ?? concept.practice.phone;
+const tel = phone ? `tel:${phone.replace(/[^\d+]/g, '')}` : null;
+---
+
+<header class="cl-head">
+  <div class="wrap cl-head__bar">
+    <a class="cl-head__name" href={surfaceHref(concept.slug, '')}>
+      {shortName(concept)}
+      {where && <span>{where}</span>}
+    </a>
+    <nav class="cl-nav" aria-label="Sections">
+      {SURFACES.map((item) => (
+        <a
+          href={surfaceHref(concept.slug, item.path)}
+          aria-current={item.path === surface ? 'page' : undefined}
+        >{item.label}</a>
+      ))}
+    </nav>
+    <div class="cl-head__acts">
+      {tel && <a class="cl-btn cl-btn--ghost" href={tel}>{phone}</a>}
+      {action && <a class="cl-btn" href={action.href}>{action.label}</a>}
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <slot />
+</main>
+
+<footer class="cl-foot">
+  <div class="wrap">
+    <dl class="cl-foot__grid">
+      <div>
+        <dt>{concept.practice.name}</dt>
+        <dd>{concept.contact.address ?? where ?? 'Address to be confirmed'}</dd>
+      </div>
+      <div>
+        <dt>Reach us</dt>
+        <dd>
+          {phone && <><a href={tel!}>{phone}</a><br /></>}
+          {concept.practice.email && <a href={`mailto:${concept.practice.email}`}>{concept.practice.email}</a>}
+          {!phone && !concept.practice.email && <>To be confirmed</>}
+        </dd>
+      </div>
+      {concept.contact.hours && concept.contact.hours.length > 0 && (
+        <div>
+          <dt>Hours</dt>
+          <dd>{concept.contact.hours.map((line) => <span>{line}<br /></span>)}</dd>
+        </div>
+      )}
+    </dl>
+  </div>
+</footer>
+
+{(action || tel) && (
+  <div class="cl-dock">
+    {tel && <a class="cl-btn cl-btn--ghost" href={tel}>Call</a>}
+    {action && <a class="cl-btn" href={action.href}>{action.label}</a>}
+  </div>
+)}

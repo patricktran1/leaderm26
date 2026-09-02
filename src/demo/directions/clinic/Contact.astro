@@ -1,0 +1,65 @@
+---
+import Plate from '../../Plate.astro';
+import { type Concept, placeName, primaryAction, instagramUrl } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const phone = concept.contact.phone ?? concept.practice.phone;
+const instagram = instagramUrl(concept);
+---
+
+<section class="band">
+  <div class="wrap">
+    <h1 class="cl-h2 rise">Visiting</h1>
+
+    <div class="cl-hero__grid rise" style="margin-top:clamp(1.5rem,3vw,2.25rem)">
+      <div style="display:grid;gap:1.25rem;align-content:start">
+        <dl class="cl-facts">
+          <div class="cl-fact">
+            <dt>Address</dt>
+            <dd>{concept.contact.address ?? where ?? 'To be confirmed'}</dd>
+          </div>
+          <div class="cl-fact">
+            <dt>Phone</dt>
+            <dd>{phone ? <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a> : 'To be confirmed'}</dd>
+          </div>
+          <div class="cl-fact">
+            <dt>Email</dt>
+            <dd>
+              {concept.practice.email
+                ? <a href={`mailto:${concept.practice.email}`}>{concept.practice.email}</a>
+                : 'To be confirmed'}
+            </dd>
+          </div>
+        </dl>
+
+        {concept.contact.hours && concept.contact.hours.length > 0 && (
+          <div>
+            <p class="cl-label">Opening hours</p>
+            <ul style="margin-top:0.5rem;display:grid;gap:0.2rem">
+              {concept.contact.hours.map((line) => <li class="cl-prose">{line}</li>)}
+            </ul>
+          </div>
+        )}
+
+        <div class="cl-hero__acts">
+          {action && <a class="cl-btn" href={action.href}>{action.label}</a>}
+          {instagram && (
+            <a class="cl-btn cl-btn--ghost" href={instagram} target="_blank" rel="noopener noreferrer">
+              {concept.practice.instagram}
+            </a>
+          )}
+        </div>
+      </div>
+
+      <Plate
+        slug={concept.slug}
+        class="cl-hero__plate"
+        label="The entrance, or the car park"
+        sizes="(min-width: 60rem) 40vw, 100vw"
+      />
+    </div>
+  </div>
+</section>

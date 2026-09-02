@@ -1,0 +1,41 @@
+---
+import Plate from '../../Plate.astro';
+import { type Concept } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+---
+
+<section class="band">
+  <div class="wrap">
+    <h1 class="cl-h2 rise">The clinicians</h1>
+    <p class="cl-prose rise" style="margin-top:0.6rem">
+      Physicians, physician associates and nurse practitioners all see patients here. What
+      matters when you book is who covers your problem.
+    </p>
+
+    <div class="cl-team rise" style="margin-top:clamp(1.5rem,3vw,2.25rem)">
+      {concept.physicians.map((person) => (
+        <article class="cl-clin">
+          <Plate
+            slug={concept.slug}
+            src={person.image}
+            alt={person.image ? person.name : ''}
+            class="cl-clin__plate"
+            label="Headshot"
+            sizes="(min-width: 68rem) 18vw, (min-width: 44rem) 45vw, 100vw"
+          />
+          <div class="cl-clin__body">
+            <h2 class="cl-h3">{person.name}</h2>
+            {person.credentials && <p class="cl-clin__cred">{person.credentials}</p>}
+            {person.specialty && <p>{person.specialty}</p>}
+            {person.shortBio && <p>{person.shortBio}</p>}
+          </div>
+        </article>
+      ))}
+      {concept.physicians.length === 0 && (
+        <p class="cl-prose">The practice's clinicians have not been recorded in this concept yet.</p>
+      )}
+    </div>
+  </div>
+</section>

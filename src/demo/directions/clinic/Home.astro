@@ -1,0 +1,106 @@
+---
+import Plate from '../../Plate.astro';
+import { surfaceHref } from '../../registry';
+import { type Concept, placeName, primaryAction, servicesByCategory } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const phone = concept.contact.phone ?? concept.practice.phone;
+/** "Start here" — whatever the first category is — carries the hero. */
+const groups = servicesByCategory(concept);
+const quick = (groups[0]?.items ?? []).slice(0, 3);
+---
+
+<section class="cl-hero">
+  <div class="wrap">
+    <div class="cl-hero__grid">
+      <div style="display:grid;gap:1.25rem">
+        <p class="cl-label rise">Dermatology{where ? ` · ${where}` : ''}</p>
+        <h1 class="cl-display rise" style="--rise-delay:50ms">
+          {concept.concept.thesis ?? concept.practice.name}
+        </h1>
+        {concept.concept.positioning && (
+          <p class="cl-lede rise" style="--rise-delay:100ms">{concept.concept.positioning}</p>
+        )}
+        <div class="cl-hero__acts rise" style="--rise-delay:150ms">
+          {action && <a class="cl-btn" href={action.href}>{action.label}</a>}
+          {phone && (
+            <a class="cl-btn cl-btn--ghost" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>
+          )}
+        </div>
+      </div>
+      <Plate
+        slug={concept.slug}
+        class="cl-hero__plate rise"
+        label="The waiting room, or the front desk"
+        sizes="(min-width: 60rem) 40vw, 100vw"
+        eager
+      />
+    </div>
+
+    {quick.length > 0 && (
+      <div class="cl-quick rise" style="margin-top:clamp(1.5rem,3vw,2.25rem)">
+        {quick.map((service) => (
+          <a href={surfaceHref(concept.slug, 'services')}>
+            <strong>{service.name}</strong>
+            {service.shortDescription && <span>{service.shortDescription}</span>}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+{concept.physicians.length > 0 && (
+  <section class="band">
+    <div class="wrap">
+      <h2 class="cl-h2 rise">Who you would see</h2>
+      <p class="cl-prose rise" style="margin-top:0.6rem">
+        Four names on a page is not information. Each one here says what they cover.
+      </p>
+      <div class="cl-team rise" style="margin-top:clamp(1.25rem,3vw,2rem)">
+        {concept.physicians.map((person) => (
+          <article class="cl-clin">
+            <Plate
+              slug={concept.slug}
+              src={person.image}
+              alt={person.image ? person.name : ''}
+              class="cl-clin__plate"
+              label="Headshot"
+              sizes="(min-width: 68rem) 18vw, (min-width: 44rem) 45vw, 100vw"
+            />
+            <div class="cl-clin__body">
+              <h3 class="cl-h3">{person.name}</h3>
+              {person.credentials && <p class="cl-clin__cred">{person.credentials}</p>}
+              {person.specialty && <p>{person.specialty}</p>}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<section class="band" style="background:var(--surface);border-block:1px solid var(--rule)">
+  <div class="wrap">
+    <h2 class="cl-h2 rise">Practical things</h2>
+    <dl class="cl-facts rise" style="margin-top:clamp(1.25rem,3vw,1.75rem)">
+      <div class="cl-fact">
+        <dt>Where</dt>
+        <dd>{concept.contact.address ?? where ?? 'To be confirmed'}</dd>
+      </div>
+      <div class="cl-fact">
+        <dt>Phone</dt>
+        <dd>
+          {phone ? <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a> : 'To be confirmed'}
+        </dd>
+      </div>
+      <div class="cl-fact">
+        <dt>Hours</dt>
+        <dd>{concept.contact.hours?.[0] ?? 'To be confirmed'}</dd>
+      </div>
+    </dl>
+  </div>
+</section>

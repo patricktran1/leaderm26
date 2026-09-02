@@ -1,0 +1,246 @@
+/* ==========================================================================
+   Direction: CHAPTER — physician-led, editorial.
+
+   One typeface doing everything, set the way a book sets a chapter opening:
+   wide margins, a hard rule under the masthead, running heads, and no button
+   until the very end of a page. Colour is bone and ink with an olive that only
+   ever appears on a hover or a rule.
+
+   The argument this direction makes: a practice whose depth is medical rather
+   than cosmetic earns trust by being unhurried and specific, not by being
+   bright. Suits a two- or three-physician medical/surgical practice.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/demo/source-serif-4.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Scoped, not :root — every direction's stylesheet ends up in the same
+   bundle, and the document says which one it is. */
+[data-direction='chapter'] {
+  --paper: #f7f4ee;
+  --surface: #efeadf;
+  --ink: #1c1b18;
+  --muted: #57544c;      /* 6.9:1 on paper */
+  --faint: #6d695f;      /* 5.0:1 on paper */
+  --rule: #d9d2c4;
+  --rule-firm: #b7ae9b;
+  --accent: #4c5c36;     /* olive; 7.4:1 on paper */
+  --focus: #4c5c36;
+
+  --display: 'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+  --body: 'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+  --label-face: 'Source Serif 4', Georgia, serif;
+
+  --base: 1.0625rem;
+  --leading: 1.62;
+  --gutter: clamp(1.25rem, 6vw, 5rem);
+  --measure-page: 74rem;
+  --measure-text: 36rem;
+  --band: clamp(3.5rem, 9vw, 9rem);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --plate-ink: #6d695f;
+}
+
+/* ------------------------------------------------------------ typography */
+.ch-display {
+  font-family: var(--display);
+  font-weight: 300;
+  /* Sized against the column it shares with the portrait, not the viewport:
+     at 5rem a two-clause thesis ran to six lines. */
+  font-size: clamp(2.125rem, 4vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+.ch-h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.016em;
+  text-wrap: balance;
+}
+.ch-h3 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  line-height: 1.25;
+  letter-spacing: -0.004em;
+}
+.ch-lede {
+  font-size: clamp(1.125rem, 1.5vw, 1.4375rem);
+  line-height: 1.5;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 34rem;
+  text-wrap: pretty;
+}
+.ch-prose { max-width: var(--measure-text); color: var(--muted); text-wrap: pretty; }
+.ch-prose + .ch-prose { margin-top: 1em; }
+
+.ch-label {
+  font-family: var(--label-face);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.ch-link {
+  color: inherit;
+  text-decoration: none;
+  box-shadow: inset 0 -1px 0 var(--rule-firm);
+  transition: box-shadow 0.3s var(--ease), color 0.3s var(--ease);
+}
+.ch-link:hover { color: var(--accent); box-shadow: inset 0 -1px 0 var(--accent); }
+
+/* The only button in the direction, and it appears once per page at the end. */
+.ch-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 3rem;
+  padding-inline: 1.75rem;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.ch-act:hover { background: var(--ink); color: var(--paper); }
+.ch-act--quiet { border-color: var(--rule-firm); }
+
+/* --------------------------------------------------------------- masthead */
+/* Centred, on a hard rule, with the navigation beneath — a title page, not a
+   toolbar. Nothing is sticky: the page is meant to be read down. */
+.ch-head { padding-block: clamp(1.5rem, 4vw, 2.75rem) 0; text-align: center; }
+.ch-head__name {
+  display: inline-block;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.ch-head__where {
+  margin-top: 0.3rem;
+  font-family: var(--label-face);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+/* The one concession the direction makes to a phone: the number is reachable
+   from the masthead, set at label size so it does not become a button. */
+.ch-head__tel { color: inherit; text-decoration: none; box-shadow: inset 0 -1px 0 var(--rule-firm); }
+.ch-head__tel:hover { color: var(--accent); box-shadow: inset 0 -1px 0 var(--accent); }
+
+.ch-nav {
+  margin-top: clamp(1.25rem, 3vw, 2rem);
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 clamp(1.25rem, 4vw, 3rem);
+}
+.ch-nav a {
+  min-height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  color: var(--muted);
+  transition: color 0.25s var(--ease);
+}
+.ch-nav a:hover { color: var(--ink); }
+.ch-nav a[aria-current='page'] { color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* ------------------------------------------------------------------- hero */
+/* Statement left, one photograph right, and the practice's own sentence set
+   as a standfirst below the rule. No action above the fold on purpose. */
+.ch-hero { padding-block: clamp(2.5rem, 7vw, 6rem) 0; }
+.ch-hero__grid { display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+@media (min-width: 60rem) {
+  .ch-hero__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
+}
+.ch-hero__type { display: grid; gap: clamp(1.25rem, 2.5vw, 1.75rem); }
+.ch-hero__plate { aspect-ratio: 4 / 5; }
+@media (max-width: 59.999rem) { .ch-hero__plate { max-width: 22rem; } }
+
+.ch-rule-note {
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--ink);
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 48rem) {
+  .ch-rule-note { grid-template-columns: 12rem minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+}
+
+/* ---------------------------------------------------------------- section */
+.ch-sec { display: grid; gap: clamp(1.5rem, 3vw, 2.25rem); }
+@media (min-width: 56rem) {
+  .ch-sec { grid-template-columns: 12rem minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); }
+}
+.ch-sec__body { display: grid; gap: clamp(1.25rem, 2.5vw, 1.75rem); }
+
+/* ------------------------------------------------------- service contents */
+/* Set like the contents page of a book: category, then a ruled list with the
+   name on the left and its one line on the right. Scannable at a glance,
+   which an alphabetical column of forty items is not. */
+.ch-contents { display: grid; gap: clamp(2rem, 4vw, 3rem); }
+.ch-group__name {
+  font-family: var(--label-face);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--ink);
+}
+.ch-item {
+  display: grid;
+  gap: 0.2rem 2rem;
+  padding-block: clamp(0.85rem, 1.8vw, 1.15rem);
+  border-bottom: 1px solid var(--rule);
+}
+@media (min-width: 44rem) {
+  .ch-item { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); align-items: baseline; }
+}
+.ch-item__name { font-weight: 600; }
+.ch-item__note { color: var(--muted); font-size: 0.9375rem; line-height: 1.55; text-wrap: pretty; }
+
+/* ---------------------------------------------------------- the physicians */
+/* One per spread: portrait, then a paragraph that reads like a person. */
+.ch-people { display: grid; gap: clamp(3rem, 7vw, 5.5rem); }
+.ch-person { display: grid; gap: clamp(1.25rem, 3vw, 2.5rem); }
+@media (min-width: 52rem) {
+  .ch-person { grid-template-columns: minmax(0, 17rem) minmax(0, 1fr); align-items: start; }
+}
+.ch-person__plate { aspect-ratio: 4 / 5; }
+/* Stacked, a portrait would run the full measure and become a wall. */
+@media (max-width: 51.999rem) { .ch-person__plate { max-width: 18rem; } }
+.ch-person__body { display: grid; gap: 0.75rem; align-content: start; }
+.ch-person__name { font-family: var(--display); font-weight: 400; font-size: clamp(1.5rem, 2.6vw, 2rem); line-height: 1.1; letter-spacing: -0.015em; }
+.ch-person__cred { font-family: var(--label-face); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
+
+.ch-wide { margin-top: clamp(2.5rem, 6vw, 4rem); aspect-ratio: 16 / 9; }
+
+/* ------------------------------------------------------------------- foot */
+.ch-foot { border-top: 1px solid var(--ink); padding-block: clamp(2.5rem, 5vw, 4rem) clamp(2rem, 4vw, 3rem); }
+.ch-foot__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); }
+@media (min-width: 48rem) { .ch-foot__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ch-foot dt { font-family: var(--label-face); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.19em; text-transform: uppercase; color: var(--faint); }
+.ch-foot dd { margin-top: 0.5rem; color: var(--muted); }

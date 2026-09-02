@@ -1,0 +1,88 @@
+{
+  "slug": "northlight-dermatology",
+  "direction": "chapter",
+  "status": "synthetic",
+  "practice": {
+    "name": "Northlight Dermatology",
+    "shortName": "Northlight",
+    "city": "Portland",
+    "state": "ME",
+    "phone": "(207) 555-0142",
+    "email": "front@example.com",
+    "existingSite": "https://example.com/northlight",
+    "instagram": "@northlightderm"
+  },
+  "physicians": [
+    {
+      "name": "Dr. Ruth Ellery",
+      "credentials": "MD, FAAD",
+      "specialty": "Medical and surgical dermatology",
+      "shortBio": "Sees general dermatology four days a week and runs the practice's surgical list on Thursdays. Particular interest in skin cancer of the head and neck."
+    },
+    {
+      "name": "Dr. Alan Fenwick",
+      "credentials": "MD",
+      "specialty": "General dermatology, paediatric dermatology",
+      "shortBio": "Splits his week between the Portland office and the Brunswick satellite. Takes most of the practice's paediatric referrals."
+    }
+  ],
+  "services": [
+    { "name": "Full skin examination", "category": "Medical", "shortDescription": "A head-to-toe check, usually annually, and the appointment most people should book first." },
+    { "name": "Acne", "category": "Medical", "shortDescription": "From first-line topicals through to isotretinoin, managed in the office." },
+    { "name": "Eczema and psoriasis", "category": "Medical", "shortDescription": "Including biologic therapy where it is warranted." },
+    { "name": "Rashes and unexplained skin change", "category": "Medical" },
+    { "name": "Skin cancer surgery", "category": "Surgical", "shortDescription": "Excision and repair, on site, with pathology read locally." },
+    { "name": "Mohs referral and follow-up", "category": "Surgical" },
+    { "name": "Biopsy", "category": "Surgical" },
+    { "name": "Cyst and lipoma removal", "category": "Surgical" },
+    { "name": "Wart and lesion treatment", "category": "Surgical" },
+    { "name": "Teledermatology review", "category": "Access", "shortDescription": "For established patients with a new spot who would otherwise wait weeks." },
+    { "name": "Second opinion on a biopsy result", "category": "Access" }
+  ],
+  "brand": {
+    "tone": "Medical first, unhurried, plainly written. A practice that would rather be trusted than admired.",
+    "photography": "Available light, the real rooms and the real coast. No models, no stock."
+  },
+  "proof": [
+    {
+      "claim": "Both physicians are certified by the American Board of Dermatology.",
+      "source": "https://example.com/northlight/our-team",
+      "checked": "2026-09-02"
+    }
+  ],
+  "contact": {
+    "address": "118 Congress Street, Portland, ME 04101",
+    "phone": "(207) 555-0142",
+    "hours": ["Monday to Thursday, 8:00–4:30", "Friday, 8:00–1:00", "Closed weekends"]
+  },
+  "concept": {
+    "thesis": "The appointment most people need is the one they cannot find on your website.",
+    "positioning": "A medical dermatology practice whose surgical work is its quiet strength, currently presented as a list of services with no order of importance.",
+    "cta": "Request an appointment",
+    "knownProblems": [
+      "The full skin examination — the reason most new patients call — is fourteenth in an alphabetical list of services.",
+      "The two physicians appear as names and credentials with no photograph and no sense of what each of them actually does.",
+      "On a phone the address and the telephone number are three taps from the home page.",
+      "The surgical work, which is the practice's real depth, is one line under \"Procedures\"."
+    ],
+    "proposedImprovements": [
+      "Lead with the examination and let everything else sit beneath it.",
+      "Give each physician a page written like a person rather than a directory row.",
+      "Put the telephone number and the address in reach from every screen.",
+      "Group services the way a patient thinks about them — medical, surgical, access — not alphabetically."
+    ],
+    "outOfScope": [
+      "Booking is a link to whatever system the practice already runs; nothing here replaces a scheduler.",
+      "Photography is indicated, not supplied — the plates are placeholders until a shoot happens.",
+      "No patient-facing forms, and nothing that could receive health information."
+    ]
+  },
+  "findings": [
+    { "kind": "fact", "text": "The practice lists two physicians and a Brunswick satellite location.", "source": "https://example.com/northlight/our-team" },
+    { "kind": "fact", "text": "The site's services page lists 24 items in a single alphabetical column.", "source": "https://example.com/northlight/services" },
+    { "kind": "observation", "text": "On a 390px screen the header pushes the first real content below two folds." },
+    { "kind": "observation", "text": "The telephone number appears only in the footer and is not a tel: link." },
+    { "kind": "hypothesis", "text": "Most inbound calls are for a general skin check rather than for a named procedure — worth confirming with the front desk before the concept commits to that hierarchy." },
+    { "kind": "copy", "text": "Proposed hero line: “Start with the full skin examination. Everything else follows from what it finds.”" }
+  ]
+}

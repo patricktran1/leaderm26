@@ -1,0 +1,64 @@
+---
+/**
+ * Where a photograph goes.
+ *
+ * If the practice has supplied one it is rendered properly, at the sizes the
+ * slot can use. If it has not — which is every concept until a shoot happens —
+ * this draws a flat tonal plate and says so.
+ *
+ * That is a deliberate structural limit rather than a missing feature. The
+ * alternative is stock photography of people who have never been in the
+ * practice, which is one of the things the factory exists not to do, and which
+ * a physician recognises instantly. A concept that shows its own gaps is
+ * easier to trust than one that papers over them.
+ */
+import { Image } from 'astro:assets';
+
+interface Props {
+  /** The practice folder the image would live in. */
+  slug: string;
+  /** File name inside practices/<slug>/images/, if the practice supplied one. */
+  src?: string | undefined;
+  alt?: string | undefined;
+  class?: string | undefined;
+  /** Shown on the placeholder; says what belongs here. */
+  label?: string | undefined;
+  sizes?: string | undefined;
+  eager?: boolean;
+}
+
+const {
+  slug,
+  src,
+  alt = '',
+  class: className = '',
+  label = 'Photograph to be supplied',
+  sizes = '(min-width: 60rem) 40vw, 100vw',
+  eager = false,
+} = Astro.props;
+
+const supplied = import.meta.glob<{ default: ImageMetadata }>(
+  '/practices/*/images/*.{jpg,jpeg,png,webp,avif}',
+  { eager: true },
+);
+const image = src ? supplied[`/practices/${slug}/images/${src}`]?.default : undefined;
+
+/**
+ * A wall of identical grey rectangles reads as a broken page. Each plate takes
+ * one of three tones from the direction's palette, chosen from its own label so
+ * the page is stable across builds and no two neighbours match by accident.
+ */
+const hash = [...`${slug}/${src ?? label}`].reduce((n, ch) => (n * 31 + ch.charCodeAt(0)) >>> 0, 7);
+const tone = ['var(--surface)', 'var(--surface-lift, var(--paper))', 'var(--rule)'][hash % 3];
+---
+
+<div class:list={['plate', className]} style={`--plate-tone:${tone}`}>
+  {image ? (
+    <Image src={image} alt={alt} widths={[480, 800, 1400]} sizes={sizes} quality={80} loading={eager ? 'eager' : 'lazy'} />
+  ) : (
+    <>
+      <div class="plate__mark" aria-hidden="true"></div>
+      <p class="plate__note">{label}</p>
+    </>
+  )}
+</div>

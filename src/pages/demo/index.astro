@@ -1,0 +1,84 @@
+---
+/**
+ * The internal index. Not linked from the journal, not in the sitemap, not
+ * indexable — the way in is knowing the address.
+ */
+import '../../demo/base.css';
+import '../../demo/pitch.css';
+import { concepts, surfaceHref } from '../../demo/registry';
+import { DIRECTIONS_BY_ID, DIRECTION_LIST } from '../../demo/directions/meta';
+import { placeName, shortName } from '../../demo/schema';
+
+const byStatus = { synthetic: 'Synthetic', draft: 'Draft', ready: 'Ready to send' } as const;
+---
+
+<!doctype html>
+<html lang="en" data-chrome="factory">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Practice concepts — internal</title>
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="pt-head">
+      <div class="wrap pt-head__row">
+        <p class="pt-label">Practice demo factory · internal</p>
+        <p class="pt-label">{concepts.length} concept{concepts.length === 1 ? '' : 's'}</p>
+      </div>
+    </header>
+
+    <main id="main" class="wrap band">
+      <h1 class="pt-h1">Concepts</h1>
+      <p class="pt-lede" style="margin-top:0.75rem">
+        Nothing here is indexed and nothing is linked from the public site.
+        <code>npm run demo:new</code> adds one.
+      </p>
+
+      <div class="pt-find" style="margin-top:clamp(1.5rem,4vw,2.5rem)">
+        {concepts.map((concept) => (
+          <div class="pt-finding">
+            <span class="pt-kind" data-kind={concept.status === 'ready' ? 'fact' : concept.status === 'draft' ? 'hypothesis' : 'observation'}>
+              {byStatus[concept.status]}
+            </span>
+            <div>
+              <p class="pt-finding__text">
+                <a href={surfaceHref(concept.slug, '')} style="color:var(--ink)">
+                  <strong>{concept.practice.name}</strong>
+                </a>
+                {placeName(concept) && <> · {placeName(concept)}</>}
+                {' · '}{DIRECTIONS_BY_ID[concept.direction].name}
+              </p>
+              <p class="pt-finding__src">
+                <a href={surfaceHref(concept.slug, '')}>Concept</a>
+                {' · '}
+                <a href={`/demo/${concept.slug}/pitch`}>Notes for {shortName(concept)}</a>
+              </p>
+            </div>
+          </div>
+        ))}
+        {concepts.length === 0 && (
+          <div class="pt-finding"><p class="pt-prose">None yet. Run <code>npm run demo:new</code>.</p></div>
+        )}
+      </div>
+
+      <h2 class="pt-h2" style="margin-top:clamp(2.5rem,6vw,4rem)">The three directions</h2>
+      <div class="pt-story" style="margin-top:1.25rem">
+        {DIRECTION_LIST.map((d) => (
+          <article class="pt-step">
+            <p class="pt-label">{d.name}</p>
+            <div class="pt-step__body">
+              <p class="pt-prose">{d.fits}</p>
+              <ul class="pt-list">{d.shape.map((line) => <li><span>{line}</span></li>)}</ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </main>
+
+    <footer class="pt-foot"><div class="wrap">Internal tooling. See docs/practice-demo-factory.md.</div></footer>
+  </body>
+</html>

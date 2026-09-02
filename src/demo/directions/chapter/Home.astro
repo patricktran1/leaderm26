@@ -1,0 +1,141 @@
+---
+import Plate from '../../Plate.astro';
+import { surfaceHref } from '../../registry';
+import { type Concept, shortName, placeName, primaryAction, servicesByCategory } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+/** The contents preview shows the first group whole, then names the rest. */
+const groups = servicesByCategory(concept);
+const lead = groups[0];
+const rest = groups.slice(1);
+---
+
+<section class="ch-hero">
+  <div class="wrap">
+    <div class="ch-hero__grid">
+      <div class="ch-hero__type">
+        <p class="ch-label rise">Dermatology{where ? ` · ${where}` : ''}</p>
+        <h1 class="ch-display rise" style="--rise-delay:60ms">
+          {concept.concept.thesis ?? shortName(concept)}
+        </h1>
+        {concept.concept.positioning && (
+          <p class="ch-lede rise" style="--rise-delay:120ms">{concept.concept.positioning}</p>
+        )}
+      </div>
+      <Plate
+        slug={concept.slug}
+        class="ch-hero__plate rise"
+        label="The room, or the coast"
+        sizes="(min-width: 60rem) 34vw, 100vw"
+        eager
+      />
+    </div>
+
+    <div class="ch-rule-note rise">
+      <p class="ch-label">The practice</p>
+      <p class="ch-prose">
+        {concept.physicians.length > 0 && (
+          <>
+            {concept.physicians.length === 1
+              ? `${concept.physicians[0]!.name} sees patients`
+              : `${concept.physicians.length} physicians see patients`}
+            {where ? ` in ${where}` : ''}.{' '}
+          </>
+        )}
+        {concept.brand.tone}
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="ch-sec">
+      <p class="ch-label rise">What we do</p>
+      <div class="ch-sec__body">
+        {lead && (
+          <div class="ch-contents rise">
+            <div>
+              <h2 class="ch-group__name">{lead.category ?? 'Services'}</h2>
+              {lead.items.map((service) => (
+                <div class="ch-item">
+                  <p class="ch-item__name">{service.name}</p>
+                  {service.shortDescription && <p class="ch-item__note">{service.shortDescription}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {rest.length > 0 && (
+          <p class="ch-prose rise">
+            Also{' '}
+            {rest.map((group, i) => (
+              <>
+                {i > 0 && (i === rest.length - 1 ? ' and ' : ', ')}
+                <span>{(group.category ?? 'other services').toLowerCase()}</span>
+              </>
+            ))}.{' '}
+            <a class="ch-link" href={surfaceHref(concept.slug, 'services')}>The full list</a>.
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+{concept.physicians.length > 0 && (
+  <section class="band" style="padding-block-start:0">
+    <div class="wrap">
+      <div class="ch-sec">
+        <p class="ch-label rise">Who you see</p>
+        <div class="ch-sec__body">
+          <div class="ch-people">
+            {concept.physicians.slice(0, 2).map((person) => (
+              <article class="ch-person rise">
+                <Plate
+                  slug={concept.slug}
+                  src={person.image}
+                  alt={person.image ? person.name : ''}
+                  class="ch-person__plate"
+                  label="Portrait"
+                  sizes="(min-width: 52rem) 17rem, 100vw"
+                />
+                <div class="ch-person__body">
+                  <h3 class="ch-person__name">{person.name}</h3>
+                  {person.credentials && <p class="ch-person__cred">{person.credentials}</p>}
+                  {person.shortBio && <p class="ch-prose">{person.shortBio}</p>}
+                </div>
+              </article>
+            ))}
+          </div>
+          {concept.physicians.length > 2 && (
+            <p class="ch-prose rise">
+              <a class="ch-link" href={surfaceHref(concept.slug, 'physicians')}>
+                The rest of the practice
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+{action && (
+  <section class="band" style="padding-block-start:0">
+    <div class="wrap">
+      <div class="ch-sec">
+        <p class="ch-label rise">Appointments</p>
+        <div class="ch-sec__body">
+          <p class="ch-lede rise">
+            {concept.contact.address ?? where ?? 'The practice'}
+          </p>
+          <p class="rise"><a class="ch-act" href={action.href}>{action.label}</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+)}

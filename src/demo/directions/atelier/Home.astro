@@ -1,0 +1,88 @@
+---
+import Plate from '../../Plate.astro';
+import { surfaceHref } from '../../registry';
+import { type Concept, placeName, primaryAction } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const lead = concept.physicians[0];
+/** Three treatments on the home page, at size. The rest live on their own page. */
+const shown = concept.services.slice(0, 3);
+---
+
+<section class="at-hero">
+  <Plate
+    slug={concept.slug}
+    class="at-hero__plate"
+    label="The room, in low light"
+    sizes="100vw"
+    eager
+  />
+  <div class="at-hero__over">
+    <div class="wrap"><div class="at-hero__type">
+      <p class="at-label rise">{where ? `Dermatology · ${where}` : 'Dermatology'}</p>
+      <h1 class="at-display rise" style="--rise-delay:60ms">
+        {concept.concept.thesis ?? concept.practice.name}
+      </h1>
+      {action && (
+        <p class="rise" style="--rise-delay:120ms"><a class="at-act" href={action.href}>{action.label}</a></p>
+      )}
+      </div>
+    </div>
+  </div>
+</section>
+
+{lead && (
+  <section class="band">
+    <div class="wrap at-person">
+      <Plate
+        slug={concept.slug}
+        src={lead.image}
+        alt={lead.image ? lead.name : ''}
+        class="at-person__plate rise"
+        label="Portrait"
+        sizes="(min-width: 54rem) 40vw, 100vw"
+      />
+      <div class="at-person__body">
+        <p class="at-label rise">{lead.credentials ?? 'The physician'}</p>
+        <h2 class="at-quote rise" style="--rise-delay:60ms">{lead.name}</h2>
+        {lead.shortBio && <p class="at-lede rise" style="--rise-delay:100ms">{lead.shortBio}</p>}
+        {concept.concept.positioning && (
+          <p class="at-prose rise" style="--rise-delay:140ms">{concept.brand.tone}</p>
+        )}
+      </div>
+    </div>
+  </section>
+)}
+
+{shown.length > 0 && (
+  <section class="band" style="padding-block-start:0">
+    <div class="wrap">
+      <p class="at-label rise">Treatments</p>
+      <div class="at-list" style="margin-top:clamp(2rem,5vw,3.5rem)">
+        {shown.map((service) => (
+          <article class="at-treat rise">
+            <Plate
+              slug={concept.slug}
+              class="at-treat__plate"
+              label={service.name}
+              sizes="(min-width: 54rem) 48vw, 100vw"
+            />
+            <div class="at-treat__body">
+              {service.category && <p class="at-label">{service.category}</p>}
+              <h3 class="at-h3">{service.name}</h3>
+              {service.shortDescription && <p class="at-prose">{service.shortDescription}</p>}
+            </div>
+          </article>
+        ))}
+      </div>
+      {concept.services.length > shown.length && (
+        <p class="rise" style="margin-top:clamp(2rem,5vw,3.5rem)">
+          <a class="at-act" href={surfaceHref(concept.slug, 'services')}>Everything else</a>
+        </p>
+      )}
+    </div>
+  </section>
+)}

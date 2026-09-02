@@ -1,0 +1,245 @@
+/* ==========================================================================
+   Direction: CLINIC — navigation first.
+
+   Built for the patient deciding at nine at night whether to call tomorrow.
+   One grotesque, set larger and tighter than the other directions; white
+   ground, hairline-bordered cards, banded sections, and an action that is
+   never off screen — a sticky bar on desktop, a fixed one at the thumb on a
+   phone. Where CHAPTER withholds the button until the end, this direction
+   puts it in front of you on every screen, because that is the whole point.
+
+   Suits a multi-clinician practice with real same-week capacity and a
+   scheduler already running.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'InterDemo';
+  src: url('/fonts/demo/inter.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Scoped, not :root — every direction's stylesheet ends up in the same
+   bundle, and the document says which one it is. */
+[data-direction='clinic'] {
+  --paper: #ffffff;
+  --surface: #f2f6f7;
+  --surface-deep: #0d3a42;
+  --ink: #11191c;
+  --muted: #4a565b;      /* 7.4:1 on white */
+  --faint: #5d686d;      /* 5.6:1 on white */
+  --rule: #dbe3e6;
+  --rule-firm: #b9c5c9;
+  --accent: #0b5e6b;     /* 6.6:1 on white */
+  --accent-deep: #084651;
+  --focus: #0b5e6b;
+
+  --display: 'InterDemo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --body: 'InterDemo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --label-face: 'InterDemo', system-ui, sans-serif;
+
+  --base: 1.0625rem;
+  --leading: 1.55;
+  --gutter: clamp(1.125rem, 4vw, 3rem);
+  --measure-page: 76rem;
+  --measure-text: 38rem;
+  --band: clamp(3rem, 6vw, 5.5rem);
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  --plate-ink: #5d686d;
+}
+
+/* ------------------------------------------------------------ typography */
+.cl-display {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1.875rem, 3.4vw, 2.875rem);
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+  /* A promise that runs past twenty words stops being a promise. */
+  max-width: 20ch;
+  text-wrap: balance;
+}
+.cl-h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.8vw, 2.125rem);
+  line-height: 1.12;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+.cl-h3 { font-family: var(--display); font-weight: 600; font-size: 1.0625rem; line-height: 1.3; letter-spacing: -0.012em; }
+.cl-lede { font-size: clamp(1.0625rem, 1.4vw, 1.25rem); line-height: 1.5; color: var(--muted); max-width: 36rem; text-wrap: pretty; }
+.cl-prose { max-width: var(--measure-text); color: var(--muted); text-wrap: pretty; }
+.cl-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.cl-link { color: var(--accent); text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+.cl-link:hover { color: var(--accent-deep); }
+
+.cl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 3rem;
+  padding-inline: 1.4rem;
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  transition: background-color 0.2s var(--ease);
+}
+.cl-btn:hover { background: var(--accent-deep); }
+.cl-btn--ghost { background: transparent; color: var(--accent); border-color: var(--rule-firm); }
+.cl-btn--ghost:hover { background: var(--surface); }
+
+/* ------------------------------------------------------------- the header */
+/* Sticky, two rows: identity and the two things a patient came for. */
+.cl-head {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+.cl-head__bar { display: flex; align-items: center; gap: 1rem; min-height: 3.75rem; justify-content: space-between; }
+.cl-head__name { font-weight: 700; font-size: 1.0625rem; letter-spacing: -0.02em; text-decoration: none; white-space: nowrap; }
+.cl-head__name span { display: block; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+.cl-head__acts { display: none; align-items: center; gap: 0.75rem; }
+.cl-nav { display: none; gap: clamp(1rem, 2vw, 1.75rem); }
+.cl-nav a {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+}
+.cl-nav a:hover { color: var(--ink); }
+.cl-nav a[aria-current='page'] { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+@media (min-width: 56rem) {
+  .cl-nav, .cl-head__acts { display: flex; }
+}
+
+/* A phone gets the action pinned at the thumb instead. */
+.cl-dock {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 45;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.5rem;
+  padding: 0.55rem var(--gutter) calc(0.55rem + env(safe-area-inset-bottom));
+  background: var(--paper);
+  border-top: 1px solid var(--rule);
+}
+@media (min-width: 56rem) { .cl-dock { display: none; } }
+body:has(.cl-dock) { padding-bottom: 4.75rem; }
+@media (min-width: 56rem) { body:has(.cl-dock) { padding-bottom: 0; } }
+
+/* ------------------------------------------------------------------- hero */
+/* Short. A promise, an action, and the three things people actually book. */
+.cl-hero { background: var(--surface); border-bottom: 1px solid var(--rule); padding-block: clamp(2.25rem, 5vw, 4rem); }
+.cl-hero__grid { display: grid; gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+@media (min-width: 60rem) { .cl-hero__grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); } }
+.cl-hero__acts { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.cl-hero__plate { aspect-ratio: 16 / 10; border: 1px solid var(--rule); }
+
+.cl-quick { display: grid; gap: 0.5rem; margin-top: 0.25rem; }
+@media (min-width: 34rem) { .cl-quick { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cl-quick a {
+  display: grid;
+  gap: 0.2rem;
+  align-content: start;
+  padding: 0.9rem 1rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  text-decoration: none;
+  transition: border-color 0.2s var(--ease);
+}
+.cl-quick a:hover { border-color: var(--accent); }
+.cl-quick strong { font-size: 0.9375rem; font-weight: 600; }
+.cl-quick span { font-size: 0.8125rem; color: var(--faint); }
+
+/* --------------------------------------------------------- service finder */
+/* Nineteen items is past the point where a list works, so it filters. */
+.cl-finder { display: grid; gap: 1rem; }
+.cl-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.cl-filter input {
+  flex: 1 1 14rem;
+  min-height: 2.75rem;
+  padding-inline: 0.85rem;
+  background: var(--paper);
+  border: 1px solid var(--rule-firm);
+  border-radius: 2px;
+  font-size: 0.9375rem;
+}
+.cl-chip {
+  min-height: 2.75rem;
+  padding-inline: 0.9rem;
+  background: var(--paper);
+  border: 1px solid var(--rule-firm);
+  border-radius: 2px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+}
+.cl-chip[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.cl-cards { display: grid; gap: 0.75rem; }
+@media (min-width: 42rem) { .cl-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 68rem) { .cl-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cl-card {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  padding: 1.1rem 1.15rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+.cl-card p { font-size: 0.875rem; line-height: 1.55; color: var(--muted); text-wrap: pretty; }
+.cl-card__cat { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); }
+.cl-empty { padding: 1.5rem 0; color: var(--muted); }
+
+/* ------------------------------------------------------------- clinicians */
+.cl-team { display: grid; gap: 0.75rem; }
+@media (min-width: 44rem) { .cl-team { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 68rem) { .cl-team { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.cl-clin { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+.cl-clin__plate { aspect-ratio: 1; }
+.cl-clin__body { display: grid; gap: 0.3rem; padding: 1rem 1.05rem 1.15rem; align-content: start; }
+.cl-clin__cred { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; color: var(--accent); }
+.cl-clin p { font-size: 0.875rem; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+
+/* ------------------------------------------------------------------ facts */
+.cl-facts { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 2px; }
+@media (min-width: 40rem) { .cl-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cl-fact { background: var(--paper); padding: 1.15rem 1.2rem; display: grid; gap: 0.3rem; align-content: start; }
+.cl-fact dt { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--faint); }
+.cl-fact dd { font-size: 0.9375rem; font-weight: 500; }
+.cl-fact dd a { color: var(--accent); text-decoration: none; }
+.cl-fact dd a:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------------- foot */
+.cl-foot { background: var(--surface-deep); color: #eaf1f2; padding-block: clamp(2.5rem, 5vw, 3.5rem); }
+.cl-foot a { color: #eaf1f2; }
+.cl-foot__grid { display: grid; gap: clamp(1.5rem, 4vw, 2.5rem); }
+@media (min-width: 48rem) { .cl-foot__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cl-foot dt { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: #9dbcc2; }
+.cl-foot dd { margin-top: 0.45rem; color: #cfe0e3; }

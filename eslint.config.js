@@ -15,7 +15,11 @@ export default [
   },
   {
     languageOptions: {
-      globals: { ...globals.browser },
+      globals: {
+        ...globals.browser,
+        // Ambient types Astro injects for `astro:assets`.
+        ImageMetadata: 'readonly',
+      },
     },
     rules: {
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],

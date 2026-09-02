@@ -1,0 +1,44 @@
+---
+import Plate from '../../Plate.astro';
+import { type Concept, servicesByCategory } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const groups = servicesByCategory(concept);
+---
+
+<section class="band">
+  <div class="wrap">
+    <p class="at-label rise">Treatments</p>
+    <h1 class="at-h2 rise" style="--rise-delay:60ms;margin-top:1rem">
+      One at a time, in the order they are usually taken.
+    </h1>
+    <p class="at-prose rise" style="--rise-delay:100ms;margin-top:1rem">
+      There is no price list here. What something costs depends on what you need, and that is a
+      conversation rather than a checkout.
+    </p>
+
+    <div class="at-list" style="margin-top:clamp(2.5rem,6vw,5rem)">
+      {groups.flatMap((group) =>
+        group.items.map((service) => (
+          <article class="at-treat rise">
+            <Plate
+              slug={concept.slug}
+              class="at-treat__plate"
+              label={service.name}
+              sizes="(min-width: 54rem) 48vw, 100vw"
+            />
+            <div class="at-treat__body">
+              {group.category && <p class="at-label">{group.category}</p>}
+              <h2 class="at-h3">{service.name}</h2>
+              {service.shortDescription && <p class="at-prose">{service.shortDescription}</p>}
+            </div>
+          </article>
+        )),
+      )}
+      {groups.length === 0 && (
+        <p class="at-prose">No treatments have been recorded in this concept yet.</p>
+      )}
+    </div>
+  </div>
+</section>

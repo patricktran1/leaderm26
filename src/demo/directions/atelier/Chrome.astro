@@ -1,0 +1,69 @@
+---
+import '../atelier.css';
+import { SURFACES, surfaceHref } from '../../registry';
+import { type Concept, shortName, placeName, primaryAction, instagramUrl } from '../../schema';
+
+interface Props { concept: Concept; surface: string }
+const { concept, surface } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const instagram = instagramUrl(concept);
+---
+
+<header class="at-head">
+  <div class="wrap at-head__bar">
+    <a class="at-head__name" href={surfaceHref(concept.slug, '')}>{shortName(concept)}</a>
+    <button class="at-menu" type="button" aria-expanded="false" aria-controls="at-panel" data-panel-open>
+      Menu
+    </button>
+  </div>
+</header>
+
+<div class="at-panel" id="at-panel" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <button class="at-menu at-panel__close" type="button" data-panel-close>Close</button>
+  <div class="wrap">
+    <nav class="at-panel__list" aria-label="Sections">
+      {SURFACES.map((item) => (
+        <a
+          href={surfaceHref(concept.slug, item.path)}
+          aria-current={item.path === surface ? 'page' : undefined}
+        >{item.label}</a>
+      ))}
+    </nav>
+    {action && (
+      <p style="margin-top:clamp(1.5rem,4vw,2.5rem)">
+        <a class="at-act" href={action.href}>{action.label}</a>
+      </p>
+    )}
+  </div>
+</div>
+
+<main id="main">
+  <slot />
+</main>
+
+<footer class="at-foot">
+  <div class="wrap">
+    <dl class="at-foot__grid">
+      <div>
+        <dt class="at-label">The practice</dt>
+        <dd>{concept.practice.name}{where ? `, ${where}` : ''}</dd>
+      </div>
+      <div>
+        <dt class="at-label">Enquiries</dt>
+        <dd>
+          {action ? <a class="at-link" href={action.href}>{action.label}</a> : 'To be confirmed'}
+          {instagram && (
+            <><br /><a class="at-link" href={instagram} target="_blank" rel="noopener noreferrer">
+              {concept.practice.instagram}
+            </a></>
+          )}
+        </dd>
+      </div>
+      <div>
+        <dt class="at-label">Hours</dt>
+        <dd>{concept.contact.hours?.join(' · ') ?? 'By appointment'}</dd>
+      </div>
+    </dl>
+  </div>
+</footer>

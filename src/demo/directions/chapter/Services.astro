@@ -1,0 +1,39 @@
+---
+import { type Concept, servicesByCategory } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const groups = servicesByCategory(concept);
+---
+
+<section class="band">
+  <div class="wrap">
+    <div class="ch-sec">
+      <p class="ch-label rise">Services</p>
+      <div class="ch-sec__body">
+        <h1 class="ch-h2 rise">Set out in the order most people need them.</h1>
+        <p class="ch-prose rise">
+          Not alphabetically. The examination that finds something comes before the procedure
+          that treats it.
+        </p>
+      </div>
+    </div>
+
+    <div class="ch-contents" style="margin-top:clamp(2.5rem,6vw,4.5rem)">
+      {groups.map((group) => (
+        <div class="rise">
+          <h2 class="ch-group__name">{group.category ?? 'Services'}</h2>
+          {group.items.map((service) => (
+            <div class="ch-item">
+              <p class="ch-item__name">{service.name}</p>
+              {service.shortDescription && <p class="ch-item__note">{service.shortDescription}</p>}
+            </div>
+          ))}
+        </div>
+      ))}
+      {groups.length === 0 && (
+        <p class="ch-prose">No services have been recorded in this concept yet.</p>
+      )}
+    </div>
+  </div>
+</section>

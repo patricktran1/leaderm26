@@ -1,0 +1,42 @@
+---
+import Plate from '../../Plate.astro';
+import { type Concept } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+---
+
+<section class="band">
+  <div class="wrap">
+    <div class="ch-sec">
+      <p class="ch-label rise">Physicians</p>
+      <div class="ch-sec__body">
+        <h1 class="ch-h2 rise">Who you see, and what they do.</h1>
+      </div>
+    </div>
+
+    <div class="ch-people" style="margin-top:clamp(2.5rem,6vw,4.5rem)">
+      {concept.physicians.map((person) => (
+        <article class="ch-person rise">
+          <Plate
+            slug={concept.slug}
+            src={person.image}
+            alt={person.image ? person.name : ''}
+            class="ch-person__plate"
+            label="Portrait"
+            sizes="(min-width: 52rem) 17rem, 100vw"
+          />
+          <div class="ch-person__body">
+            <h2 class="ch-person__name">{person.name}</h2>
+            {person.credentials && <p class="ch-person__cred">{person.credentials}</p>}
+            {person.specialty && <p class="ch-h3">{person.specialty}</p>}
+            {person.shortBio && <p class="ch-prose">{person.shortBio}</p>}
+          </div>
+        </article>
+      ))}
+      {concept.physicians.length === 0 && (
+        <p class="ch-prose">The practice's clinicians have not been recorded in this concept yet.</p>
+      )}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,43 @@
+---
+/**
+ * Every surface of every concept, from one route.
+ *
+ * A concept is four pages — home, physicians, services, visit — because that is
+ * the smallest information architecture that demonstrates an information
+ * architecture. It is deliberately not thirty thin treatment pages: those are a
+ * deliverable, not a concept, and generating them would be the exact SEO-filler
+ * habit the whole factory is arguing against.
+ */
+import DemoShell from '../../../demo/DemoShell.astro';
+import { concepts, SURFACES } from '../../../demo/registry';
+import { DIRECTION_UI } from '../../../demo/directions';
+import { shortName, placeName } from '../../../demo/schema';
+
+export function getStaticPaths() {
+  return concepts.flatMap((concept) =>
+    SURFACES.map((surface) => ({
+      params: { slug: concept.slug, surface: surface.path || undefined },
+      props: { concept, surface: surface.path, label: surface.label },
+    })),
+  );
+}
+
+// Props come from getStaticPaths above, so they are inferred rather than declared.
+const { concept, surface, label } = Astro.props;
+
+const ui = DIRECTION_UI[concept.direction];
+const Chrome = ui.Chrome;
+const Body = ui[(surface || 'home') as 'home' | 'physicians' | 'services' | 'contact'];
+
+const where = placeName(concept);
+const title = surface
+  ? `${label} — ${shortName(concept)}`
+  : [concept.practice.name, where].filter(Boolean).join(' · ');
+const description = concept.concept.thesis ?? concept.concept.positioning;
+---
+
+<DemoShell concept={concept} title={title} description={description}>
+  <Chrome concept={concept} surface={surface}>
+    <Body concept={concept} />
+  </Chrome>
+</DemoShell>

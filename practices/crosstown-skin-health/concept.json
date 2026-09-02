@@ -1,0 +1,211 @@
+{
+  "slug": "crosstown-skin-health",
+  "direction": "clinic",
+  "status": "synthetic",
+  "practice": {
+    "name": "Crosstown Skin Health",
+    "shortName": "Crosstown",
+    "city": "Columbus",
+    "state": "OH",
+    "phone": "(614) 555-0188",
+    "email": "hello@example.com",
+    "existingSite": "https://example.com/crosstown",
+    "instagram": "@crosstownskin"
+  },
+  "physicians": [
+    {
+      "name": "Dr. Priya Raghunathan",
+      "credentials": "MD, FAAD",
+      "specialty": "General and surgical dermatology",
+      "shortBio": "Sees adults and children at the Grandview office. Runs the practice's surgical afternoons."
+    },
+    {
+      "name": "Dr. Marcus Oyelaran",
+      "credentials": "MD",
+      "specialty": "Medical dermatology, complex disease",
+      "shortBio": "Manages the practice's biologic and phototherapy patients."
+    },
+    {
+      "name": "Hannah Brede",
+      "credentials": "PA-C",
+      "specialty": "General dermatology, acne",
+      "shortBio": "Most same-week acne and rash appointments are with Hannah."
+    },
+    {
+      "name": "Tomás Villareal",
+      "credentials": "NP",
+      "specialty": "General dermatology, skin checks",
+      "shortBio": "Runs the Tuesday and Thursday skin-check clinic at the east office."
+    }
+  ],
+  "services": [
+    {
+      "name": "Annual skin check",
+      "category": "Start here",
+      "shortDescription": "Thirty minutes, head to toe. Book this one if you are not sure what to book."
+    },
+    {
+      "name": "New or changing spot",
+      "category": "Start here",
+      "shortDescription": "Same-week appointments are held open for this."
+    },
+    {
+      "name": "Rash that will not settle",
+      "category": "Start here"
+    },
+    {
+      "name": "Acne",
+      "category": "Medical",
+      "shortDescription": "Topicals, antibiotics, hormonal treatment and isotretinoin."
+    },
+    {
+      "name": "Eczema",
+      "category": "Medical"
+    },
+    {
+      "name": "Psoriasis",
+      "category": "Medical",
+      "shortDescription": "Including biologics and in-office phototherapy."
+    },
+    {
+      "name": "Rosacea",
+      "category": "Medical"
+    },
+    {
+      "name": "Hidradenitis suppurativa",
+      "category": "Medical"
+    },
+    {
+      "name": "Hair loss",
+      "category": "Medical"
+    },
+    {
+      "name": "Nail disease",
+      "category": "Medical"
+    },
+    {
+      "name": "Skin cancer excision",
+      "category": "Procedures",
+      "shortDescription": "Performed in the office; pathology returns in about a week."
+    },
+    {
+      "name": "Biopsy",
+      "category": "Procedures"
+    },
+    {
+      "name": "Cryotherapy",
+      "category": "Procedures"
+    },
+    {
+      "name": "Cyst removal",
+      "category": "Procedures"
+    },
+    {
+      "name": "Patch testing",
+      "category": "Procedures",
+      "shortDescription": "For contact allergy; requires three visits in one week."
+    },
+    {
+      "name": "Phototherapy",
+      "category": "Procedures"
+    },
+    {
+      "name": "Paediatric dermatology",
+      "category": "Who we see"
+    },
+    {
+      "name": "Skin of colour",
+      "category": "Who we see"
+    },
+    {
+      "name": "Transplant and immunosuppressed patients",
+      "category": "Who we see"
+    }
+  ],
+  "brand": {
+    "tone": "Clear, quick, unfussy. Written for someone deciding at 9pm whether to call tomorrow.",
+    "photography": "Bright, plain, the actual rooms and the actual staff."
+  },
+  "proof": [
+    {
+      "claim": "The practice operates from two Columbus locations, Grandview and East.",
+      "source": "https://example.com/crosstown/locations",
+      "checked": "2026-09-02"
+    },
+    {
+      "claim": "Online scheduling is already live through the practice's patient portal.",
+      "source": "https://example.com/crosstown/appointments",
+      "checked": "2026-09-02"
+    }
+  ],
+  "contact": {
+    "address": "1440 Grandview Avenue, Columbus, OH 43212",
+    "phone": "(614) 555-0188",
+    "bookingUrl": "https://example.com/crosstown/appointments",
+    "hours": [
+      "Monday to Friday, 7:30–5:00",
+      "Saturday, 8:00–12:00 (Grandview only)",
+      "Closed Sunday"
+    ]
+  },
+  "concept": {
+    "thesis": "Most people should book the annual skin check.",
+    "positioning": "A four-clinician practice with real same-week capacity, and a website that hides it behind a menu. If you know what is wrong, this should take two taps; if you do not, the site should say what to book.",
+    "cta": "Book an appointment",
+    "ctaHref": "https://example.com/crosstown/appointments",
+    "knownProblems": [
+      "Scheduling already exists but is linked once, in the footer, as \"Patient Portal\".",
+      "Nineteen services are presented as one undifferentiated list, so a patient has to already know the name of their condition.",
+      "Four clinicians, and nothing on the site says who has the soonest opening or who sees children.",
+      "The Saturday morning clinic is not mentioned anywhere on the home page."
+    ],
+    "proposedImprovements": [
+      "A booking action that is present on every screen, including a fixed bar on a phone.",
+      "Services grouped as \"Start here\" first, so somebody who does not know what to ask for still lands correctly.",
+      "A filter over the service list, because nineteen items is past the point where scanning works.",
+      "Each clinician carries what they actually cover and which office they sit in."
+    ],
+    "outOfScope": [
+      "The booking button points at the practice's existing portal. Nothing here handles scheduling itself.",
+      "Wait times and openings are not shown; that needs a live feed from the practice management system.",
+      "No forms, and nothing that could receive health information."
+    ]
+  },
+  "findings": [
+    {
+      "kind": "fact",
+      "text": "The practice publishes two locations and a Saturday morning clinic at Grandview.",
+      "source": "https://example.com/crosstown/locations"
+    },
+    {
+      "kind": "fact",
+      "text": "A patient portal with online scheduling is already in use.",
+      "source": "https://example.com/crosstown/appointments"
+    },
+    {
+      "kind": "fact",
+      "text": "Four clinicians are listed: two physicians, one physician associate and one nurse practitioner.",
+      "source": "https://example.com/crosstown/team"
+    },
+    {
+      "kind": "observation",
+      "text": "The scheduling link is in the footer only, labelled \"Patient Portal\", and is easy to miss on a phone."
+    },
+    {
+      "kind": "observation",
+      "text": "The services page is a single alphabetical list of nineteen items with no grouping and no search."
+    },
+    {
+      "kind": "observation",
+      "text": "Nothing on the home page mentions Saturday hours."
+    },
+    {
+      "kind": "hypothesis",
+      "text": "Same-week capacity is the practice's strongest selling point and is currently invisible — needs confirming against their actual schedule before it goes in the hero."
+    },
+    {
+      "kind": "copy",
+      "text": "Proposed hero line: “Most people should book the annual skin check. If something has changed, we hold this week open.”"
+    }
+  ]
+}

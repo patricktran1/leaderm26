@@ -1,0 +1,238 @@
+---
+/**
+ * The handoff.
+ *
+ * Patrick meets someone, sends them the concept, and then has to be able to
+ * say what he did and why without narrating it down a phone. This page is that
+ * conversation, written down: what exists, what could be better, what the
+ * concept does about it, what he would build next, and — the part most
+ * redesign pitches leave out — what is deliberately only a drawing.
+ *
+ * Tone matters more than anything here. The physician on the other end paid
+ * for the site being critiqued, and often wrote the copy. Observations are
+ * about the experience, never about their judgement.
+ */
+import QRCode from 'qrcode';
+import DemoShell from '../../../demo/DemoShell.astro';
+import '../../../demo/pitch.css';
+import { concepts, SURFACES, surfaceHref } from '../../../demo/registry';
+import { DIRECTIONS_BY_ID } from '../../../demo/directions/meta';
+import { shortName, placeName, FINDING_LABEL, primaryAction } from '../../../demo/schema';
+
+export function getStaticPaths() {
+  return concepts.map((concept) => ({ params: { slug: concept.slug }, props: { concept } }));
+}
+
+const { concept } = Astro.props;
+const direction = DIRECTIONS_BY_ID[concept.direction];
+const where = placeName(concept);
+const action = primaryAction(concept);
+
+const conceptUrl = new URL(surfaceHref(concept.slug, ''), Astro.site ?? 'http://localhost:4321').toString();
+/**
+ * Generated here, at build time, from the URL itself. No image service, no
+ * shortener, nothing that would put a prospect's visit in somebody's log.
+ */
+const qr = await QRCode.toString(conceptUrl, {
+  type: 'svg',
+  errorCorrectionLevel: 'M',
+  margin: 0,
+  color: { dark: '#12161a', light: '#ffffff' },
+});
+
+const findings = concept.findings;
+const facts = findings.filter((f) => f.kind === 'fact');
+---
+
+<DemoShell
+  concept={concept}
+  title={`Concept notes — ${shortName(concept)}`}
+  chrome="factory"
+>
+  <header class="pt-head">
+    <div class="wrap pt-head__row">
+      <p class="pt-label">Concept notes · not part of the site</p>
+      <p class="pt-label">{direction.name} direction</p>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="wrap pt-open">
+      <h1 class="pt-h1">
+        A concept for {concept.practice.name}{where ? `, ${where}` : ''}
+      </h1>
+      <p class="pt-lede">
+        {concept.concept.positioning ??
+          'A redesign concept prepared from what the practice publishes about itself.'}
+      </p>
+      <div class="pt-open__acts">
+        <a class="pt-btn" href={surfaceHref(concept.slug, '')}>Open the concept</a>
+        {concept.practice.existingSite && (
+          <a
+            class="pt-btn pt-btn--ghost"
+            href={concept.practice.existingSite}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >The site today</a>
+        )}
+      </div>
+    </section>
+
+    <section class="wrap band" style="padding-block-start:0">
+      <div class="pt-story">
+        <article class="pt-step">
+          <p class="pt-label">What exists</p>
+          <div class="pt-step__body">
+            <h2 class="pt-h2">The public experience today</h2>
+            <p class="pt-prose">
+              Observations about the current site, not about the people who made it. Every
+              practice site is the product of a decision made under time pressure.
+            </p>
+            {concept.concept.knownProblems.length > 0 && (
+              <ul class="pt-list">
+                {concept.concept.knownProblems.map((line) => <li><span>{line}</span></li>)}
+              </ul>
+            )}
+          </div>
+        </article>
+
+        <article class="pt-step">
+          <p class="pt-label">Opportunity</p>
+          <div class="pt-step__body">
+            <h2 class="pt-h2">What could be clearer</h2>
+            {concept.concept.proposedImprovements.length > 0 ? (
+              <ul class="pt-list">
+                {concept.concept.proposedImprovements.map((line) => <li><span>{line}</span></li>)}
+              </ul>
+            ) : (
+              <p class="pt-prose">Not yet written up.</p>
+            )}
+          </div>
+        </article>
+
+        <article class="pt-step">
+          <p class="pt-label">Concept</p>
+          <div class="pt-step__body">
+            <h2 class="pt-h2">Why this direction</h2>
+            <p class="pt-prose">{direction.fits}</p>
+            <ul class="pt-list">
+              {direction.shape.map((line) => <li><span>{line}</span></li>)}
+            </ul>
+            <p class="pt-prose">
+              Four surfaces are built — {SURFACES.map((s) => s.label.toLowerCase()).join(', ')} —
+              which is enough to show how the information is organised without pretending the
+              whole engagement is finished.
+            </p>
+          </div>
+        </article>
+
+        <article class="pt-step">
+          <p class="pt-label">Next</p>
+          <div class="pt-step__body">
+            <h2 class="pt-h2">What I would build first</h2>
+            <p class="pt-prose">
+              The home page, properly, for a fixed fee — real photography, the practice's own
+              words, and the booking path wired to whatever system is already running. Everything
+              else follows from whether that page is better than what exists.
+            </p>
+          </div>
+        </article>
+
+        <article class="pt-step">
+          <p class="pt-label">Only a drawing</p>
+          <div class="pt-step__body">
+            <h2 class="pt-h2">What is deliberately conceptual</h2>
+            <ul class="pt-list">
+              <li><span>Every photograph is a placeholder plate. Nothing here is stock imagery of the practice or its patients.</span></li>
+              <li><span>The copy is proposed, not the practice's. It is a suggestion about tone, and it is theirs to reject.</span></li>
+              {concept.concept.outOfScope.map((line) => <li><span>{line}</span></li>)}
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap band" style="padding-block-start:0">
+      <p class="pt-label">Where this came from</p>
+      <h2 class="pt-h2" style="margin-top:0.5rem">
+        {facts.length} verified {facts.length === 1 ? 'fact' : 'facts'}, and everything else marked as what it is
+      </h2>
+      <p class="pt-prose" style="margin-top:0.5rem">
+        A concept about somebody's practice is only as good as its provenance. Nothing labelled
+        below as a hypothesis has been checked, and nothing labelled as proposed copy is theirs.
+      </p>
+
+      {findings.length > 0 ? (
+        <div class="pt-find" style="margin-top:clamp(1.25rem,3vw,1.75rem)">
+          {findings.map((f) => (
+            <div class="pt-finding">
+              <span class="pt-kind" data-kind={f.kind}>{FINDING_LABEL[f.kind]}</span>
+              <div>
+                <p class="pt-finding__text">{f.text}</p>
+                {f.source && (
+                  <p class="pt-finding__src">
+                    <a href={f.source} target="_blank" rel="noopener noreferrer nofollow">{f.source}</a>
+                  </p>
+                )}
+                {f.note && <p class="pt-finding__src">{f.note}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="pt-prose" style="margin-top:1rem">
+          No research has been recorded for this concept yet. It should not be sent.
+        </p>
+      )}
+
+      {concept.proof.length > 0 && (
+        <>
+          <p class="pt-label" style="margin-top:clamp(2rem,4vw,3rem)">Claims the concept makes</p>
+          <div class="pt-find" style="margin-top:0.75rem">
+            {concept.proof.map((p) => (
+              <div class="pt-finding">
+                <span class="pt-kind" data-kind="fact">Sourced</span>
+                <div>
+                  <p class="pt-finding__text">{p.claim}</p>
+                  <p class="pt-finding__src">
+                    <a href={p.source} target="_blank" rel="noopener noreferrer nofollow">{p.source}</a>
+                    {p.checked && <> · checked {p.checked}</>}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+
+    <section class="wrap band" style="padding-block-start:0">
+      <p class="pt-label">Send it</p>
+      <div class="pt-share" style="margin-top:clamp(1rem,2.5vw,1.5rem)">
+        <div class="pt-qr" set:html={qr} aria-hidden="true"></div>
+        <div style="display:grid;gap:0.75rem">
+          <p class="pt-prose">
+            Hold a phone up to this, or send the address. It is not indexed, there is no
+            tracker on it, and the code is drawn here at build time rather than fetched from
+            anybody.
+          </p>
+          <p class="pt-url">{conceptUrl}</p>
+          {action && (
+            <p class="pt-prose" style="font-size:0.875rem">
+              The concept's own action points at{' '}
+              <a href={action.href} style="color:var(--accent)">{action.href}</a> — the practice's
+              existing booking route, never a form this page invented.
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pt-foot">
+    <div class="wrap">
+      Prepared by Patrick Tran, MD, FAAD · patrick@trandermatology.com. This page is for the
+      conversation, not for the practice's website.
+    </div>
+  </footer>
+</DemoShell>

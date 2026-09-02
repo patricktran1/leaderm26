@@ -1,0 +1,155 @@
+/* ==========================================================================
+   Practice demo — mechanics.
+
+   Deliberately duplicated from src/styles/global.css rather than extracted
+   from it. The journal's stylesheet is production and its tokens carry a
+   specific editorial opinion — warm paper, one pine accent, a serif display
+   scale — which is exactly what a practice concept must not inherit if the
+   three directions are to look like three different studios made them.
+
+   So this file holds only what has no taste in it: the reset, the container,
+   the focus ring, the screen-reader utilities, the reveal, the print rules.
+   Every colour, typeface and measure arrives from a direction stylesheet.
+   When a primitive here and in global.css drift, that is fine — they are
+   answering to different designs. See docs/practice-demo-factory.md.
+   ========================================================================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--base, 1rem);
+  line-height: var(--leading, 1.6);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, p, figure, blockquote, ul, ol, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img, svg { display: block; max-width: 100%; }
+button, input, select { font: inherit; color: inherit; }
+a { color: inherit; }
+
+::selection { background: var(--accent); color: var(--paper); }
+
+/* ------------------------------------------------------------- container */
+.wrap {
+  width: 100%;
+  max-width: var(--measure-page, 78rem);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.band { padding-block: var(--band, clamp(3.5rem, 8vw, 8rem)); }
+
+/* ------------------------------------------------------------------ focus */
+:where(a, button, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus, var(--accent));
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* -------------------------------------------------------------- utilities */
+.vh {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.75rem 1.1rem;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip:focus { top: 1rem; }
+
+/* Every interactive target clears the 44px the hand needs. */
+.tap { display: inline-flex; align-items: center; min-height: 2.75rem; }
+
+/* --------------------------------------------------------------- entrance */
+.js .rise {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.8s var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)),
+              transform 0.8s var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1));
+  transition-delay: var(--rise-delay, 0ms);
+}
+.js .rise.is-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .rise { opacity: 1; transform: none; transition: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ----------------------------------------------------------------- plates */
+/* Where a photograph will go. Never a stock image, never a face nobody
+   consented to: a flat tone, a hairline and a label saying what is missing. */
+.plate {
+  position: relative;
+  overflow: hidden;
+  background: var(--plate-tone, var(--surface, #e8e6e1));
+  display: grid;
+  place-items: center;
+}
+.plate img { width: 100%; height: 100%; object-fit: cover; }
+/* On a chip of the direction's own paper, not straight on the plate: the tone
+   underneath varies from plate to plate and two of the three failed contrast
+   against a single fixed ink. */
+.plate__note {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 1.5rem);
+  padding: 0.3rem 0.55rem;
+  background: var(--paper);
+  font-family: var(--label-face, var(--body));
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+.plate__mark {
+  width: 34%;
+  max-width: 6rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--plate-ink, var(--muted));
+  opacity: 0.35;
+  border-radius: 50%;
+}
+
+/* ------------------------------------------------------------------ print */
+@media print {
+  .demo-flag, .skip, .dm-nav, .dm-actions { display: none !important; }
+  body { background: #fff; color: #000; }
+  .js .rise { opacity: 1 !important; transform: none !important; }
+  .band { padding-block: 1.25rem; break-inside: avoid-page; }
+}

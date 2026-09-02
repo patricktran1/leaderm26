@@ -1,0 +1,68 @@
+{
+  "slug": "verre-aesthetics",
+  "direction": "atelier",
+  "status": "synthetic",
+  "practice": {
+    "name": "Verre Aesthetic Dermatology",
+    "shortName": "Verre",
+    "city": "Scottsdale",
+    "state": "AZ",
+    "existingSite": "https://example.com/verre",
+    "instagram": "@verreskin"
+  },
+  "physicians": [
+    {
+      "name": "Dr. Camille Ardouin",
+      "credentials": "MD",
+      "specialty": "Cosmetic and laser dermatology",
+      "shortBio": "Sees a small list, one patient at a time, and does every injection herself."
+    }
+  ],
+  "services": [
+    { "name": "Consultation", "category": "Beginning", "shortDescription": "An hour, unhurried, with no obligation to book anything afterwards." },
+    { "name": "Neuromodulator", "category": "Injectable" },
+    { "name": "Filler", "category": "Injectable" },
+    { "name": "Biostimulatory injection", "category": "Injectable" },
+    { "name": "Resurfacing laser", "category": "Device" },
+    { "name": "Vascular laser", "category": "Device" },
+    { "name": "Microneedling with radiofrequency", "category": "Device" },
+    { "name": "Skin health programme", "category": "Ongoing", "shortDescription": "Prescription topicals reviewed every three months." }
+  ],
+  "brand": {
+    "tone": "Quiet, exact, physician-led. Nothing shouted, nothing promised.",
+    "photography": "Low light, close, texture over faces. Rooms and hands rather than portraits."
+  },
+  "proof": [],
+  "contact": {
+    "bookingUrl": "https://example.com/verre/enquire"
+  },
+  "concept": {
+    "thesis": "One physician, one room, one list.",
+    "positioning": "A single-physician cosmetic practice competing with medspas on their terms — price grids and menus — when its actual advantage is that a dermatologist does the work.",
+    "cta": "Enquire",
+    "knownProblems": [
+      "The home page opens with a price list, which is the one thing that puts this practice on the same footing as a medspa.",
+      "The physician appears once, in a paragraph, below eight treatment tiles.",
+      "Every photograph on the site is stock, and it shows.",
+      "There is no way to tell, from the site, that a dermatologist performs the treatments personally."
+    ],
+    "proposedImprovements": [
+      "Open with the physician, not the menu.",
+      "Treatments presented one at a time, at size, with real photography.",
+      "An enquiry that reads like the beginning of a conversation rather than a checkout.",
+      "Say plainly who holds the syringe."
+    ],
+    "outOfScope": [
+      "No before-and-after imagery, in this concept or any other; it is a regulatory and consent question, not a design one.",
+      "No pricing, until the practice decides what it wants published.",
+      "Photography is indicated, not supplied."
+    ]
+  },
+  "findings": [
+    { "kind": "fact", "text": "The practice lists one physician and eight treatments.", "source": "https://example.com/verre" },
+    { "kind": "observation", "text": "The home page's first screen is a three-column price grid." },
+    { "kind": "observation", "text": "The imagery is licensed stock; the same portrait appears on two unrelated practice sites." },
+    { "kind": "hypothesis", "text": "The single-physician model is the differentiator worth leading on — needs confirming that she does in fact perform every treatment before the concept says so." },
+    { "kind": "copy", "text": "Proposed hero line: “One physician. One room. Everything done by the person you booked.”" }
+  ]
+}

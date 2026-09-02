@@ -1,0 +1,122 @@
+/* ==========================================================================
+   The pitch surface.
+
+   Not a design direction — the factory's own chrome, deliberately plain, so
+   it never gets mistaken for part of the concept it is describing. Ink on
+   paper, one grotesque, no photography.
+   ========================================================================== */
+
+/* The factory's own chrome, scoped so it never leaks into a concept. */
+[data-chrome='factory'] {
+  --paper: #12161a;
+  --surface: #1a2026;
+  --surface-lift: #222a31;
+  --ink: #eef2f4;
+  --muted: #a7b2b9;      /* 8.0:1 on paper */
+  --faint: #8d989f;      /* 6.0:1 on paper */
+  --rule: #2a333a;
+  --rule-firm: #3d4952;
+  --accent: #86c7d6;
+  --focus: #86c7d6;
+
+  --body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, sans-serif;
+  --label-face: var(--body);
+  --base: 1rem;
+  --leading: 1.6;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --measure-page: 60rem;
+  --band: clamp(2.5rem, 6vw, 4.5rem);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --plate-ink: #8d989f;
+}
+
+.pt-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.pt-h1 { font-size: clamp(1.75rem, 4.4vw, 2.75rem); font-weight: 650; line-height: 1.08; letter-spacing: -0.028em; text-wrap: balance; }
+.pt-h2 { font-size: clamp(1.25rem, 2.4vw, 1.625rem); font-weight: 650; line-height: 1.15; letter-spacing: -0.022em; }
+.pt-lede { font-size: clamp(1.0625rem, 1.5vw, 1.25rem); line-height: 1.5; color: var(--muted); max-width: 40rem; text-wrap: pretty; }
+.pt-prose { color: var(--muted); max-width: 42rem; text-wrap: pretty; }
+
+.pt-head { border-bottom: 1px solid var(--rule); padding-block: clamp(1.5rem, 4vw, 2.5rem); }
+.pt-head__row { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: baseline; justify-content: space-between; }
+
+.pt-open { display: grid; gap: clamp(1rem, 2.5vw, 1.5rem); padding-block: clamp(2rem, 5vw, 3.5rem); }
+.pt-open__acts { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+.pt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 3rem;
+  padding-inline: 1.3rem;
+  background: var(--accent);
+  color: #0d1418;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.pt-btn--ghost { background: transparent; color: var(--ink); border-color: var(--rule-firm); }
+.pt-btn--ghost:hover { border-color: var(--accent); }
+
+/* ------------------------------------------------------------- the story */
+.pt-story { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); }
+.pt-step { border-top: 1px solid var(--rule); padding-top: clamp(1.1rem, 2.5vw, 1.6rem); display: grid; gap: 0.75rem; }
+@media (min-width: 50rem) {
+  .pt-step { grid-template-columns: 10rem minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); }
+}
+.pt-step__body { display: grid; gap: 0.6rem; }
+.pt-list { display: grid; gap: 0.55rem; }
+.pt-list li { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr); gap: 0.3rem; color: var(--muted); text-wrap: pretty; }
+.pt-list li::before { content: '—'; color: var(--faint); }
+
+/* --------------------------------------------------------- the provenance */
+/* Colour-coded by kind so nobody has to read carefully to tell a checked fact
+   from a guess. The label is spelled out; the colour is only a reinforcement. */
+.pt-find { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 2px; }
+.pt-finding { background: var(--paper); padding: 0.9rem 1rem; display: grid; gap: 0.35rem; }
+@media (min-width: 44rem) {
+  .pt-finding { grid-template-columns: 8rem minmax(0, 1fr); gap: 1.25rem; align-items: baseline; }
+}
+.pt-kind {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  justify-self: start;
+  padding: 0.2rem 0.45rem;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+}
+.pt-kind[data-kind='fact'] { color: #7fd0a8; }
+.pt-kind[data-kind='observation'] { color: #86c7d6; }
+.pt-kind[data-kind='hypothesis'] { color: #e2bd72; }
+.pt-kind[data-kind='copy'] { color: #c3a4dd; }
+.pt-finding__text { color: var(--ink); text-wrap: pretty; }
+.pt-finding__src { margin-top: 0.3rem; font-size: 0.8125rem; }
+.pt-finding__src a { color: var(--accent); }
+
+/* -------------------------------------------------------------- the share */
+.pt-share { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
+@media (min-width: 44rem) { .pt-share { grid-template-columns: auto minmax(0, 1fr); align-items: center; } }
+.pt-qr { background: #fff; padding: 0.75rem; border-radius: 2px; width: max-content; }
+.pt-qr svg { width: 10.5rem; height: 10.5rem; display: block; }
+.pt-url {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.7rem 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.pt-foot { border-top: 1px solid var(--rule); padding-block: clamp(1.5rem, 4vw, 2.5rem); color: var(--faint); font-size: 0.8125rem; }

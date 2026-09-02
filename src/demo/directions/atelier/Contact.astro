@@ -1,0 +1,46 @@
+---
+import Plate from '../../Plate.astro';
+import { type Concept, placeName, primaryAction, instagramUrl } from '../../schema';
+
+interface Props { concept: Concept }
+const { concept } = Astro.props;
+const where = placeName(concept);
+const action = primaryAction(concept);
+const phone = concept.contact.phone ?? concept.practice.phone;
+const instagram = instagramUrl(concept);
+---
+
+<section class="band">
+  <div class="wrap at-person">
+    <Plate
+      slug={concept.slug}
+      class="at-person__plate rise"
+      label="The doorway"
+      sizes="(min-width: 54rem) 40vw, 100vw"
+    />
+    <div class="at-person__body">
+      <p class="at-label rise">Visiting</p>
+      <h1 class="at-h2 rise" style="--rise-delay:60ms">
+        {concept.contact.address ?? where ?? 'By appointment'}
+      </h1>
+      <div class="at-prose rise" style="--rise-delay:100ms">
+        {phone && <p><a class="at-link" href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a></p>}
+        {concept.practice.email && (
+          <p><a class="at-link" href={`mailto:${concept.practice.email}`}>{concept.practice.email}</a></p>
+        )}
+        {instagram && (
+          <p><a class="at-link" href={instagram} target="_blank" rel="noopener noreferrer">
+            {concept.practice.instagram}
+          </a></p>
+        )}
+        {concept.contact.hours?.map((line) => <p>{line}</p>)}
+        {!phone && !concept.practice.email && !instagram && !concept.contact.hours && (
+          <p>Contact details to be confirmed with the practice.</p>
+        )}
+      </div>
+      {action && (
+        <p class="rise" style="--rise-delay:140ms"><a class="at-act" href={action.href}>{action.label}</a></p>
+      )}
+    </div>
+  </div>
+</section>
